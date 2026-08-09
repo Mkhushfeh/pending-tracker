@@ -838,7 +838,7 @@ function switchProject(id){
   const newPage = proj.pages.find(p=>p.id===proj.activePageId) || proj.pages[0];
   filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(['Identified','Pending / Stuck','In Progress']), party: new Set(getParties(newPage)) };
   trendSelected = new Set(proj.pages.map(p=>p.id));
-  saveData();
+  saveData(false);
   renderAll();
 }
 function openProjectNameModal(){
@@ -1035,9 +1035,10 @@ function ensureTaskIds(){
   }));
   if(changed) saveData();
 }
-async function saveData(){
+async function saveData(bumpModified){
+  if(bumpModified === undefined) bumpModified = true;
   const el = document.getElementById('saveStatus');
-  data.lastModified = Date.now();
+  if(bumpModified) data.lastModified = Date.now();
   if(typeof appStorage === 'undefined' || !appStorage || typeof appStorage.set !== 'function'){
     if(el){ el.textContent = '⚠ No live save here — use ⬇ Export before closing, ⬆ Import when you reopen'; el.style.color = 'var(--red)'; }
     showToast('This view has no storage API — see the note under the title');
@@ -1047,7 +1048,7 @@ async function saveData(){
   try{
     await appStorage.set(STORAGE_KEY, JSON.stringify(data), true);
     if(el){ el.textContent = 'Saved ✓ ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); el.style.color = 'var(--text-dim)'; }
-    if(driveConnected) drivePush();
+    if(driveConnected && bumpModified) drivePush();
   } catch(e){
     console.error('Storage error', e);
     const msg = (e && e.message) ? e.message : String(e);

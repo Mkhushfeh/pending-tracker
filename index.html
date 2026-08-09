@@ -7,6 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#14171d">
+<script>(function(){try{if(localStorage.getItem('theme')==='light'){document.documentElement.classList.add('light');}}catch(e){}})();</script>
 <title>Pending Tracker</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -22,6 +23,15 @@
     --font-ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
     --font-mono:"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
   }
+  html.light{
+    --bg:#f3f5f9; --panel:#ffffff; --panel-alt:#f6f8fb; --panel-raised:#eaeef4;
+    --border:#dbe1ea; --border-soft:#e6eaf1; --text:#1c2434; --text-muted:#525f76; --text-dim:#8492a8;
+    --accent:#2563eb; --accent-dim:rgba(37,99,235,.10);
+    --green:#16a34a; --amber:#b45309; --orange:#c2650b; --red:#dc2626; --gray:#64748b;
+    --toolbar:#ffffff;
+  }
+  html.light .kpi.k-aging .kpi-value{color:var(--orange);}
+  html.light .project-tab.active{color:#fff;}
   *{box-sizing:border-box;}
   html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ui);}
   html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
@@ -96,6 +106,31 @@
   /* Summary */
   .sum-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px;}
   .trend-controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:14px;padding:9px 11px;background:var(--panel);border:1px solid var(--border);border-radius:0;}
+
+  .cal-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .cal-title{font-size:15px;font-weight:600;color:var(--text);flex:1;text-align:center;}
+  .cal-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;font-size:11.5px;color:var(--text-muted);}
+  .cal-legend span{display:flex;align-items:center;gap:5px;}
+  .cal-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border:1px solid var(--border);}
+  .cal-dow{background:var(--panel-raised);color:var(--text-dim);font-size:10px;text-transform:uppercase;letter-spacing:.4px;padding:6px 8px;text-align:center;}
+  .cal-cell{background:var(--panel);min-height:88px;padding:5px 6px;display:flex;flex-direction:column;gap:3px;}
+  .cal-cell.other-month{background:var(--panel-alt);}
+  .cal-cell.today{box-shadow:inset 0 0 0 2px var(--accent);}
+  .cal-daynum{font-size:11px;color:var(--text-dim);margin-bottom:2px;}
+  .cal-cell.today .cal-daynum{color:var(--accent);font-weight:700;}
+  .cal-item{font-size:10.5px;padding:2px 5px;border-radius:0;color:#fff;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cal-item.st-identified{background:var(--gray);}
+  .cal-item.st-pending{background:var(--amber);color:#1a1400;}
+  .cal-item.st-progress{background:var(--accent);}
+  .cal-item.st-resolved{background:var(--green);color:#04220f;}
+  .cal-item.st-overdue{background:var(--red);}
+  .cal-more{font-size:10px;color:var(--text-dim);cursor:pointer;padding:1px 5px;}
+  @media(max-width:700px){
+    .cal-cell{min-height:64px;font-size:10px;}
+    .cal-dow{font-size:9px;padding:4px 2px;}
+    .cal-item{font-size:9.5px;}
+  }
   .trend-check{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);cursor:pointer;}
   .trend-check input{cursor:pointer;accent-color:var(--accent);}
   .trend-swatch{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0;}
@@ -274,6 +309,8 @@
     #btnViewSummary::before{content:'\25A4';}
     #btnViewTrend::before{content:'\1F4C8';}
     #btnViewWorking::before{content:'\2630';}
+    #btnViewCalendar::before{content:'\1F4C5';}
+    .view-toggle button{font-size:9.5px;}
 
     /* Floating action button to add a task */
     .mobile-fab{display:flex;}
@@ -301,6 +338,9 @@
     #activeBody td,#resolvedBody td{padding:0;border:none;}
     #activeBody td:nth-child(1),#activeBody td:nth-child(4),#activeBody td:nth-child(5){display:none;}
     #resolvedBody td:nth-child(1),#resolvedBody td:nth-child(4){display:none;}
+    .cal-grid{grid-template-columns:repeat(7,110px);overflow-x:auto;min-width:100%;}
+    .cal-header{padding:0 14px;}
+    .cal-legend{padding:0 14px;}
     #activeBody td.item-cell,#resolvedBody td.item-cell{font-size:15px;font-weight:600;color:var(--text);margin-bottom:5px;}
     #activeBody td:nth-child(3){font-size:12.5px;color:var(--text-dim);margin-bottom:8px;}
     #resolvedBody td:nth-child(3){font-size:12.5px;color:var(--text-dim);margin-bottom:5px;}
@@ -330,6 +370,8 @@
       <button class="btn" id="btnImport">⬆ Import from Excel</button>
       <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none">
       <button class="btn-ghost" id="btnManualSave" style="font-size:11px">💾 Save now</button>
+      <button class="btn-ghost" id="btnRefresh" style="font-size:11px" title="Reload latest version and re-sync">🔄 Refresh</button>
+      <button class="btn-ghost" id="btnThemeToggle" style="font-size:11px" title="Toggle light/dark theme">🌙 Dark</button>
       <button class="btn-ghost" id="btnDriveSync" style="font-size:11px">☁ Connect Drive</button>
       <button class="btn-ghost" id="btnResetOpen" style="color:var(--red);border-color:rgba(229,72,77,.4)">🗑 Delete Data</button>
     </div>
@@ -350,6 +392,7 @@
       <button id="btnViewSummary" class="active">Summary</button>
       <button id="btnViewTrend">Trend</button>
       <button id="btnViewWorking">Working Table</button>
+      <button id="btnViewCalendar">Calendar</button>
     </div>
     <button class="btn-ghost" id="btnWeeklySummary">📋 Weekly Summary</button>
   </div>
@@ -417,6 +460,23 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div id="calendarView" style="display:none">
+    <div class="cal-header">
+      <button class="btn-ghost" id="calPrev">‹</button>
+      <div class="cal-title" id="calTitle">—</div>
+      <button class="btn-ghost" id="calNext">›</button>
+      <button class="btn-ghost" id="calToday">Today</button>
+    </div>
+    <div class="cal-legend">
+      <span><i class="cal-dot" style="background:var(--gray)"></i>Identified</span>
+      <span><i class="cal-dot" style="background:var(--amber)"></i>Pending/Stuck</span>
+      <span><i class="cal-dot" style="background:var(--accent)"></i>In Progress</span>
+      <span><i class="cal-dot" style="background:var(--green)"></i>Resolved</span>
+      <span><i class="cal-dot" style="background:var(--red)"></i>Overdue</span>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
   </div>
 </div>
 
@@ -2043,16 +2103,69 @@ document.getElementById('auditHead').addEventListener('click', ()=>{
   document.getElementById('auditArrow').classList.toggle('open');
 });
 function showView(name){
-  const map = {summary:'summaryView', trend:'trendView', working:'workingView'};
-  const btns = {summary:'btnViewSummary', trend:'btnViewTrend', working:'btnViewWorking'};
+  const map = {summary:'summaryView', trend:'trendView', working:'workingView', calendar:'calendarView'};
+  const btns = {summary:'btnViewSummary', trend:'btnViewTrend', working:'btnViewWorking', calendar:'btnViewCalendar'};
   Object.keys(map).forEach(k=>{
     document.getElementById(map[k]).style.display = (k===name) ? 'block' : 'none';
     document.getElementById(btns[k]).classList.toggle('active', k===name);
   });
+  if(name==='calendar') renderCalendar();
 }
 document.getElementById('btnViewSummary').addEventListener('click', ()=>showView('summary'));
 document.getElementById('btnViewTrend').addEventListener('click', ()=>showView('trend'));
 document.getElementById('btnViewWorking').addEventListener('click', ()=>showView('working'));
+document.getElementById('btnViewCalendar').addEventListener('click', ()=>showView('calendar'));
+
+/* ---------- Calendar view ---------- */
+let calMonth = new Date(); calMonth.setDate(1);
+function calStatusClass(item){
+  if(item.status === 'Resolved') return 'st-resolved';
+  if(item.due && item.due < todayStr()) return 'st-overdue';
+  if(item.status === 'Pending / Stuck') return 'st-pending';
+  if(item.status === 'In Progress') return 'st-progress';
+  return 'st-identified';
+}
+function calAllTasks(){
+  const proj = activeProject();
+  const list = [];
+  proj.pages.forEach(p=> p.items.forEach(i=>{ if(i.due) list.push(i); }));
+  return list;
+}
+function renderCalendar(){
+  const year = calMonth.getFullYear(), month = calMonth.getMonth();
+  document.getElementById('calTitle').textContent = calMonth.toLocaleDateString(undefined,{month:'long', year:'numeric'});
+  const firstDow = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+  const tasks = calAllTasks();
+  const byDate = {};
+  tasks.forEach(i=>{ (byDate[i.due] = byDate[i.due] || []).push(i); });
+  const today = todayStr();
+  const dowNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html = dowNames.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  const totalCells = Math.ceil((firstDow + daysInMonth) / 7) * 7;
+  for(let cell=0; cell<totalCells; cell++){
+    const dayNum = cell - firstDow + 1;
+    let cellDate, otherMonth = false;
+    if(dayNum < 1){ cellDate = new Date(year, month-1, daysInPrevMonth + dayNum); otherMonth = true; }
+    else if(dayNum > daysInMonth){ cellDate = new Date(year, month+1, dayNum - daysInMonth); otherMonth = true; }
+    else { cellDate = new Date(year, month, dayNum); }
+    const dateStr = cellDate.toISOString().slice(0,10);
+    const isToday = dateStr === today;
+    const items = (byDate[dateStr] || []);
+    const shown = items.slice(0, 3);
+    const extra = items.length - shown.length;
+    html += `<div class="cal-cell ${otherMonth?'other-month':''} ${isToday?'today':''}">
+      <div class="cal-daynum">${cellDate.getDate()}</div>
+      ${shown.map(i=>`<div class="cal-item ${calStatusClass(i)}" onclick="openModal('${i.id}')" title="${escapeHtml(i.title)}">${escapeHtml(i.title)}</div>`).join('')}
+      ${extra>0?`<div class="cal-more" onclick="showView('working')">+${extra} more</div>`:''}
+    </div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+}
+document.getElementById('calPrev').addEventListener('click', ()=>{ calMonth.setMonth(calMonth.getMonth()-1); renderCalendar(); });
+document.getElementById('calNext').addEventListener('click', ()=>{ calMonth.setMonth(calMonth.getMonth()+1); renderCalendar(); });
+document.getElementById('calToday').addEventListener('click', ()=>{ calMonth = new Date(); calMonth.setDate(1); renderCalendar(); });
 document.getElementById('pageNameCancel').addEventListener('click', ()=>document.getElementById('pageNameOverlay').classList.remove('open'));
 document.getElementById('pageNameOk').addEventListener('click', createPage);
 document.getElementById('projectNameCancel').addEventListener('click', ()=>document.getElementById('projectNameOverlay').classList.remove('open'));
@@ -2326,6 +2439,26 @@ document.getElementById('btnManualSave').addEventListener('click', async ()=>{
 });
 document.getElementById('btnResetOpen').addEventListener('click', openResetModal);
 document.getElementById('btnDriveSync').addEventListener('click', driveConnectClick);
+document.getElementById('btnRefresh').addEventListener('click', async ()=>{
+  showToast('Refreshing…');
+  try{
+    const regs = await navigator.serviceWorker.getRegistrations();
+    for(const r of regs) await r.unregister();
+    const keys = await caches.keys();
+    for(const k of keys) await caches.delete(k);
+  }catch(e){ /* ignore */ }
+  location.reload();
+});
+function applyTheme(light){
+  document.documentElement.classList.toggle('light', light);
+  const btn = document.getElementById('btnThemeToggle');
+  if(btn) btn.textContent = light ? '☀ Light' : '🌙 Dark';
+  try{ localStorage.setItem('theme', light ? 'light' : 'dark'); }catch(e){}
+}
+document.getElementById('btnThemeToggle').addEventListener('click', ()=>{
+  applyTheme(!document.documentElement.classList.contains('light'));
+});
+applyTheme(document.documentElement.classList.contains('light'));
 document.getElementById('btnResetCancel').addEventListener('click', ()=>document.getElementById('resetDataOverlay').classList.remove('open'));
 document.getElementById('btnResetConfirm').addEventListener('click', confirmResetData);
 document.getElementById('resetDataOverlay').addEventListener('click', (e)=>{ if(e.target.id==='resetDataOverlay') e.currentTarget.classList.remove('open'); });

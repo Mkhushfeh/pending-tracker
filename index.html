@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#14171d">
-<script>(function(){try{if(localStorage.getItem('theme')==='light'){document.documentElement.classList.add('light');}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='medium'){document.documentElement.classList.add(t);}}catch(e){}})();</script>
 <title>Pending Tracker</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -29,6 +29,13 @@
     --accent:#2563eb; --accent-dim:rgba(37,99,235,.10);
     --green:#16a34a; --amber:#b45309; --orange:#c2650b; --red:#dc2626; --gray:#64748b;
     --toolbar:#ffffff;
+  }
+  html.medium{
+    --bg:#6b7484; --panel:#7a8494; --panel-alt:#727c8c; --panel-raised:#868fa0;
+    --border:#57606f; --border-soft:#606a78; --text:#f7f9fb; --text-muted:#e3e7ec; --text-dim:#c7ced7;
+    --accent:#60a5fa; --accent-dim:rgba(96,165,250,.22);
+    --green:#4ade80; --amber:#fbbf24; --orange:#fb923c; --red:#f87171; --gray:#aab4c2;
+    --toolbar:#5c6675;
   }
   html.light .kpi.k-aging .kpi-value{color:var(--orange);}
   html.light .project-tab.active{color:#fff;}
@@ -2449,16 +2456,23 @@ document.getElementById('btnRefresh').addEventListener('click', async ()=>{
   }catch(e){ /* ignore */ }
   location.reload();
 });
-function applyTheme(light){
-  document.documentElement.classList.toggle('light', light);
+function applyTheme(mode){
+  document.documentElement.classList.remove('light','medium');
+  if(mode==='light') document.documentElement.classList.add('light');
+  if(mode==='medium') document.documentElement.classList.add('medium');
   const btn = document.getElementById('btnThemeToggle');
-  if(btn) btn.textContent = light ? '☀ Light' : '🌙 Dark';
-  try{ localStorage.setItem('theme', light ? 'light' : 'dark'); }catch(e){}
+  const labels = {dark:'🌙 Dark', medium:'◐ Medium', light:'☀ Light'};
+  if(btn) btn.textContent = labels[mode];
+  try{ localStorage.setItem('theme', mode); }catch(e){}
 }
 document.getElementById('btnThemeToggle').addEventListener('click', ()=>{
-  applyTheme(!document.documentElement.classList.contains('light'));
+  const current = document.documentElement.classList.contains('light') ? 'light'
+    : document.documentElement.classList.contains('medium') ? 'medium' : 'dark';
+  const next = { dark:'medium', medium:'light', light:'dark' }[current];
+  applyTheme(next);
 });
-applyTheme(document.documentElement.classList.contains('light'));
+applyTheme(document.documentElement.classList.contains('light') ? 'light'
+  : document.documentElement.classList.contains('medium') ? 'medium' : 'dark');
 document.getElementById('btnResetCancel').addEventListener('click', ()=>document.getElementById('resetDataOverlay').classList.remove('open'));
 document.getElementById('btnResetConfirm').addEventListener('click', confirmResetData);
 document.getElementById('resetDataOverlay').addEventListener('click', (e)=>{ if(e.target.id==='resetDataOverlay') e.currentTarget.classList.remove('open'); });

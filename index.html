@@ -245,6 +245,7 @@
     .field input,.field select,.field textarea{padding:11px 12px;font-size:16px;}
   }
 </style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <div class="app">
@@ -253,6 +254,7 @@
       <h1 id="appTitle" onclick="editTitle()" title="Click to rename">Pending Tracker</h1>
       <div class="sub" id="subLine">Loading…</div>
       <div id="saveStatus" style="font-size:10.5px;color:var(--text-dim);margin-top:2px;"></div>
+      <div id="driveStatus" style="font-size:10.5px;color:var(--text-dim);margin-top:2px;"></div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <div style="position:relative">
@@ -265,6 +267,7 @@
       <button class="btn-ghost" id="btnManualSave" style="font-size:11px">💾 Save now</button>
       <button class="btn-ghost" id="btnReloadData" style="font-size:11px">🔄 Reload</button>
       <button class="btn-ghost" id="btnTestStorage" style="color:#f0a83a;border-color:rgba(240,168,58,.4);font-size:11px">🔬 Test Storage</button>
+      <button class="btn-ghost" id="btnConnectDrive" style="color:#5aa8ff;border-color:rgba(90,168,255,.4)">🔗 Connect Google Drive</button>
       <button class="btn-ghost" id="btnResetOpen" style="color:var(--red);border-color:rgba(229,72,77,.4)">🗑 Delete Data</button>
     </div>
   </div>
@@ -751,7 +754,120 @@ async function saveData(){
     if(el){ el.textContent = '⚠ Save failed: ' + msg.slice(0,70) + ' (private browsing mode blocks storage)'; el.style.color = 'var(--red)'; }
     showToast('Save failed — ' + msg.slice(0,90));
   }
+  driveSaveData(); // best-effort background sync, doesn't block or fail the local save above
 }
+
+/* ---------- Google Drive sync (optional, cross-device) ---------- */
+// To activate: create an OAuth 2.0 Client ID (Web application) at
+// https://console.cloud.google.com/apis/credentials, add your GitHub Pages
+// URL under "Authorized JavaScript origins", enable the Drive API for that
+// project, then paste the Client ID below.
+const GOOGLE_CLIENT_ID = 'PASTE_YOUR_CLIENT_ID_HERE.apps.googleusercontent.com';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const DRIVE_FILENAME = 'pending-tracker-data.json';
+let driveAccessToken = null;
+let driveFileId = null;
+let driveTokenClient = null;
+
+function updateDriveStatus(msg, isErr){
+  const el = document.getElementById('driveStatus');
+  if(el){ el.textContent = msg; el.style.color = isErr ? 'var(--red)' : 'var(--text-dim)'; }
+}
+function initGoogleAuth(){
+  if(typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) return;
+  if(GOOGLE_CLIENT_ID.includes('PASTE_YOUR')) return;
+  driveTokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: DRIVE_SCOPE,
+    callback: async (resp)=>{
+      if(resp.error){ updateDriveStatus('⚠ Google sign-in failed: '+resp.error, true); return; }
+      driveAccessToken = resp.access_token;
+      updateDriveStatus('Connected — checking Drive…');
+      await driveInitialSync();
+    }
+  });
+}
+function connectDrive(){
+  if(GOOGLE_CLIENT_ID.includes('PASTE_YOUR')){
+    showToast('Google Drive is not set up yet — see README.md for the one-time setup steps');
+    return;
+  }
+  if(!driveTokenClient){ showToast('Google sign-in still loading — try again in a moment'); return; }
+  driveTokenClient.requestAccessToken();
+}
+async function driveFindFile(){
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=name%3D%27${encodeURIComponent(DRIVE_FILENAME)}%27+and+trashed%3Dfalse&spaces=drive&fields=files(id,name,modifiedTime)`, {
+    headers: { Authorization: `Bearer ${driveAccessToken}` }
+  });
+  const json = await res.json();
+  return (json.files && json.files.length) ? json.files[0] : null;
+}
+async function driveLoadFileContent(fileId){
+  const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+    headers: { Authorization: `Bearer ${driveAccessToken}` }
+  });
+  return await res.text();
+}
+async function driveCreateFile(){
+  const metadata = { name: DRIVE_FILENAME, mimeType: 'application/json' };
+  const boundary = 'ptboundary' + Date.now();
+  const body =
+    `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(metadata)}\r\n`+
+    `--${boundary}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(data)}\r\n`+
+    `--${boundary}--`;
+  const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${driveAccessToken}`, 'Content-Type': `multipart/related; boundary=${boundary}` },
+    body
+  });
+  const json = await res.json();
+  driveFileId = json.id;
+}
+async function driveInitialSync(){
+  try{
+    const file = await driveFindFile();
+    if(file){
+      driveFileId = file.id;
+      const content = await driveLoadFileContent(file.id);
+      const driveData = JSON.parse(content);
+      const driveModified = new Date(file.modifiedTime).toLocaleString();
+      const loadFromDrive = confirm(`Found existing data on Google Drive (last saved ${driveModified}).\n\nOK = load that data (replaces what's showing now)\nCancel = keep what's showing now and push it to Drive instead`);
+      if(loadFromDrive){
+        data = driveData;
+        ensureTaskIds();
+        await storage.set(STORAGE_KEY, JSON.stringify(data));
+        renderAll();
+        updateDriveStatus('✓ Loaded from Drive');
+      } else {
+        await driveSaveData();
+        updateDriveStatus('✓ Connected — this device\'s data pushed to Drive');
+      }
+    } else {
+      await driveCreateFile();
+      updateDriveStatus('✓ Connected — created new file on Drive');
+    }
+  }catch(e){
+    console.error(e);
+    updateDriveStatus('⚠ Drive sync error: '+(e.message||e), true);
+  }
+}
+async function driveSaveData(){
+  if(!driveAccessToken) return;
+  try{
+    if(!driveFileId){ await driveCreateFile(); return; }
+    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${driveAccessToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    updateDriveStatus('Synced to Drive ✓ '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
+  }catch(e){
+    console.error(e);
+    updateDriveStatus('⚠ Drive sync failed', true);
+  }
+}
+document.getElementById('btnConnectDrive').addEventListener('click', connectDrive);
+
 function showToast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -2140,6 +2256,16 @@ document.getElementById('resetDataOverlay').addEventListener('click', (e)=>{ if(
   await loadData();
   filterState.party = new Set(getParties(activePage()));
   renderAll();
+  let tries = 0;
+  const waitForGoogle = setInterval(()=>{
+    tries++;
+    if(typeof google !== 'undefined' && google.accounts && google.accounts.oauth2){
+      clearInterval(waitForGoogle);
+      initGoogleAuth();
+    } else if(tries > 20){
+      clearInterval(waitForGoogle); // gave up after ~6s, Connect button will just show the "not ready" toast
+    }
+  }, 300);
 })();
 </script>
 </body>

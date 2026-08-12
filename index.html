@@ -149,8 +149,23 @@
   .cal-more{font-size:10px;color:var(--accent);cursor:pointer;}
   .cal-unscheduled{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;}
   .cal-unscheduled-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:30px;}
+
+  /* Sticky notes */
+  .sticky-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;}
+  .sticky-note{border-radius:6px;padding:14px 14px 10px;min-height:110px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 5px 14px rgba(0,0,0,.28);cursor:pointer;position:relative;transform:rotate(var(--rot,0deg));transition:transform .12s;}
+  .sticky-note:hover{transform:rotate(0deg) scale(1.03);}
+  .sticky-note.done{opacity:.5;}
+  .sticky-note.done .sticky-note-text{text-decoration:line-through;}
+  .sticky-note-text{font-size:13.5px;color:#26241c;line-height:1.4;word-break:break-word;font-family:var(--font-ui);}
+  .sticky-note-del{position:absolute;top:6px;right:9px;font-size:13px;color:rgba(0,0,0,.35);cursor:pointer;line-height:1;}
+  .sticky-note-del:hover{color:rgba(0,0,0,.7);}
+  .sticky-note-date{font-size:9.5px;color:rgba(0,0,0,.4);margin-top:10px;}
   .gantt-row{display:flex;align-items:center;gap:12px;cursor:pointer;}
   .gantt-row-label{width:220px;min-width:220px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  #primaveraTable{--prim-font-size:13px;}
+  #primaveraTable .gantt-row-label{font-size:var(--prim-font-size);white-space:normal;width:260px;min-width:260px;}
+  #primaveraTable .gantt-row-label small{font-size:calc(var(--prim-font-size) - 2.5px);}
+  #primaveraTable .gantt-row-plan{font-size:calc(var(--prim-font-size) - 1px);}
   .gantt-row-label small{display:block;color:var(--text-dim);font-size:10px;}
   .gantt-row-plan{width:150px;min-width:150px;text-align:right;font-size:11px;flex-shrink:0;}
   .gantt-row-plan .due-sub{color:var(--text-dim);font-size:9.5px;margin-top:2px;}
@@ -263,7 +278,7 @@
         <input type="text" id="globalSearch" placeholder="Search all pages…" style="background:var(--panel-alt);border:1px solid var(--border);color:var(--text);border-radius:5px;padding:6px 9px;font-size:12.5px;min-width:190px;font-family:inherit;">
         <div id="globalSearchResults" class="filter-dropdown" style="min-width:280px;right:0;left:auto;max-height:320px;overflow-y:auto;"></div>
       </div>
-      <button class="btn" id="btnExport">⬇ Export</button>
+      <button class="btn-ghost" id="btnExport">⬇ Export</button>
       <button class="btn-ghost" id="btnImport">⬆ Import</button>
       <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none">
       <button class="btn-ghost" id="btnTheme">🌙 Dark</button>
@@ -288,11 +303,6 @@
     </div>
   </div>
 
-  <div style="background:var(--accent-dim);border:1px solid rgba(74,158,255,.3);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text-muted);line-height:1.5;">
-    💡 <strong style="color:var(--text)">Auto-saves to this browser</strong> as you work — no button needed for normal use.
-    This save is local to this specific browser/device though, so to move your data to your phone or another computer: click <strong style="color:var(--accent)">⬇ Export</strong> there, then <strong style="color:var(--accent)">⬆ Import</strong> on the other device.
-  </div>
-
   <div class="page-tabs" id="pageTabs"></div>
 
   <div class="kpi-strip">
@@ -308,6 +318,7 @@
       <button id="btnViewTrend">Trend</button>
       <button id="btnViewCalendar">Calendar</button>
       <button id="btnViewPrimavera">Primavera View</button>
+      <button id="btnViewSticky">📌 Sticky Notes</button>
       <button id="btnViewWorking">Working Table</button>
     </div>
     <button class="btn-ghost" id="btnWeeklySummary">📋 Weekly Summary</button>
@@ -352,23 +363,27 @@
         <option value="group">Task group</option>
         <option value="none">None — flat list</option>
       </select>
+      <span style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-left:8px">Text size</span>
+      <select id="primaveraFontSelect">
+        <option value="13">Normal</option>
+        <option value="15">Large</option>
+        <option value="17">Extra large</option>
+      </select>
       <div class="spacer"></div>
-    </div>
-    <div class="sum-card wide" style="margin-bottom:14px">
-      <div class="sum-card-title">Finish histogram — when tasks are due or were completed, weekly</div>
-      <div class="bar-legend" style="margin-bottom:10px">
-        <span><span class="dot" style="background:var(--gray);margin-right:5px"></span>On track (open)</span>
-        <span><span class="dot" style="background:var(--red);margin-right:5px"></span>Delayed (open)</span>
-        <span><span class="dot" style="background:var(--green);margin-right:5px"></span>Completed on time</span>
-        <span><span class="dot" style="background:var(--orange);margin-right:5px"></span>Completed late</span>
-      </div>
-      <div id="primaveraHistogram" style="overflow-x:auto"></div>
     </div>
     <div class="sum-card wide">
       <div class="sum-card-title">All tasks — Primavera view</div>
       <div id="primaveraGanttAxis"></div>
       <div id="primaveraTable"></div>
     </div>
+  </div>
+
+  <div id="stickyView" style="display:none">
+    <div class="toolbar" style="margin-bottom:14px">
+      <input type="text" id="stickyInput" placeholder="Quick note or small task for today…" style="flex:1">
+      <button class="btn-ghost" id="btnAddSticky">+ Add note</button>
+    </div>
+    <div class="sticky-grid" id="stickyGrid"></div>
   </div>
 
   <div id="workingView" style="display:none">
@@ -872,6 +887,7 @@ async function loadData(){
 }
 function ensureTaskIds(){
   if(!data.nextTaskNumber) data.nextTaskNumber = 1;
+  if(!data.stickyNotes) data.stickyNotes = [];
   let changed = false;
   data.pages.forEach(p=>p.items.forEach(i=>{
     if(!i.taskId){ i.taskId = 'T-' + String(data.nextTaskNumber).padStart(3,'0'); data.nextTaskNumber++; changed = true; }
@@ -1451,7 +1467,7 @@ function svgAgingBars(buckets){
 }
 function renderGanttAxis(scaleMin, scaleSpan){
   const pct = d => (d/scaleSpan)*100;
-  const interval = scaleSpan > 60 ? 14 : scaleSpan > 30 ? 7 : 3;
+  const interval = scaleSpan > 180 ? 14 : scaleSpan > 21 ? 7 : 3;
   let grid = '';
   for(let d=0; d<=scaleSpan; d+=interval){
     grid += `<div class="axis-grid" style="left:${pct(d)}%"><span>${fmtDate(addDays(scaleMin, d))}</span></div>`;
@@ -1862,6 +1878,46 @@ document.getElementById('calToday').addEventListener('click', ()=>{ calendarDate
 /* ---------- Primavera view (cross-page) ---------- */
 let primaveraSelectedPages = null;
 let primaveraGroupBy = 'page';
+/* ---------- sticky notes ---------- */
+const STICKY_COLORS = ['#fff59d','#ffccbc','#c8e6c9','#bbdefb','#e1bee7','#ffe0b2','#f8bbd0'];
+function renderStickyNotes(){
+  if(!data.stickyNotes) data.stickyNotes = [];
+  const grid = document.getElementById('stickyGrid');
+  if(data.stickyNotes.length===0){
+    grid.innerHTML = `<div style="color:var(--text-dim);grid-column:1/-1;text-align:center;padding:34px 10px">No notes yet — add a quick one above for today's small tasks.</div>`;
+    return;
+  }
+  grid.innerHTML = data.stickyNotes.slice().reverse().map(n=>`
+    <div class="sticky-note ${n.done?'done':''}" style="background:${n.color};--rot:${n.rot}deg" onclick="toggleSticky('${n.id}')">
+      <span class="sticky-note-del" onclick="event.stopPropagation();deleteSticky('${n.id}')" title="Delete">✕</span>
+      <div class="sticky-note-text">${escapeHtml(n.text)}</div>
+      <div class="sticky-note-date">${fmtDate(n.createdAt)}${n.done?' · done':''}</div>
+    </div>`).join('');
+}
+async function addSticky(){
+  const input = document.getElementById('stickyInput');
+  const text = input.value.trim();
+  if(!text) return;
+  if(!data.stickyNotes) data.stickyNotes = [];
+  const color = STICKY_COLORS[Math.floor(Math.random()*STICKY_COLORS.length)];
+  const rot = Math.round(Math.random()*6-3);
+  data.stickyNotes.push({id: uid(), text, color, rot, done:false, createdAt: todayStr()});
+  input.value = '';
+  await saveData();
+  renderStickyNotes();
+}
+async function toggleSticky(id){
+  const n = (data.stickyNotes||[]).find(x=>x.id===id);
+  if(n){ n.done = !n.done; await saveData(); renderStickyNotes(); }
+}
+async function deleteSticky(id){
+  data.stickyNotes = (data.stickyNotes||[]).filter(x=>x.id!==id);
+  await saveData();
+  renderStickyNotes();
+}
+document.getElementById('btnAddSticky').addEventListener('click', addSticky);
+document.getElementById('stickyInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') addSticky(); });
+
 function renderPrimaveraControls(){
   if(!primaveraSelectedPages) primaveraSelectedPages = new Set(data.pages.map(p=>p.id));
   document.getElementById('primaveraControls').innerHTML =
@@ -1962,12 +2018,16 @@ function svgFinishHistogram(items){
 }
 function renderPrimaveraView(){
   renderPrimaveraControls();
-  document.getElementById('primaveraHistogram').innerHTML = themeChartSvg(svgFinishHistogram(getPrimaveraItems()));
   renderPrimaveraTable();
 }
 document.getElementById('primaveraGroupSelect').addEventListener('change', (e)=>{
   primaveraGroupBy = e.target.value;
   renderPrimaveraTable();
+});
+document.getElementById('primaveraFontSelect').addEventListener('change', (e)=>{
+  const px = e.target.value;
+  document.getElementById('primaveraTable').style.setProperty('--prim-font-size', px+'px');
+  localStorage.setItem('pending-tracker-primavera-fontsize', px);
 });
 
 function renderTitle(){
@@ -2027,6 +2087,7 @@ function renderAll(){
   renderTrendChart();
   renderCalendar();
   renderPrimaveraView();
+  renderStickyNotes();
   refreshFilterUI();
   renderActiveTable();
   renderResolvedTable();
@@ -2178,8 +2239,8 @@ document.getElementById('auditHead').addEventListener('click', ()=>{
   document.getElementById('auditArrow').classList.toggle('open');
 });
 function showView(name){
-  const map = {summary:'summaryView', trend:'trendView', calendar:'calendarView', primavera:'primaveraView', working:'workingView'};
-  const btns = {summary:'btnViewSummary', trend:'btnViewTrend', calendar:'btnViewCalendar', primavera:'btnViewPrimavera', working:'btnViewWorking'};
+  const map = {summary:'summaryView', trend:'trendView', calendar:'calendarView', primavera:'primaveraView', sticky:'stickyView', working:'workingView'};
+  const btns = {summary:'btnViewSummary', trend:'btnViewTrend', calendar:'btnViewCalendar', primavera:'btnViewPrimavera', sticky:'btnViewSticky', working:'btnViewWorking'};
   Object.keys(map).forEach(k=>{
     document.getElementById(map[k]).style.display = (k===name) ? 'block' : 'none';
     document.getElementById(btns[k]).classList.toggle('active', k===name);
@@ -2189,6 +2250,7 @@ document.getElementById('btnViewSummary').addEventListener('click', ()=>showView
 document.getElementById('btnViewTrend').addEventListener('click', ()=>showView('trend'));
 document.getElementById('btnViewCalendar').addEventListener('click', ()=>showView('calendar'));
 document.getElementById('btnViewPrimavera').addEventListener('click', ()=>showView('primavera'));
+document.getElementById('btnViewSticky').addEventListener('click', ()=>showView('sticky'));
 document.getElementById('btnViewWorking').addEventListener('click', ()=>showView('working'));
 document.getElementById('pageNameCancel').addEventListener('click', ()=>document.getElementById('pageNameOverlay').classList.remove('open'));
 document.getElementById('pageNameOk').addEventListener('click', createPage);
@@ -2515,6 +2577,9 @@ document.getElementById('resetDataOverlay').addEventListener('click', (e)=>{ if(
 
 (async function init(){
   document.getElementById('brightnessSlider').value = brightnessOffset;
+  const savedFontSize = localStorage.getItem('pending-tracker-primavera-fontsize') || '13';
+  document.getElementById('primaveraFontSelect').value = savedFontSize;
+  document.getElementById('primaveraTable').style.setProperty('--prim-font-size', savedFontSize+'px');
   applyTheme(currentTheme, false);
   await loadData();
   filterState.party = new Set(getParties(activePage()));

@@ -60,16 +60,22 @@ pull in what the first device already saved.
 **Note:** the Drive connection doesn't persist across closing the browser (you'll need to click
 Connect again each session) — this keeps the setup simple and avoids storing long-lived tokens.
 
+## Sticky Notes
+
+A new tab for quick daily tasks and short-term to-dos that don't need the full task form —
+just type and hit **+ Add note**. Click a note to mark it done (fades + strikes through), the ✕
+in the corner deletes it. Colors and slight tilt are random per note, like real sticky notes.
+
 ## Primavera View
 
-A new tab between Calendar and Working Table — shows every task across whichever pages you
-select, laid out like a classic Primavera/MS Project Gantt: dense rows with Start date, Finish
-date, and duration spelled out, a timeline bar per task, and a **finish histogram** on top
-showing, week by week, how many tasks are on track, delayed, completed on time, or completed
-late — the same categories as Delivery Health, just plotted over time.
+A tab between Calendar and Working Table — shows every task across whichever pages you select,
+laid out like a classic Primavera/MS Project Gantt: dense rows with Start date, Finish date, and
+duration spelled out, plus a timeline bar per task.
 
-Use the **Include** checkboxes to pick which pages feed the view, and **Group by** to switch
-between grouping by page, by your custom task groups, or a flat list sorted by start date.
+Use **Include** to pick which pages feed the view, **Group by** to switch between page / task
+group / flat list, and **Text size** to bump up the row text if it's too small to read at a
+glance. The date ruler along the top now marks every week (not every two), so you can pinpoint
+exactly when something in between finishes.
 
 ## Mobile / iPhone
 

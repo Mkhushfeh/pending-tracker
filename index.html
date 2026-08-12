@@ -266,9 +266,14 @@
       <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none">
       <button class="btn-ghost" id="btnManualSave" style="font-size:11px">💾 Save now</button>
       <button class="btn-ghost" id="btnReloadData" style="font-size:11px">🔄 Reload</button>
-      <button class="btn-ghost" id="btnTestStorage" style="color:#f0a83a;border-color:rgba(240,168,58,.4);font-size:11px">🔬 Test Storage</button>
+      <button class="btn-ghost" id="btnTestStorage" style="color:var(--amber);border-color:rgba(240,168,58,.4);font-size:11px">🔬 Test Storage</button>
       <button class="btn-ghost" id="btnTheme">🌙 Dark</button>
-      <button class="btn-ghost" id="btnConnectDrive" style="color:#5aa8ff;border-color:rgba(90,168,255,.4)">🔗 Connect Google Drive</button>
+      <div style="display:flex;align-items:center;gap:6px;background:var(--panel-alt);border:1px solid var(--border);border-radius:6px;padding:4px 10px;">
+        <span style="font-size:10px;color:var(--text-dim)">☾</span>
+        <input type="range" id="brightnessSlider" min="-25" max="25" step="1" value="0" style="width:90px;accent-color:var(--accent);cursor:pointer">
+        <span style="font-size:10px;color:var(--text-dim)">☀</span>
+      </div>
+      <button class="btn-ghost" id="btnConnectDrive" style="color:var(--accent);border-color:rgba(90,168,255,.4)">🔗 Connect Google Drive</button>
       <button class="btn-ghost" id="btnResetOpen" style="color:var(--red);border-color:rgba(229,72,77,.4)">🗑 Delete Data</button>
     </div>
   </div>
@@ -577,40 +582,80 @@ const storage = {
 };
 /* ---------- theme system (Dark: Cool Blue / Light: Cool Light Gray) ---------- */
 const THEMES = {
-  dark:  { bg:'#1b1f28', panel:'#242a35', panelAlt:'#2a3140', panelRaised:'#323a4a', border:'#3c4456', borderSoft:'#343c4c', text:'#e9ecf1', textMuted:'#98a0b3', textDim:'#6b7385', accent:'#5aa8ff', accentDim:'rgba(90,168,255,.16)' },
-  light: { bg:'#f4f6f9', panel:'#eaedf2', panelAlt:'#e0e4ec', panelRaised:'#d3d9e3', border:'#c3cad6', borderSoft:'#d7dce5', text:'#1c222c', textMuted:'#4c5568', textDim:'#7a8394', accent:'#3a7bd5', accentDim:'rgba(58,123,213,.12)' }
+  dark:  { bg:'#1b1f28', panel:'#242a35', panelAlt:'#2a3140', panelRaised:'#323a4a', border:'#3c4456', borderSoft:'#343c4c', text:'#e9ecf1', textMuted:'#98a0b3', textDim:'#6b7385', accent:'#5aa8ff', accentDim:'rgba(90,168,255,.16)', green:'#3ecf93', amber:'#f2ae45', orange:'#ec8140', red:'#ec5b60', gray:'#767f92' },
+  light: { bg:'#f4f6f9', panel:'#eaedf2', panelAlt:'#e0e4ec', panelRaised:'#d3d9e3', border:'#c3cad6', borderSoft:'#d7dce5', text:'#1c222c', textMuted:'#4c5568', textDim:'#69738c', accent:'#3a7bd5', accentDim:'rgba(58,123,213,.12)', green:'#1f9d63', amber:'#b8790a', orange:'#c5661f', red:'#d93a3f', gray:'#5c6472' }
 };
 const THEME_LABELS = { dark:'🌙 Dark', light:'☀️ Light' };
 const THEME_ORDER = ['dark','light'];
-// neutral tones baked into chart SVG strings assume the "dark" (Cool Blue) palette by
-// default; this remaps them to whichever theme is active without touching every chart function.
+// neutral + semantic tones baked into chart SVG strings assume the "dark" (Cool Blue)
+// palette by default; this remaps them without touching every chart function.
 const CHART_NEUTRALS = {
-  dark:  { grid:'#1e222b', dim:'#5c6472', target:'#3a4150', strokeBg:'#14171d', panelRaised:'#252a35', text:'#e6e9ef', accent:'#4a9eff', muted:'#8b92a5' },
-  light: { grid:'#dde1e8', dim:'#7a8394', target:'#b8c0cc', strokeBg:'#f4f6f9', panelRaised:'#d3d9e3', text:'#1c222c', accent:'#3a7bd5', muted:'#4c5568' }
+  dark:  { grid:'#1e222b', dim:'#5c6472', target:'#3a4150', strokeBg:'#14171d', panelRaised:'#252a35', text:'#e6e9ef', accent:'#4a9eff', muted:'#8b92a5', green:'#34c789', red:'#e5484d', orange:'#e8792f', gray:'#6b7280' },
+  light: { grid:'#dde1e8', dim:'#69738c', target:'#b8c0cc', strokeBg:'#f4f6f9', panelRaised:'#d3d9e3', text:'#1c222c', accent:'#3a7bd5', muted:'#4c5568', green:'#1f9d63', red:'#d93a3f', orange:'#c5661f', gray:'#5c6472' }
 };
 let currentTheme = localStorage.getItem('pending-tracker-theme') || 'dark';
+let brightnessOffset = parseInt(localStorage.getItem('pending-tracker-brightness')||'0', 10);
 function themeChartSvg(svg){
   if(currentTheme==='dark') return svg;
   const base = CHART_NEUTRALS.dark, cur = CHART_NEUTRALS[currentTheme];
   return svg.split(base.grid).join(cur.grid).split(base.dim).join(cur.dim).split(base.target).join(cur.target)
     .split(base.strokeBg).join(cur.strokeBg).split(base.panelRaised).join(cur.panelRaised).split(base.text).join(cur.text)
-    .split(base.accent).join(cur.accent).split(base.muted).join(cur.muted);
+    .split(base.accent).join(cur.accent).split(base.muted).join(cur.muted)
+    .split(base.green).join(cur.green).split(base.red).join(cur.red).split(base.orange).join(cur.orange).split(base.gray).join(cur.gray);
+}
+/* brightness slider: HSL lightness offset applied to surface colors only (bg/panel/border),
+   leaving text and semantic colors alone so contrast stays intact at any position. */
+function hexToHsl(hex){
+  const r=parseInt(hex.slice(1,3),16)/255, g=parseInt(hex.slice(3,5),16)/255, b=parseInt(hex.slice(5,7),16)/255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h=0,s=0,l=(max+min)/2;
+  if(max!==min){
+    const d=max-min;
+    s = l>0.5 ? d/(2-max-min) : d/(max+min);
+    if(max===r) h=(g-b)/d+(g<b?6:0);
+    else if(max===g) h=(b-r)/d+2;
+    else h=(r-g)/d+4;
+    h/=6;
+  }
+  return [h*360, s*100, l*100];
+}
+function hslToHex(h,s,l){
+  h/=360; s/=100; l/=100;
+  let r,g,b;
+  if(s===0){ r=g=b=l; }
+  else{
+    const hue2rgb=(p,q,t)=>{ if(t<0)t+=1; if(t>1)t-=1; if(t<1/6)return p+(q-p)*6*t; if(t<1/2)return q; if(t<2/3)return p+(q-p)*(2/3-t)*6; return p; };
+    const q = l<0.5 ? l*(1+s) : l+s-l*s, p = 2*l-q;
+    r=hue2rgb(p,q,h+1/3); g=hue2rgb(p,q,h); b=hue2rgb(p,q,h-1/3);
+  }
+  const toHex=x=>Math.round(Math.max(0,Math.min(1,x))*255).toString(16).padStart(2,'0');
+  return '#'+toHex(r)+toHex(g)+toHex(b);
+}
+function adjustLightness(hex, deltaL){
+  if(!deltaL) return hex;
+  const [h,s,l] = hexToHsl(hex);
+  return hslToHex(h, s, Math.max(2, Math.min(98, l+deltaL)));
 }
 function applyTheme(name, rerender){
-  const t = THEMES[name] || THEMES.dark;
-  currentTheme = THEMES[name] ? name : 'dark';
+  if(name && THEMES[name]) currentTheme = name;
+  const t = THEMES[currentTheme] || THEMES.dark;
   const root = document.documentElement.style;
-  root.setProperty('--bg', t.bg);
-  root.setProperty('--panel', t.panel);
-  root.setProperty('--panel-alt', t.panelAlt);
-  root.setProperty('--panel-raised', t.panelRaised);
-  root.setProperty('--border', t.border);
-  root.setProperty('--border-soft', t.borderSoft);
+  root.setProperty('--bg', adjustLightness(t.bg, brightnessOffset));
+  root.setProperty('--panel', adjustLightness(t.panel, brightnessOffset));
+  root.setProperty('--panel-alt', adjustLightness(t.panelAlt, brightnessOffset));
+  root.setProperty('--panel-raised', adjustLightness(t.panelRaised, brightnessOffset));
+  root.setProperty('--border', adjustLightness(t.border, brightnessOffset));
+  root.setProperty('--border-soft', adjustLightness(t.borderSoft, brightnessOffset));
   root.setProperty('--text', t.text);
   root.setProperty('--text-muted', t.textMuted);
   root.setProperty('--text-dim', t.textDim);
   root.setProperty('--accent', t.accent);
   root.setProperty('--accent-dim', t.accentDim);
+  root.setProperty('--green', t.green);
+  root.setProperty('--amber', t.amber);
+  root.setProperty('--orange', t.orange);
+  root.setProperty('--red', t.red);
+  root.setProperty('--gray', t.gray);
   localStorage.setItem('pending-tracker-theme', currentTheme);
   const btn = document.getElementById('btnTheme');
   if(btn) btn.textContent = THEME_LABELS[currentTheme];
@@ -619,6 +664,11 @@ function applyTheme(name, rerender){
 function cycleTheme(){
   const idx = THEME_ORDER.indexOf(currentTheme);
   applyTheme(THEME_ORDER[(idx+1) % THEME_ORDER.length], true);
+}
+function setBrightness(val){
+  brightnessOffset = parseInt(val, 10);
+  localStorage.setItem('pending-tracker-brightness', brightnessOffset);
+  applyTheme(null, true);
 }
 
 const STORAGE_KEY = 'pending-tracker-pages-v6';
@@ -915,6 +965,7 @@ async function driveSaveData(){
 }
 document.getElementById('btnConnectDrive').addEventListener('click', connectDrive);
 document.getElementById('btnTheme').addEventListener('click', cycleTheme);
+document.getElementById('brightnessSlider').addEventListener('input', (e)=> setBrightness(e.target.value));
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -1402,11 +1453,11 @@ function renderDeliveryHealth(items){
   const counts = {ontrack:0, delayed:0, ontime:0, late:0, neutral:0};
   items.forEach(i=>{ const ps=planStatus(i); counts[ps.cls]=(counts[ps.cls]||0)+1; });
   const rows = [
-    {label:'On track', count:counts.ontrack, color:'#8b92a5'},
-    {label:'Delayed', count:counts.delayed, color:'#e5484d'},
-    {label:'Completed on time', count:counts.ontime, color:'#34c789'},
-    {label:'Completed late', count:counts.late, color:'#e8792f'},
-    {label:'No due date set', count:counts.neutral, color:'#5c6472'}
+    {label:'On track', count:counts.ontrack, color:'var(--gray)'},
+    {label:'Delayed', count:counts.delayed, color:'var(--red)'},
+    {label:'Completed on time', count:counts.ontime, color:'var(--green)'},
+    {label:'Completed late', count:counts.late, color:'var(--orange)'},
+    {label:'No due date set', count:counts.neutral, color:'var(--text-dim)'}
   ];
   return `<div class="sum-legend" style="min-width:0">${rows.map(r=>`<div class="legend-row"><span class="dot" style="background:${r.color}"></span>${r.label}<span class="mono">${r.count}</span></div>`).join('')}</div>`;
 }
@@ -1471,7 +1522,7 @@ function renderSummary(){
         <table class="mini-table">
           <thead><tr><th>Item</th><th>Party</th><th>Days</th><th>Status</th><th>Plan</th><th>Escalate to</th></tr></thead>
           <tbody>
-          ${topAging.length ? topAging.map(i=>`<tr onclick="openModal('${i.id}')"><td>${i.taskId?`<span class="mono" style="color:var(--text-dim)">${i.taskId}</span> `:''}${escapeHtml(i.title)}</td><td>${escapeHtml(i.party)}</td><td class="mono" style="color:${daysStuck(i)>=15?'#e5484d':(daysStuck(i)>=8?'#e8792f':'#e6e9ef')}">${daysStuck(i)}d</td><td>${i.status}</td><td class="plan-${planStatus(i).cls}">${planStatus(i).text}</td><td>${escapeHtml(i.escalationContact)||'—'}</td></tr>`).join('') : '<tr><td colspan="6" style="color:var(--text-dim);text-align:center">Nothing open — all caught up.</td></tr>'}
+          ${topAging.length ? topAging.map(i=>`<tr onclick="openModal('${i.id}')"><td>${i.taskId?`<span class="mono" style="color:var(--text-dim)">${i.taskId}</span> `:''}${escapeHtml(i.title)}</td><td>${escapeHtml(i.party)}</td><td class="mono" style="color:${daysStuck(i)>=15?'var(--red)':(daysStuck(i)>=8?'var(--orange)':'var(--text)')}">${daysStuck(i)}d</td><td>${i.status}</td><td class="plan-${planStatus(i).cls}">${planStatus(i).text}</td><td>${escapeHtml(i.escalationContact)||'—'}</td></tr>`).join('') : '<tr><td colspan="6" style="color:var(--text-dim);text-align:center">Nothing open — all caught up.</td></tr>'}
           </tbody>
         </table>
       </div>
@@ -2301,6 +2352,7 @@ document.getElementById('btnResetConfirm').addEventListener('click', confirmRese
 document.getElementById('resetDataOverlay').addEventListener('click', (e)=>{ if(e.target.id==='resetDataOverlay') e.currentTarget.classList.remove('open'); });
 
 (async function init(){
+  document.getElementById('brightnessSlider').value = brightnessOffset;
   applyTheme(currentTheme, false);
   await loadData();
   filterState.party = new Set(getParties(activePage()));

@@ -63,8 +63,17 @@ Connect again each session) — this keeps the setup simple and avoids storing l
 ## Theme
 
 Click the theme button in the header to toggle between **🌙 Dark** (Cool Blue) and **☀️ Light**
-(Cool Light Gray). Your choice is remembered per-browser. Both charts and every UI element switch
-together — nothing is left half-themed.
+(Cool Light Gray). Next to it, a **brightness slider** lets you fine-tune how light or dark the
+current theme's surfaces are — slide toward ☀ for a brighter/whiter look, toward ☾ for a more
+muted/darker version of the same theme. It never goes fully black or fully white. Text and status
+colors (red/green/amber/etc.) stay fixed for readability regardless of where the slider sits —
+only backgrounds and panels shift. Both the theme and brightness position are remembered
+per-browser.
+
+**Contrast fix:** status colors (delayed/on-track/priority labels, etc.) now use different,
+darker shades specifically on the Light theme — the original shades were tuned for dark
+backgrounds and were hard to read on light ones. This is fixed everywhere those colors appear:
+tables, charts, badges.
 
 ## Files
 

@@ -8,6 +8,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#14171d">
 <title>Pending Tracker</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
@@ -536,6 +539,25 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// Self-heal: remove any service worker / cache storage left behind by an
+// earlier deployment at this URL. This is almost certainly why the browser
+// kept showing an old version even after hard refresh — a service worker
+// from a prior project intercepts page loads and serves its own cached
+// copy instead of hitting the network. This runs on every load, so once
+// this version reaches the browser even once, it can't happen again.
+(function selfHeal(){
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.getRegistrations().then(regs=>{
+      regs.forEach(reg=>reg.unregister());
+    }).catch(()=>{});
+  }
+  if('caches' in window){
+    caches.keys().then(names=>{
+      names.forEach(name=>caches.delete(name));
+    }).catch(()=>{});
+  }
+})();
+
 // Standalone storage adapter (localStorage) — replaces Claude's window.storage
 // so this works as a real, always-saving app once hosted (e.g. GitHub Pages).
 const storage = {

@@ -176,6 +176,8 @@
   #primaveraTable .gantt-row-label{font-size:var(--prim-font-size);white-space:normal;width:260px;min-width:260px;}
   #primaveraTable .gantt-row-label small{font-size:calc(var(--prim-font-size) - 2.5px);}
   #primaveraTable .gantt-row-plan{font-size:calc(var(--prim-font-size) - 1px);}
+  #primaveraTable .gantt-rows{gap:4px;padding-right:22px;}
+  #primaveraTable .gantt-row{padding:5px 0;}
   .gantt-row-label small{display:block;color:var(--text-dim);font-size:10px;}
   .gantt-row-plan{width:150px;min-width:150px;text-align:right;font-size:11px;flex-shrink:0;}
   .gantt-row-plan .due-sub{color:var(--text-dim);font-size:9.5px;margin-top:2px;}
@@ -291,7 +293,7 @@
       <button class="btn-ghost" id="btnExport">⬇ Export</button>
       <button class="btn-ghost" id="btnImport">⬆ Import</button>
       <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none">
-      <button class="btn-ghost" id="btnTheme">🌙 Dark</button>
+      <button class="btn-ghost" id="btnManualSave">💾 Save now</button>
       <button class="btn-ghost cloud-alarm" id="btnConnectDrive" style="color:var(--red);border-color:var(--red);font-weight:600">🔗 Cloud: Not Connected</button>
       <div class="more-menu-wrap" style="position:relative">
         <button class="btn-ghost" id="btnMoreMenu">⋮ More</button>
@@ -303,7 +305,7 @@
             <span style="font-size:11px;color:var(--text-dim)">☀</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--border-soft);padding-top:10px;">
-            <button class="btn-ghost" id="btnManualSave" style="text-align:left">💾 Save now</button>
+            <button class="btn-ghost" id="btnTheme" style="text-align:left">🌙 Dark</button>
             <button class="btn-ghost" id="btnReloadData" style="text-align:left">🔄 Reload</button>
             <button class="btn-ghost" id="btnTestStorage" style="text-align:left;color:var(--amber);border-color:rgba(240,168,58,.4)">🔬 Test Storage</button>
             <button class="btn-ghost" id="btnResetOpen" style="text-align:left;color:var(--red);border-color:rgba(229,72,77,.4)">🗑 Delete Data</button>

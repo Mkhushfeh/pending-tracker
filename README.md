@@ -60,6 +60,25 @@ pull in what the first device already saved.
 **Note:** the Drive connection doesn't persist across closing the browser (you'll need to click
 Connect again each session) — this keeps the setup simple and avoids storing long-lived tokens.
 
+## Primavera View
+
+A new tab between Calendar and Working Table — shows every task across whichever pages you
+select, laid out like a classic Primavera/MS Project Gantt: dense rows with Start date, Finish
+date, and duration spelled out, a timeline bar per task, and a **finish histogram** on top
+showing, week by week, how many tasks are on track, delayed, completed on time, or completed
+late — the same categories as Delivery Health, just plotted over time.
+
+Use the **Include** checkboxes to pick which pages feed the view, and **Group by** to switch
+between grouping by page, by your custom task groups, or a flat list sorted by start date.
+
+## Mobile / iPhone
+
+The header now stays clean on a phone: Search, Export, Import, and the theme toggle are always
+visible; everything else (Save, Reload, Test Storage, Google Drive, Delete Data, brightness
+slider) lives behind a **⋮ More** button. Touch targets are sized for a thumb, inputs use 16px
+text so iOS doesn't auto-zoom on tap, and safe-area padding keeps content clear of the notch and
+home indicator.
+
 ## Theme
 
 Click the theme button in the header to toggle between **🌙 Dark** (Cool Blue) and **☀️ Light**

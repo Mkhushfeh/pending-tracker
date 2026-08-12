@@ -267,6 +267,7 @@
       <button class="btn-ghost" id="btnManualSave" style="font-size:11px">💾 Save now</button>
       <button class="btn-ghost" id="btnReloadData" style="font-size:11px">🔄 Reload</button>
       <button class="btn-ghost" id="btnTestStorage" style="color:#f0a83a;border-color:rgba(240,168,58,.4);font-size:11px">🔬 Test Storage</button>
+      <button class="btn-ghost" id="btnTheme">🎨 Theme: Medium</button>
       <button class="btn-ghost" id="btnConnectDrive" style="color:#5aa8ff;border-color:rgba(90,168,255,.4)">🔗 Connect Google Drive</button>
       <button class="btn-ghost" id="btnResetOpen" style="color:var(--red);border-color:rgba(229,72,77,.4)">🗑 Delete Data</button>
     </div>
@@ -574,6 +575,54 @@ const storage = {
     return { key, value };
   }
 };
+/* ---------- theme system (Dark / Light Dark / Medium) ---------- */
+const THEMES = {
+  dark:      { bg:'#14171d', panel:'#1c2029', panelAlt:'#20242e', panelRaised:'#252a35', border:'#2a2f3a', borderSoft:'#232833', text:'#e6e9ef', textMuted:'#8b92a5', textDim:'#5c6472', accent:'#4a9eff', accentDim:'rgba(74,158,255,.14)' },
+  lightdark: { bg:'#1b1f28', panel:'#242a35', panelAlt:'#2a3140', panelRaised:'#323a4a', border:'#3c4456', borderSoft:'#343c4c', text:'#e9ecf1', textMuted:'#98a0b3', textDim:'#6b7385', accent:'#5aa8ff', accentDim:'rgba(90,168,255,.16)' },
+  medium:    { bg:'#22242a', panel:'#2c2e36', panelAlt:'#333540', panelRaised:'#3a3d48', border:'#40424c', borderSoft:'#383a44', text:'#edeef1', textMuted:'#a4a9b4', textDim:'#787e8c', accent:'#6bb0ff', accentDim:'rgba(107,176,255,.16)' }
+};
+const THEME_LABELS = { dark:'Dark', lightdark:'Light Dark', medium:'Medium' };
+const THEME_ORDER = ['dark','lightdark','medium'];
+// neutral tones baked into chart SVG strings assume the "dark" palette by default;
+// this remaps them to whichever theme is active without touching every chart function.
+const CHART_NEUTRALS = {
+  dark:      { grid:'#1e222b', dim:'#5c6472', target:'#3a4150', strokeBg:'#14171d', panelRaised:'#252a35', text:'#e6e9ef', accent:'#4a9eff', muted:'#8b92a5' },
+  lightdark: { grid:'#2a3140', dim:'#6b7385', target:'#455065', strokeBg:'#1b1f28', panelRaised:'#323a4a', text:'#e9ecf1', accent:'#5aa8ff', muted:'#98a0b3' },
+  medium:    { grid:'#333540', dim:'#787e8c', target:'#4a4d58', strokeBg:'#22242a', panelRaised:'#3a3d48', text:'#edeef1', accent:'#6bb0ff', muted:'#a4a9b4' }
+};
+let currentTheme = localStorage.getItem('pending-tracker-theme') || 'medium';
+function themeChartSvg(svg){
+  if(currentTheme==='dark') return svg;
+  const base = CHART_NEUTRALS.dark, cur = CHART_NEUTRALS[currentTheme];
+  return svg.split(base.grid).join(cur.grid).split(base.dim).join(cur.dim).split(base.target).join(cur.target)
+    .split(base.strokeBg).join(cur.strokeBg).split(base.panelRaised).join(cur.panelRaised).split(base.text).join(cur.text)
+    .split(base.accent).join(cur.accent).split(base.muted).join(cur.muted);
+}
+function applyTheme(name, rerender){
+  const t = THEMES[name] || THEMES.medium;
+  currentTheme = THEMES[name] ? name : 'medium';
+  const root = document.documentElement.style;
+  root.setProperty('--bg', t.bg);
+  root.setProperty('--panel', t.panel);
+  root.setProperty('--panel-alt', t.panelAlt);
+  root.setProperty('--panel-raised', t.panelRaised);
+  root.setProperty('--border', t.border);
+  root.setProperty('--border-soft', t.borderSoft);
+  root.setProperty('--text', t.text);
+  root.setProperty('--text-muted', t.textMuted);
+  root.setProperty('--text-dim', t.textDim);
+  root.setProperty('--accent', t.accent);
+  root.setProperty('--accent-dim', t.accentDim);
+  localStorage.setItem('pending-tracker-theme', currentTheme);
+  const btn = document.getElementById('btnTheme');
+  if(btn) btn.textContent = '🎨 Theme: ' + THEME_LABELS[currentTheme];
+  if(rerender && typeof renderAll === 'function') renderAll();
+}
+function cycleTheme(){
+  const idx = THEME_ORDER.indexOf(currentTheme);
+  applyTheme(THEME_ORDER[(idx+1) % THEME_ORDER.length], true);
+}
+
 const STORAGE_KEY = 'pending-tracker-pages-v6';
 let data = { pages: [], activePageId: '' };
 let pendingDeleteId = null;
@@ -867,6 +916,7 @@ async function driveSaveData(){
   }
 }
 document.getElementById('btnConnectDrive').addEventListener('click', connectDrive);
+document.getElementById('btnTheme').addEventListener('click', cycleTheme);
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -1172,13 +1222,13 @@ function renderTrendChart(){
       <span><span class="dot" style="background:#4a9eff;margin-right:5px"></span>Open — on track</span>
       <span><span class="dot" style="background:#e5484d;margin-right:5px"></span>Open — delayed</span>
     </div>
-    ${svgPlannedTrend(plannedStats, plannedStats?plannedStats.xRef:null, sharedMaxX)}`;
+    ${themeChartSvg(svgPlannedTrend(plannedStats, plannedStats?plannedStats.xRef:null, sharedMaxX))}`;
   document.getElementById('actualChart').innerHTML = `
     <div class="bar-legend" style="margin-bottom:10px">
       <span><span class="dot" style="background:#34c789;margin-right:5px"></span>Finished task</span>
       <span style="color:var(--text-dim)">dashed line = forecast</span>
     </div>
-    ${svgActualTrend(actualStats, actualStats?actualStats.xRef:null, sharedMaxX)}`;
+    ${themeChartSvg(svgActualTrend(actualStats, actualStats?actualStats.xRef:null, sharedMaxX))}`;
 }
 
 /* ---------- derived lists ---------- */
@@ -1387,7 +1437,7 @@ function renderSummary(){
       <div class="sum-card">
         <div class="sum-card-title">Status breakdown</div>
         <div class="sum-donut-wrap">
-          ${svgDonut(statusData,100,16)}
+          ${themeChartSvg(svgDonut(statusData,100,16))}
           <div class="sum-legend">
             ${statusData.map(s=>`<div class="legend-row"><span class="dot" style="background:${s.color}"></span>${s.label}<span class="mono">${s.count}</span></div>`).join('')}
           </div>
@@ -1396,7 +1446,7 @@ function renderSummary(){
       </div>
       <div class="sum-card">
         <div class="sum-card-title">Trend — this page, live</div>
-        ${svgTrendMini(computeProjectStats(items))}
+        ${themeChartSvg(svgTrendMini(computeProjectStats(items)))}
       </div>
       <div class="sum-card">
         <div class="sum-card-title">Delivery health</div>
@@ -2253,6 +2303,7 @@ document.getElementById('btnResetConfirm').addEventListener('click', confirmRese
 document.getElementById('resetDataOverlay').addEventListener('click', (e)=>{ if(e.target.id==='resetDataOverlay') e.currentTarget.classList.remove('open'); });
 
 (async function init(){
+  applyTheme(currentTheme, false);
   await loadData();
   filterState.party = new Set(getParties(activePage()));
   renderAll();

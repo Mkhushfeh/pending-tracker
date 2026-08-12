@@ -60,6 +60,12 @@ pull in what the first device already saved.
 **Note:** the Drive connection doesn't persist across closing the browser (you'll need to click
 Connect again each session) — this keeps the setup simple and avoids storing long-lived tokens.
 
+## Theme
+
+Click the **🎨 Theme** button in the header to cycle through three dark palettes: Dark (deep),
+Light Dark (soft slate), and Medium (neutral charcoal, the default). All three stay in the dark
+spectrum — none are bright/light. Your choice is remembered per-browser.
+
 ## Files
 
 - `index.html` — the whole app

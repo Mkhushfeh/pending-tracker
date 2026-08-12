@@ -62,9 +62,9 @@ Connect again each session) — this keeps the setup simple and avoids storing l
 
 ## Theme
 
-Click the **🎨 Theme** button in the header to cycle through three dark palettes: Dark (deep),
-Light Dark (soft slate), and Medium (neutral charcoal, the default). All three stay in the dark
-spectrum — none are bright/light. Your choice is remembered per-browser.
+Click the theme button in the header to toggle between **🌙 Dark** (Cool Blue) and **☀️ Light**
+(Cool Light Gray). Your choice is remembered per-browser. Both charts and every UI element switch
+together — nothing is left half-themed.
 
 ## Files
 

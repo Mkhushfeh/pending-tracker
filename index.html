@@ -35,6 +35,11 @@
   .header .sub{color:var(--text-dim);font-size:12px;margin-top:3px;}
 
   .page-tabs{display:flex;align-items:center;gap:4px;margin-bottom:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:0;}
+  .project-tabs{display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;}
+  .project-tab{background:var(--panel);border:1px solid var(--border);border-radius:16px;color:var(--text-muted);padding:5px 13px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .project-tab.active{background:var(--accent);color:#0a1420;border-color:var(--accent);}
+  .project-tab .cnt{font-family:var(--font-mono);font-size:9.5px;opacity:.75;}
+  .project-add-pill{background:transparent;border:1px dashed var(--border);border-radius:16px;color:var(--text-dim);padding:5px 12px;font-size:12px;cursor:pointer;}
   .page-tab{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);padding:9px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px;}
   .page-tab:hover{color:var(--text);}
   .page-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
@@ -73,6 +78,8 @@
   .bar{position:absolute;top:8px;height:12px;border-radius:6px;box-sizing:border-box;}
   .bar.aging{box-shadow:0 0 0 1.5px rgba(229,72,77,.6);animation:pulse 2.4s ease-in-out infinite;}
   @keyframes pulse{0%,100%{box-shadow:0 0 0 1.5px rgba(229,72,77,.3);}50%{box-shadow:0 0 0 1.5px rgba(229,72,77,.85);}}
+  .cloud-alarm{animation:cloudAlarm 1.8s ease-in-out infinite;}
+  @keyframes cloudAlarm{0%,100%{box-shadow:0 0 0 0 rgba(229,72,77,.5);}50%{box-shadow:0 0 0 4px rgba(229,72,77,0);}}
   .bar-check{position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:9px;color:#0a1420;font-weight:900;}
   .today-mark{position:absolute;top:-3px;bottom:-3px;border-left:1px dashed var(--accent);z-index:2;}
   .due-mark{position:absolute;top:-3px;width:7px;height:7px;background:#fff;transform:translateX(-50%) rotate(45deg);border-radius:1px;z-index:3;box-shadow:0 0 0 1px rgba(0,0,0,.35);}
@@ -121,6 +128,9 @@
   .gantt-axis-plan{width:150px;min-width:150px;flex-shrink:0;font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;text-align:right;}
   .axis-grid{position:absolute;top:0;bottom:0;border-left:1px solid var(--border-soft);}
   .axis-grid span{position:absolute;bottom:2px;left:4px;font-size:9px;color:var(--text-dim);font-family:var(--font-mono);white-space:nowrap;}
+  #primaveraGanttAxis .axis-grid span{font-size:11.5px;color:var(--text-muted);}
+  #primaveraGanttAxis .axis-today span{font-size:11.5px;font-weight:700;}
+  #primaveraGanttAxis .gantt-axis-track{height:26px;}
   .axis-today{position:absolute;top:0;bottom:-4px;border-left:1.5px dashed var(--accent);z-index:2;}
   .axis-today span{position:absolute;bottom:2px;left:4px;font-size:9px;color:var(--accent);font-family:var(--font-mono);font-weight:700;white-space:nowrap;}
   .gantt-rows{display:flex;flex-direction:column;gap:10px;max-height:460px;overflow-y:auto;padding-right:4px;}
@@ -282,6 +292,7 @@
       <button class="btn-ghost" id="btnImport">⬆ Import</button>
       <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none">
       <button class="btn-ghost" id="btnTheme">🌙 Dark</button>
+      <button class="btn-ghost cloud-alarm" id="btnConnectDrive" style="color:var(--red);border-color:var(--red);font-weight:600">🔗 Cloud: Not Connected</button>
       <div class="more-menu-wrap" style="position:relative">
         <button class="btn-ghost" id="btnMoreMenu">⋮ More</button>
         <div class="more-menu-panel" id="moreMenuPanel">
@@ -295,7 +306,6 @@
             <button class="btn-ghost" id="btnManualSave" style="text-align:left">💾 Save now</button>
             <button class="btn-ghost" id="btnReloadData" style="text-align:left">🔄 Reload</button>
             <button class="btn-ghost" id="btnTestStorage" style="text-align:left;color:var(--amber);border-color:rgba(240,168,58,.4)">🔬 Test Storage</button>
-            <button class="btn-ghost" id="btnConnectDrive" style="text-align:left;color:var(--accent);border-color:rgba(90,168,255,.4)">🔗 Connect Google Drive</button>
             <button class="btn-ghost" id="btnResetOpen" style="text-align:left;color:var(--red);border-color:rgba(229,72,77,.4)">🗑 Delete Data</button>
           </div>
         </div>
@@ -303,6 +313,7 @@
     </div>
   </div>
 
+  <div class="project-tabs" id="projectTabs"></div>
   <div class="page-tabs" id="pageTabs"></div>
 
   <div class="kpi-strip">
@@ -514,6 +525,17 @@
     <div class="confirm-actions">
       <button class="btn-ghost" id="confirmCancel">Cancel</button>
       <button class="btn" id="confirmOk" style="background:var(--red);color:#fff">Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="projectNameOverlay">
+  <div class="confirm-box">
+    <p style="margin-bottom:8px">Name the new project</p>
+    <input type="text" id="newProjectName" placeholder="e.g. Project 2, Site B…">
+    <div class="confirm-actions">
+      <button class="btn-ghost" id="projectNameCancel">Cancel</button>
+      <button class="btn" id="projectNameOk">Create project</button>
     </div>
   </div>
 </div>
@@ -753,7 +775,7 @@ function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':
 function fmtDate(d){ return d ? new Date(d).toLocaleDateString(undefined,{month:'short',day:'numeric'}) : '—'; }
 function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
 
-function activePage(){ return data.pages.find(p=>p.id===data.activePageId) || data.pages[0]; }
+function activePage(){ const proj = activeProject(); return proj.pages.find(p=>p.id===proj.activePageId) || proj.pages[0]; }
 
 /* ---------- plan vs actual ---------- */
 function planStatus(item){
@@ -851,33 +873,43 @@ function makeSimpleSeed(list){
 }
 function seedAll(){
   return {
-    activePageId: 'tasks',
-    pages: [
-      { id:'tasks', name:'Tasks', items: makeTasksSeed() },
-      { id:'remaining', name:'Remaining Work', items: makeSimpleSeed([
-        {title:'Cable tray extension — north wing', party:'Electrical Contractor', priority:'Medium', status:'Identified', reason:'Resource constraint', group:'North Wing Electrical'},
-        {title:'Instrument tubing installation', party:'Instrumentation Tech', priority:'High', status:'Pending / Stuck', reason:'Material delay', group:'North Wing Electrical'},
-        {title:'Final punch-list walkdown', party:'Site Supervisor', priority:'Medium', status:'Identified', reason:'Awaiting internal review', group:''},
-        {title:'Spare parts handover to client', party:'Procurement', priority:'Low', status:'Pending / Stuck', reason:'Awaiting client / owner approval', group:'Project Closeout'},
-        {title:'O&M staff training session', party:'Commissioning Engineer', priority:'Medium', status:'In Progress', reason:'Resource constraint', group:'Project Closeout'},
-        {title:'Warranty documentation compilation', party:'QA Team', priority:'Low', status:'Identified', reason:'Other', group:'Project Closeout'}
-      ])},
-      { id:'asbuilt', name:'As-Built Drawing', items: makeSimpleSeed([
-        {title:'RTU panel as-built markup', party:'Design Team', priority:'Medium', status:'In Progress', reason:'Awaiting internal review', group:'RTU Documentation'},
-        {title:'Cable routing as-built drawing', party:'Electrical Contractor', priority:'High', status:'Pending / Stuck', reason:'Technical / design issue', group:'RTU Documentation'},
-        {title:'Instrument loop diagram updates', party:'Design Team', priority:'Medium', status:'Resolved', reason:'Awaiting internal review', group:'Instrumentation Docs'},
-        {title:'P&ID redline incorporation', party:'Vendor Eng. Lead', priority:'Critical', status:'Pending / Stuck', reason:'Awaiting vendor / supplier', group:'Instrumentation Docs'},
-        {title:'As-built drawing client submission', party:'Client PM', priority:'High', status:'Identified', reason:'Awaiting client / owner approval', group:''},
-        {title:'Drawing register close-out', party:'QA Team', priority:'Low', status:'Resolved', reason:'Other', group:''}
-      ])}
+    activeProjectId: 'project1',
+    projects: [
+      { id:'project1', name:'Project 1', activePageId: 'tasks', pages: [
+        { id:'tasks', name:'Tasks', items: makeTasksSeed() },
+        { id:'remaining', name:'Remaining Work', items: makeSimpleSeed([
+          {title:'Cable tray extension — north wing', party:'Electrical Contractor', priority:'Medium', status:'Identified', reason:'Resource constraint', group:'North Wing Electrical'},
+          {title:'Instrument tubing installation', party:'Instrumentation Tech', priority:'High', status:'Pending / Stuck', reason:'Material delay', group:'North Wing Electrical'},
+          {title:'Final punch-list walkdown', party:'Site Supervisor', priority:'Medium', status:'Identified', reason:'Awaiting internal review', group:''},
+          {title:'Spare parts handover to client', party:'Procurement', priority:'Low', status:'Pending / Stuck', reason:'Awaiting client / owner approval', group:'Project Closeout'},
+          {title:'O&M staff training session', party:'Commissioning Engineer', priority:'Medium', status:'In Progress', reason:'Resource constraint', group:'Project Closeout'},
+          {title:'Warranty documentation compilation', party:'QA Team', priority:'Low', status:'Identified', reason:'Other', group:'Project Closeout'}
+        ])},
+        { id:'asbuilt', name:'As-Built Drawing', items: makeSimpleSeed([
+          {title:'RTU panel as-built markup', party:'Design Team', priority:'Medium', status:'In Progress', reason:'Awaiting internal review', group:'RTU Documentation'},
+          {title:'Cable routing as-built drawing', party:'Electrical Contractor', priority:'High', status:'Pending / Stuck', reason:'Technical / design issue', group:'RTU Documentation'},
+          {title:'Instrument loop diagram updates', party:'Design Team', priority:'Medium', status:'Resolved', reason:'Awaiting internal review', group:'Instrumentation Docs'},
+          {title:'P&ID redline incorporation', party:'Vendor Eng. Lead', priority:'Critical', status:'Pending / Stuck', reason:'Awaiting vendor / supplier', group:'Instrumentation Docs'},
+          {title:'As-built drawing client submission', party:'Client PM', priority:'High', status:'Identified', reason:'Awaiting client / owner approval', group:''},
+          {title:'Drawing register close-out', party:'QA Team', priority:'Low', status:'Resolved', reason:'Other', group:''}
+        ])}
+      ]}
     ]
   };
+}
+function activeProject(){
+  if(!data.projects || data.projects.length===0){
+    data.projects = [{ id:'project1', name:'Project 1', activePageId: (data.pages&&data.pages[0]?data.pages[0].id:'tasks'), pages: data.pages || [] }];
+    data.activeProjectId = 'project1';
+    delete data.pages;
+  }
+  return data.projects.find(p=>p.id===data.activeProjectId) || data.projects[0];
 }
 
 async function loadData(){
   try{
     const res = await storage.get(STORAGE_KEY);
-    if(res && res.value){ data = JSON.parse(res.value); ensureTaskIds(); return; }
+    if(res && res.value){ data = JSON.parse(res.value); migrateToProjects(); ensureTaskIds(); return; }
   }catch(e){
     // no saved data yet — first run on this browser, safe to seed
   }
@@ -885,16 +917,30 @@ async function loadData(){
   await saveData();
   ensureTaskIds();
 }
+function migrateToProjects(){
+  // older saved data has data.pages directly; wrap it into a Project 1 the first time it's loaded
+  if(!data.projects && data.pages){
+    data.projects = [{ id:'project1', name:'Project 1', activePageId: data.activePageId || (data.pages[0]?data.pages[0].id:'tasks'), pages: data.pages }];
+    data.activeProjectId = 'project1';
+    delete data.pages;
+    delete data.activePageId;
+  }
+  if(!data.projects || data.projects.length===0){
+    data.projects = [{ id:'project1', name:'Project 1', activePageId:'tasks', pages: [] }];
+    data.activeProjectId = 'project1';
+  }
+}
 function ensureTaskIds(){
   if(!data.nextTaskNumber) data.nextTaskNumber = 1;
   if(!data.stickyNotes) data.stickyNotes = [];
   let changed = false;
-  data.pages.forEach(p=>p.items.forEach(i=>{
+  (data.projects||[]).forEach(proj=>proj.pages.forEach(p=>p.items.forEach(i=>{
     if(!i.taskId){ i.taskId = 'T-' + String(data.nextTaskNumber).padStart(3,'0'); data.nextTaskNumber++; changed = true; }
-  }));
+  })));
   if(changed) saveData();
 }
 async function saveData(){
+  data.lastModified = Date.now();
   const el = document.getElementById('saveStatus');
   if(el){ el.textContent = 'Saving…'; el.style.color = 'var(--text-dim)'; }
   try{
@@ -925,6 +971,21 @@ function updateDriveStatus(msg, isErr){
   const el = document.getElementById('driveStatus');
   if(el){ el.textContent = msg; el.style.color = isErr ? 'var(--red)' : 'var(--text-dim)'; }
 }
+function updateConnectButton(connected){
+  const btn = document.getElementById('btnConnectDrive');
+  if(!btn) return;
+  if(connected){
+    btn.textContent = '🔗 Cloud: Connected';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'var(--green)';
+    btn.classList.remove('cloud-alarm');
+  } else {
+    btn.textContent = '🔗 Cloud: Not Connected';
+    btn.style.color = 'var(--red)';
+    btn.style.borderColor = 'var(--red)';
+    btn.classList.add('cloud-alarm');
+  }
+}
 function initGoogleAuth(){
   if(typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) return;
   if(GOOGLE_CLIENT_ID.includes('PASTE_YOUR')) return;
@@ -932,12 +993,18 @@ function initGoogleAuth(){
     client_id: GOOGLE_CLIENT_ID,
     scope: DRIVE_SCOPE,
     callback: async (resp)=>{
-      if(resp.error){ updateDriveStatus('⚠ Google sign-in failed: '+resp.error, true); return; }
+      if(resp.error){ updateDriveStatus('⚠ Google sign-in failed: '+resp.error, true); updateConnectButton(false); return; }
       driveAccessToken = resp.access_token;
-      updateDriveStatus('Connected — checking Drive…');
+      localStorage.setItem('pending-tracker-drive-was-connected', 'true');
+      updateDriveStatus('Connected — syncing…');
       await driveInitialSync();
     }
   });
+  // if this browser connected before, try a fast silent reconnect so sync happens
+  // automatically on open instead of requiring a click every single time.
+  if(localStorage.getItem('pending-tracker-drive-was-connected')==='true'){
+    try{ driveTokenClient.requestAccessToken({prompt:''}); }catch(e){ /* ignore, user can click Connect manually */ }
+  }
 }
 function connectDrive(){
   if(GOOGLE_CLIENT_ID.includes('PASTE_YOUR')){
@@ -980,27 +1047,29 @@ async function driveInitialSync(){
     const file = await driveFindFile();
     if(file){
       driveFileId = file.id;
-      const content = await driveLoadFileContent(file.id);
-      const driveData = JSON.parse(content);
-      const driveModified = new Date(file.modifiedTime).toLocaleString();
-      const loadFromDrive = confirm(`Found existing data on Google Drive (last saved ${driveModified}).\n\nOK = load that data (replaces what's showing now)\nCancel = keep what's showing now and push it to Drive instead`);
-      if(loadFromDrive){
-        data = driveData;
+      const driveModifiedMs = new Date(file.modifiedTime).getTime();
+      const localModifiedMs = data.lastModified || 0;
+      if(driveModifiedMs > localModifiedMs + 5000){
+        // Drive has newer changes (e.g. made on another device) — pull automatically, no prompt
+        const content = await driveLoadFileContent(file.id);
+        data = JSON.parse(content);
         ensureTaskIds();
         await storage.set(STORAGE_KEY, JSON.stringify(data));
         renderAll();
-        updateDriveStatus('✓ Loaded from Drive');
+        updateDriveStatus('✓ Synced — pulled newer changes from another device');
       } else {
         await driveSaveData();
-        updateDriveStatus('✓ Connected — this device\'s data pushed to Drive');
+        updateDriveStatus('✓ Synced — this device is up to date');
       }
     } else {
       await driveCreateFile();
-      updateDriveStatus('✓ Connected — created new file on Drive');
+      updateDriveStatus('✓ Connected — created file on Drive');
     }
+    updateConnectButton(true);
   }catch(e){
     console.error(e);
     updateDriveStatus('⚠ Drive sync error: '+(e.message||e), true);
+    updateConnectButton(false);
   }
 }
 async function driveSaveData(){
@@ -1013,6 +1082,7 @@ async function driveSaveData(){
       body: JSON.stringify(data)
     });
     updateDriveStatus('Synced to Drive ✓ '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}));
+    updateConnectButton(true);
   }catch(e){
     console.error(e);
     updateDriveStatus('⚠ Drive sync failed', true);
@@ -1038,19 +1108,62 @@ function showToast(msg){
 }
 
 /* ---------- pages ---------- */
+function renderProjectTabs(){
+  let html = '';
+  data.projects.forEach(proj=>{
+    const openCnt = proj.pages.reduce((s,p)=> s + p.items.filter(i=>i.status!=='Resolved').length, 0);
+    html += `<button class="project-tab ${proj.id===data.activeProjectId?'active':''}" onclick="switchProject('${proj.id}')">${escapeHtml(proj.name)} <span class="cnt">${openCnt}</span></button>`;
+  });
+  html += `<button class="project-add-pill" id="btnAddProject" title="Add project">+ Project</button>`;
+  document.getElementById('projectTabs').innerHTML = html;
+  document.getElementById('btnAddProject').addEventListener('click', openProjectNameModal);
+}
+function switchProject(id){
+  data.activeProjectId = id;
+  const proj = activeProject();
+  const newPage = proj.pages.find(p=>p.id===proj.activePageId) || proj.pages[0];
+  filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(['Identified','Pending / Stuck','In Progress']), party: new Set(getParties(newPage)) };
+  trendSelected = null;
+  primaveraSelectedPages = null;
+  summarySelectedPages = null;
+  renderAll();
+}
+function openProjectNameModal(){
+  document.getElementById('newProjectName').value = '';
+  document.getElementById('projectNameOverlay').classList.add('open');
+  document.getElementById('newProjectName').focus();
+}
+async function createProject(){
+  const name = document.getElementById('newProjectName').value.trim();
+  if(!name){ showToast('Give the project a name'); return; }
+  const id = 'proj' + Date.now().toString(36);
+  data.projects.push({ id, name, activePageId: 'tasks', pages: [{ id:'tasks', name:'Tasks', items: [], weeklyReports: [] }] });
+  data.activeProjectId = id;
+  trendSelected = null;
+  primaveraSelectedPages = null;
+  summarySelectedPages = null;
+  await saveData();
+  document.getElementById('projectNameOverlay').classList.remove('open');
+  renderAll();
+}
+document.getElementById('projectNameCancel').addEventListener('click', ()=>document.getElementById('projectNameOverlay').classList.remove('open'));
+document.getElementById('projectNameOk').addEventListener('click', createProject);
+document.getElementById('projectNameOverlay').addEventListener('click', (e)=>{ if(e.target.id==='projectNameOverlay') e.currentTarget.classList.remove('open'); });
+document.getElementById('newProjectName').addEventListener('keydown', (e)=>{ if(e.key==='Enter') createProject(); });
+
 function renderPageTabs(){
   let html = '';
-  data.pages.forEach(p=>{
+  activeProject().pages.forEach(p=>{
     const openCnt = p.items.filter(i=>i.status!=='Resolved').length;
-    html += `<button class="page-tab ${p.id===data.activePageId?'active':''}" onclick="switchPage('${p.id}')">${escapeHtml(p.name)} <span class="cnt">${openCnt}</span></button>`;
+    html += `<button class="page-tab ${p.id===activeProject().activePageId?'active':''}" onclick="switchPage('${p.id}')">${escapeHtml(p.name)} <span class="cnt">${openCnt}</span></button>`;
   });
   html += `<button class="page-add" id="btnAddPage" title="Add page">+</button>`;
   document.getElementById('pageTabs').innerHTML = html;
   document.getElementById('btnAddPage').addEventListener('click', openPageNameModal);
 }
 function switchPage(id){
-  data.activePageId = id;
-  const newPage = data.pages.find(p=>p.id===id);
+  activeProject().activePageId = id;
+  const newPage = activeProject().pages.find(p=>p.id===id);
   filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(['Identified','Pending / Stuck','In Progress']), party: new Set(getParties(newPage)) };
   renderAll();
 }
@@ -1063,8 +1176,8 @@ async function createPage(){
   const name = document.getElementById('newPageName').value.trim();
   if(!name){ showToast('Give the page a name'); return; }
   const id = 'pg' + Date.now().toString(36);
-  data.pages.push({ id, name, items: [], weeklyReports: [] });
-  data.activePageId = id;
+  activeProject().pages.push({ id, name, items: [], weeklyReports: [] });
+  activeProject().activePageId = id;
   if(trendSelected) trendSelected.add(id);
   await saveData();
   document.getElementById('pageNameOverlay').classList.remove('open');
@@ -1075,13 +1188,13 @@ async function createPage(){
 let trendSelected = null;
 const PAGE_PALETTE = ['#4a9eff','#34c789','#f0a83a','#a78bfa','#22d3ee','#e5484d','#f472b6','#facc15'];
 function pageColor(id){
-  const idx = data.pages.findIndex(p=>p.id===id);
+  const idx = activeProject().pages.findIndex(p=>p.id===id);
   return PAGE_PALETTE[idx % PAGE_PALETTE.length];
 }
 function renderTrendControls(){
   document.getElementById('trendControls').innerHTML =
     `<span style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px">Include:</span>` +
-    data.pages.map(p=>`<label class="trend-check"><input type="checkbox" ${trendSelected.has(p.id)?'checked':''} onchange="toggleTrendPage('${p.id}', this.checked)"><span class="trend-swatch" style="background:${pageColor(p.id)}"></span>${escapeHtml(p.name)}</label>`).join('');
+    activeProject().pages.map(p=>`<label class="trend-check"><input type="checkbox" ${trendSelected.has(p.id)?'checked':''} onchange="toggleTrendPage('${p.id}', this.checked)"><span class="trend-swatch" style="background:${pageColor(p.id)}"></span>${escapeHtml(p.name)}</label>`).join('');
 }
 function toggleTrendPage(id, checked){
   if(checked) trendSelected.add(id); else trendSelected.delete(id);
@@ -1298,7 +1411,7 @@ function svgTrendMini(stats){
 }
 function renderTrendChart(){
   const items = [];
-  data.pages.forEach(p=>{ if(trendSelected.has(p.id)) p.items.forEach(it=> items.push({...it, _pageId:p.id})); });
+  activeProject().pages.forEach(p=>{ if(trendSelected.has(p.id)) p.items.forEach(it=> items.push({...it, _pageId:p.id})); });
   const actualStats = computeProjectStats(items);
   const plannedStats = computePlannedStats(items);
   const resolvedCount = items.filter(i=>i.status==='Resolved').length;
@@ -1919,10 +2032,10 @@ document.getElementById('btnAddSticky').addEventListener('click', addSticky);
 document.getElementById('stickyInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') addSticky(); });
 
 function renderPrimaveraControls(){
-  if(!primaveraSelectedPages) primaveraSelectedPages = new Set(data.pages.map(p=>p.id));
+  if(!primaveraSelectedPages) primaveraSelectedPages = new Set(activeProject().pages.map(p=>p.id));
   document.getElementById('primaveraControls').innerHTML =
     `<span style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px">Include:</span>` +
-    data.pages.map(p=>`<label class="trend-check"><input type="checkbox" ${primaveraSelectedPages.has(p.id)?'checked':''} onchange="togglePrimaveraPage('${p.id}', this.checked)">${escapeHtml(p.name)}</label>`).join('');
+    activeProject().pages.map(p=>`<label class="trend-check"><input type="checkbox" ${primaveraSelectedPages.has(p.id)?'checked':''} onchange="togglePrimaveraPage('${p.id}', this.checked)">${escapeHtml(p.name)}</label>`).join('');
 }
 function togglePrimaveraPage(id, checked){
   if(checked) primaveraSelectedPages.add(id); else primaveraSelectedPages.delete(id);
@@ -1930,7 +2043,7 @@ function togglePrimaveraPage(id, checked){
 }
 function getPrimaveraItems(){
   const items = [];
-  data.pages.forEach(p=>{ if(primaveraSelectedPages.has(p.id)) p.items.forEach(it=> items.push({...it, _pageName:p.name})); });
+  activeProject().pages.forEach(p=>{ if(primaveraSelectedPages.has(p.id)) p.items.forEach(it=> items.push({...it, _pageName:p.name})); });
   return items;
 }
 function primaveraRowHtml(item, scaleMin, scaleSpan){
@@ -2057,7 +2170,7 @@ function editTitle(){
 function exportToExcel(){
   if(typeof XLSX === 'undefined'){ showToast("Excel library didn't load — check your connection and try again"); return; }
   const wb = XLSX.utils.book_new();
-  data.pages.forEach(p=>{
+  activeProject().pages.forEach(p=>{
     const rows = p.items.map(i=>({
       'ID': i.taskId||'', 'Item': i.title, 'Group': i.group||'', 'Party': i.party, 'Priority': i.priority, 'Status': i.status,
       'Reason': i.reason, 'Reason Notes': i.reasonNotes,
@@ -2077,9 +2190,10 @@ function exportToExcel(){
 document.getElementById('btnExport').addEventListener('click', exportToExcel);
 
 function renderAll(){
-  if(!trendSelected) trendSelected = new Set(data.pages.map(p=>p.id));
-  if(!primaveraSelectedPages) primaveraSelectedPages = new Set(data.pages.map(p=>p.id));
+  if(!trendSelected) trendSelected = new Set(activeProject().pages.map(p=>p.id));
+  if(!primaveraSelectedPages) primaveraSelectedPages = new Set(activeProject().pages.map(p=>p.id));
   renderTitle();
+  renderProjectTabs();
   renderPageTabs();
   renderKPIs();
   renderSummary();
@@ -2266,11 +2380,11 @@ function samePageSet(a,b){
   return sa.every((v,i)=>v===sb[i]);
 }
 function generateWeeklySummary(weeks, pageIds){
-  const pages = data.pages.filter(p=>pageIds.includes(p.id));
+  const pages = activeProject().pages.filter(p=>pageIds.includes(p.id));
   const items = [];
   pages.forEach(p=> p.items.forEach(it=> items.push({...it, _pageName:p.name})));
   const multi = pages.length > 1;
-  const pageLabel = pages.length===data.pages.length ? 'All Pages' : pages.map(p=>p.name).join(' + ');
+  const pageLabel = pages.length===activeProject().pages.length ? 'All Pages' : pages.map(p=>p.name).join(' + ');
   const tag = i => multi ? ` [${i._pageName}]` : '';
 
   const rangeStartStr = addDays(todayStr(), -7*weeks);
@@ -2335,7 +2449,7 @@ function generateWeeklySummary(weeks, pageIds){
 function renderSummaryPageControls(){
   document.getElementById('summaryPageControls').innerHTML =
     `<span style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px">Include:</span>` +
-    data.pages.map(p=>`<label class="trend-check"><input type="checkbox" ${summarySelectedPages.has(p.id)?'checked':''} onchange="toggleSummaryPage('${p.id}', this.checked)">${escapeHtml(p.name)}</label>`).join('');
+    activeProject().pages.map(p=>`<label class="trend-check"><input type="checkbox" ${summarySelectedPages.has(p.id)?'checked':''} onchange="toggleSummaryPage('${p.id}', this.checked)">${escapeHtml(p.name)}</label>`).join('');
 }
 function toggleSummaryPage(id, checked){
   if(checked) summarySelectedPages.add(id); else summarySelectedPages.delete(id);
@@ -2347,7 +2461,7 @@ function refreshSavedReportsDropdown(){
     currentReportsList.map((r,idx)=>`<option value="${idx}">${fmtDate(r.date)} · ${r.weeks}wk · ${r.pageLabel} · ${r.stats.completed} done</option>`).join('');
 }
 function openWeeklySummary(){
-  summarySelectedPages = new Set(data.pages.map(p=>p.id));
+  summarySelectedPages = new Set(activeProject().pages.map(p=>p.id));
   renderSummaryPageControls();
   document.getElementById('summaryModalTitle').textContent = `Weekly Summary`;
   refreshSavedReportsDropdown();
@@ -2392,7 +2506,7 @@ function renderGlobalSearch(){
   const panel = document.getElementById('globalSearchResults');
   if(!q){ panel.classList.remove('open'); panel.innerHTML=''; return; }
   let matches = [];
-  data.pages.forEach(p=>{
+  activeProject().pages.forEach(p=>{
     p.items.forEach(i=>{
       const hay = (i.title+' '+i.party+' '+i.reason+' '+i.reasonNotes+' '+i.action+' '+(i.taskId||'')+' '+(i.group||'')).toLowerCase();
       if(hay.includes(q)) matches.push({page:p, item:i});
@@ -2406,8 +2520,8 @@ function renderGlobalSearch(){
   panel.classList.add('open');
 }
 function jumpToItem(pageId, itemId){
-  data.activePageId = pageId;
-  const pg = data.pages.find(p=>p.id===pageId);
+  activeProject().activePageId = pageId;
+  const pg = activeProject().pages.find(p=>p.id===pageId);
   filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(STATUSES), party: new Set(getParties(pg)) };
   document.getElementById('globalSearch').value = '';
   document.getElementById('globalSearchResults').classList.remove('open');
@@ -2428,7 +2542,7 @@ function openResetModal(){
   list.innerHTML = `<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);font-weight:600;border-bottom:1px solid var(--border-soft);padding-bottom:8px;cursor:pointer">
       <input type="checkbox" id="resetSelectAll" onchange="toggleResetAll(this.checked)"> Select all pages
     </label>` +
-    data.pages.map(p=>`<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);cursor:pointer">
+    activeProject().pages.map(p=>`<label style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);cursor:pointer">
       <input type="checkbox" class="reset-page-cb" value="${p.id}"> ${escapeHtml(p.name)} <span style="color:var(--text-dim);font-size:10.5px">(${p.items.length} task${p.items.length===1?'':'s'})</span>
     </label>`).join('');
   document.getElementById('resetDataOverlay').classList.add('open');
@@ -2439,15 +2553,15 @@ function toggleResetAll(checked){
 async function confirmResetData(){
   const selected = [...document.querySelectorAll('.reset-page-cb:checked')].map(cb=>cb.value);
   if(selected.length===0){ showToast('Select at least one page first'); return; }
-  const deletedAll = selected.length === data.pages.length;
-  data.pages = data.pages.filter(p=> !selected.includes(p.id));
-  if(data.pages.length===0){
-    data.pages = [{ id:'tasks', name:'Tasks', items:[], weeklyReports:[] }];
+  const deletedAll = selected.length === activeProject().pages.length;
+  activeProject().pages = activeProject().pages.filter(p=> !selected.includes(p.id));
+  if(activeProject().pages.length===0){
+    activeProject().pages = [{ id:'tasks', name:'Tasks', items:[], weeklyReports:[] }];
     data.nextTaskNumber = 1;
   }
-  data.activePageId = data.pages[0].id;
-  trendSelected = new Set(data.pages.map(p=>p.id));
-  filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(['Identified','Pending / Stuck','In Progress']), party: new Set(getParties(data.pages[0])) };
+  activeProject().activePageId = activeProject().pages[0].id;
+  trendSelected = new Set(activeProject().pages.map(p=>p.id));
+  filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(['Identified','Pending / Stuck','In Progress']), party: new Set(getParties(activeProject().pages[0])) };
   sortField = 'days';
   await saveData();
   document.getElementById('resetDataOverlay').classList.remove('open');
@@ -2493,8 +2607,8 @@ function importFromExcel(file){
         newPages.push({ id: 'pg'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), name: sheetName, items, weeklyReports: [] });
       });
       if(newPages.length===0){ showToast('No importable rows found in that file'); return; }
-      data.pages = newPages;
-      data.activePageId = newPages[0].id;
+      activeProject().pages = newPages;
+      activeProject().activePageId = newPages[0].id;
       data.nextTaskNumber = Math.max(maxTaskNum+1, 1);
       trendSelected = new Set(newPages.map(p=>p.id));
       filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(['Identified','Pending / Stuck','In Progress']), party: new Set(getParties(newPages[0])) };

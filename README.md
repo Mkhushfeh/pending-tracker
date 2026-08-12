@@ -66,6 +66,21 @@ A new tab for quick daily tasks and short-term to-dos that don't need the full t
 just type and hit **+ Add note**. Click a note to mark it done (fades + strikes through), the ✕
 in the corner deletes it. Colors and slight tilt are random per note, like real sticky notes.
 
+## Projects
+
+Everything now lives under **Project 1** by default (Tasks, Remaining Work, As-Built Drawing —
+all your existing pages, unchanged). A new tab row above the pages lets you switch projects or
+click **+ Project** to start a new one, which gets its own separate set of pages/tasks. Trend,
+Primavera View, and Weekly Summary all scope to the currently selected project.
+
+## Cloud connection status
+
+The Google Drive button now lives in the main header, not tucked in the More menu — it's red and
+gently pulsing when not connected, turns green once it is. Syncing is also now automatic: on
+every save, and whenever the app opens after you've connected once before, it silently checks
+Drive and pulls in whichever copy (local or cloud) is actually newer — no more manual "load from
+Drive?" prompt interrupting you each time.
+
 ## Primavera View
 
 A tab between Calendar and Working Table — shows every task across whichever pages you select,
@@ -74,8 +89,8 @@ duration spelled out, plus a timeline bar per task.
 
 Use **Include** to pick which pages feed the view, **Group by** to switch between page / task
 group / flat list, and **Text size** to bump up the row text if it's too small to read at a
-glance. The date ruler along the top now marks every week (not every two), so you can pinpoint
-exactly when something in between finishes.
+glance. The date ruler along the top now marks every week (not every two) and uses a larger font
+than the rest of the app, since there's room for it.
 
 ## Mobile / iPhone
 

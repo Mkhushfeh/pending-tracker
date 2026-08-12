@@ -1000,10 +1000,10 @@ function initGoogleAuth(){
       await driveInitialSync();
     }
   });
-  // if this browser connected before, try a fast silent reconnect so sync happens
-  // automatically on open instead of requiring a click every single time.
+  // Browsers block popups that aren't triggered by a direct click, so a fully
+  // automatic reconnect isn't possible — instead, make the one click needed obvious.
   if(localStorage.getItem('pending-tracker-drive-was-connected')==='true'){
-    try{ driveTokenClient.requestAccessToken({prompt:''}); }catch(e){ /* ignore, user can click Connect manually */ }
+    updateDriveStatus('Click 🔗 Cloud to resume syncing this session');
   }
 }
 function connectDrive(){

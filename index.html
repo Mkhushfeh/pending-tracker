@@ -981,15 +981,16 @@ let driveTokenClient = null;
 
 function saveDriveTokenToSession(accessToken, expiresInSeconds){
   try{
-    sessionStorage.setItem('drive_token', accessToken);
-    sessionStorage.setItem('drive_token_expiry', String(Date.now() + (expiresInSeconds||3500)*1000));
-  }catch(e){ /* sessionStorage unavailable, just skip persistence */ }
+    localStorage.setItem('drive_token', accessToken);
+    localStorage.setItem('drive_token_expiry', String(Date.now() + (expiresInSeconds||3500)*1000));
+  }catch(e){ /* storage unavailable, just skip persistence */ }
 }
 function getValidSessionToken(){
   try{
-    const token = sessionStorage.getItem('drive_token');
-    const expiry = parseInt(sessionStorage.getItem('drive_token_expiry')||'0', 10);
+    const token = localStorage.getItem('drive_token');
+    const expiry = parseInt(localStorage.getItem('drive_token_expiry')||'0', 10);
     if(token && Date.now() < expiry - 60000) return token; // 1 min safety buffer before expiry
+    if(token){ localStorage.removeItem('drive_token'); localStorage.removeItem('drive_token_expiry'); }
   }catch(e){ /* ignore */ }
   return null;
 }

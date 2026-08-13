@@ -168,6 +168,9 @@
   .sticky-note.done .sticky-note-text{text-decoration:line-through;}
   .sticky-note-text{font-size:13.5px;color:#26241c;line-height:1.4;word-break:break-word;font-family:var(--font-ui);}
   .sticky-note-del{position:absolute;top:6px;right:9px;font-size:13px;color:rgba(0,0,0,.35);cursor:pointer;line-height:1;}
+  .sticky-note-edit{position:absolute;top:6px;right:28px;font-size:12px;color:rgba(0,0,0,.35);cursor:pointer;line-height:1;}
+  .sticky-note-edit:hover{color:rgba(0,0,0,.7);}
+  .sticky-note-edit-area{width:100%;background:rgba(255,255,255,.5);border:1px solid rgba(0,0,0,.2);border-radius:4px;padding:5px 6px;font-size:13.5px;color:#26241c;font-family:var(--font-ui);resize:none;min-height:56px;}
   .sticky-note-del:hover{color:rgba(0,0,0,.7);}
   .sticky-note-date{font-size:9.5px;color:rgba(0,0,0,.4);margin-top:10px;}
   .gantt-row{display:flex;align-items:center;gap:12px;cursor:pointer;}
@@ -1145,11 +1148,34 @@ function renderProjectTabs(){
   let html = '';
   data.projects.forEach(proj=>{
     const openCnt = proj.pages.reduce((s,p)=> s + p.items.filter(i=>i.status!=='Resolved').length, 0);
-    html += `<button class="project-tab ${proj.id===data.activeProjectId?'active':''}" onclick="switchProject('${proj.id}')">${escapeHtml(proj.name)} <span class="cnt">${openCnt}</span></button>`;
+    html += `<span class="project-tab ${proj.id===data.activeProjectId?'active':''}" style="cursor:pointer" id="projTab-${proj.id}">
+      <span onclick="switchProject('${proj.id}')">${escapeHtml(proj.name)} <span class="cnt">${openCnt}</span></span>
+      <span onclick="event.stopPropagation();renameProjectTab('${proj.id}')" title="Rename" style="margin-left:5px;opacity:.65">✎</span>
+    </span>`;
   });
   html += `<button class="project-add-pill" id="btnAddProject" title="Add project">+ Project</button>`;
   document.getElementById('projectTabs').innerHTML = html;
   document.getElementById('btnAddProject').addEventListener('click', openProjectNameModal);
+}
+function renameProjectTab(id){
+  const proj = data.projects.find(p=>p.id===id);
+  if(!proj) return;
+  const tab = document.getElementById('projTab-'+id);
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = proj.name;
+  input.style.cssText = 'font-size:12px;font-weight:600;background:var(--panel-alt);border:1px solid var(--accent);color:var(--text);border-radius:12px;padding:4px 10px;width:130px;font-family:inherit;';
+  const commit = async ()=>{
+    const val = input.value.trim();
+    if(val) proj.name = val;
+    await saveData();
+    renderAll();
+  };
+  input.addEventListener('blur', commit);
+  input.addEventListener('keydown', (e)=>{ if(e.key==='Enter') input.blur(); });
+  tab.replaceWith(input);
+  input.focus();
+  input.select();
 }
 function switchProject(id){
   data.activeProjectId = id;
@@ -2039,11 +2065,34 @@ function renderStickyNotes(){
     return;
   }
   grid.innerHTML = data.stickyNotes.slice().reverse().map(n=>`
-    <div class="sticky-note ${n.done?'done':''}" style="background:${n.color};--rot:${n.rot}deg" onclick="toggleSticky('${n.id}')">
+    <div class="sticky-note ${n.done?'done':''}" style="background:${n.color};--rot:${n.rot}deg" onclick="toggleSticky('${n.id}')" data-id="${n.id}">
+      <span class="sticky-note-edit" onclick="event.stopPropagation();editSticky('${n.id}')" title="Edit">✎</span>
       <span class="sticky-note-del" onclick="event.stopPropagation();deleteSticky('${n.id}')" title="Delete">✕</span>
-      <div class="sticky-note-text">${escapeHtml(n.text)}</div>
+      <div class="sticky-note-text" id="stickyText-${n.id}">${escapeHtml(n.text)}</div>
       <div class="sticky-note-date">${fmtDate(n.createdAt)}${n.done?' · done':''}</div>
     </div>`).join('');
+}
+function editSticky(id){
+  const n = (data.stickyNotes||[]).find(x=>x.id===id);
+  if(!n) return;
+  const textEl = document.getElementById('stickyText-'+id);
+  if(!textEl || textEl.tagName==='TEXTAREA') return;
+  const ta = document.createElement('textarea');
+  ta.className = 'sticky-note-edit-area';
+  ta.value = n.text;
+  ta.id = 'stickyText-'+id;
+  ta.onclick = (e)=>e.stopPropagation();
+  const commit = async ()=>{
+    const newText = ta.value.trim();
+    if(newText) n.text = newText;
+    await saveData();
+    renderStickyNotes();
+  };
+  ta.addEventListener('blur', commit);
+  ta.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); ta.blur(); } });
+  textEl.replaceWith(ta);
+  ta.focus();
+  ta.select();
 }
 async function addSticky(){
   const input = document.getElementById('stickyInput');

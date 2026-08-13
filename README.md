@@ -100,6 +100,22 @@ slider) lives behind a **⋮ More** button. Touch targets are sized for a thumb,
 text so iOS doesn't auto-zoom on tap, and safe-area padding keeps content clear of the notch and
 home indicator.
 
+## Latest updates
+
+- **Calendar:** click any empty day to open Add Task with that due date pre-filled. Text size
+  slider next to the month nav.
+- **Tab order:** Summary, Working Table, Trend, Calendar, **Primavera View** (now bold), Sticky
+  Notes (now last).
+- **Weekly Summary:** added **Export to Excel** next to the existing Copy button — Copy is for
+  pasting into an email/Teams message for management, Export gives a downloadable .xlsx.
+- **Status legend** now also appears in Primavera View and Working Table, not just Summary.
+- **Sticky notes** are now editable — click the ✎ icon on any note.
+- **Project tabs** are now renamable — click the ✎ next to any project name, including Project 1.
+- **Cloud connection** now persists in `localStorage` (not `sessionStorage`) — reconnects
+  automatically for about an hour after your last connect, even after fully closing the browser,
+  not just on refresh. Past that hour, one click is unavoidable (a browser popup-permission rule,
+  not something any code can remove).
+
 ## Theme
 
 Click the theme button in the header to toggle between **🌙 Dark** (Cool Blue) and **☀️ Light**

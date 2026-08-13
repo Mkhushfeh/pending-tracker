@@ -145,7 +145,8 @@
   .cal-month-label{font-size:15px;font-weight:600;}
   .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
   .cal-dow{font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--text-dim);text-align:center;padding-bottom:4px;}
-  .cal-day{background:var(--panel);border:1px solid var(--border);border-radius:6px;min-height:104px;padding:6px;display:flex;flex-direction:column;gap:3px;}
+  .cal-day{background:var(--panel);border:1px solid var(--border);border-radius:6px;min-height:104px;padding:6px;display:flex;flex-direction:column;gap:3px;cursor:pointer;}
+  .cal-day:hover{border-color:var(--accent);}
   .cal-day.other-month{opacity:0.4;}
   .cal-day.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset;}
   .cal-day.drag-over{background:var(--accent-dim);}
@@ -331,11 +332,11 @@
   <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
     <div class="view-toggle" style="margin-bottom:0">
       <button id="btnViewSummary" class="active">Summary</button>
+      <button id="btnViewWorking">Working Table</button>
       <button id="btnViewTrend">Trend</button>
       <button id="btnViewCalendar">Calendar</button>
-      <button id="btnViewPrimavera">Primavera View</button>
+      <button id="btnViewPrimavera" style="font-weight:800">Primavera View</button>
       <button id="btnViewSticky">📌 Sticky Notes</button>
-      <button id="btnViewWorking">Working Table</button>
     </div>
     <button class="btn-ghost" id="btnWeeklySummary">📋 Weekly Summary</button>
   </div>
@@ -396,6 +397,7 @@
     </div>
     <div class="sum-card wide">
       <div class="sum-card-title">All tasks — Primavera view</div>
+      <div id="primaveraLegend"></div>
       <div id="primaveraGanttAxis"></div>
       <div id="primaveraTable"></div>
     </div>
@@ -410,6 +412,7 @@
   </div>
 
   <div id="workingView" style="display:none">
+    <div id="workingLegend" style="margin-bottom:12px"></div>
     <div class="toolbar">
       <input type="text" id="filterSearch" placeholder="Search item, party…">
       <select id="sortField">
@@ -507,6 +510,8 @@
           <option>Technical / design issue</option>
           <option>Resource constraint</option>
           <option>Awaiting internal review</option>
+          <option>In Progress</option>
+          <option>Planned</option>
           <option>Other</option>
         </select>
       </div>
@@ -595,6 +600,7 @@
     <div class="modal-actions" style="justify-content:flex-end">
       <button class="btn-ghost" id="btnCloseSummaryModal">Close</button>
       <button class="btn-ghost" id="btnSaveReport">💾 Save this report</button>
+      <button class="btn-ghost" id="btnExportReportExcel">⬇ Export to Excel</button>
       <button class="btn" id="btnCopySummary">Copy</button>
     </div>
   </div>
@@ -767,7 +773,7 @@ let sortField = 'days';
 const STATUSES = ['Identified','Pending / Stuck','In Progress','Resolved'];
 const PRIORITIES = ['Critical','High','Medium','Low'];
 const REASONS = ['Awaiting client / owner approval','Awaiting vendor / supplier','Material delay',
-  'Permit / site access issue','Technical / design issue','Resource constraint','Awaiting internal review','Other'];
+  'Permit / site access issue','Technical / design issue','Resource constraint','Awaiting internal review','In Progress','Planned','Other'];
 const STATUS_SLUG = {'Identified':'identified','Pending / Stuck':'stuck','In Progress':'inprogress','Resolved':'resolved'};
 let filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(['Identified','Pending / Stuck','In Progress']), party: new Set() };
 function getParties(page){ return [...new Set(page.items.map(i=>i.party).filter(Boolean))].sort(); }
@@ -1660,6 +1666,25 @@ function ganttRowHtml(i, scaleMin, scaleSpan){
       <div class="gantt-row-plan">${planLabelHtml(i)}</div>
     </div>`;
 }
+function barLegendHtml(){
+  return `<div class="bar-legend">
+      <span><i class="bar-swatch bar-identified"></i>Identified</span>
+      <span><i class="bar-swatch bar-stuck"></i>Pending / Stuck</span>
+      <span><i class="bar-swatch bar-inprogress"></i>In Progress</span>
+      <span><i class="bar-swatch bar-resolved"></i>Resolved</span>
+      <span><i class="swatch-plan"></i>Planned duration</span>
+      <span><i class="swatch-diamond"></i>Due date</span>
+      <span><i class="bar-swatch bar-overrun"></i>Overrun / delay</span>
+    </div>`;
+}
+function statusLegendHtml(){
+  return `<div class="bar-legend">
+      <span><i class="bar-swatch bar-identified"></i>Identified</span>
+      <span><i class="bar-swatch bar-stuck"></i>Pending / Stuck</span>
+      <span><i class="bar-swatch bar-inprogress"></i>In Progress</span>
+      <span><i class="bar-swatch bar-resolved"></i>Resolved</span>
+    </div>`;
+}
 function renderGanttCard(items){
   if(items.length===0) return `<div style="color:var(--text-dim);font-size:12.5px;padding:10px 0">No items on this page yet.</div>`;
   const sorted = [...items].sort((a,b)=> new Date(a.since) - new Date(b.since));
@@ -1674,15 +1699,7 @@ function renderGanttCard(items){
   } else {
     rows = sorted.map(i=>ganttRowHtml(i,scaleMin,scaleSpan)).join('');
   }
-  return `<div class="bar-legend">
-      <span><i class="bar-swatch bar-identified"></i>Identified</span>
-      <span><i class="bar-swatch bar-stuck"></i>Pending / Stuck</span>
-      <span><i class="bar-swatch bar-inprogress"></i>In Progress</span>
-      <span><i class="bar-swatch bar-resolved"></i>Resolved</span>
-      <span><i class="swatch-plan"></i>Planned duration</span>
-      <span><i class="swatch-diamond"></i>Due date</span>
-      <span><i class="bar-swatch bar-overrun"></i>Overrun / delay</span>
-    </div>
+  return `${barLegendHtml()}
     ${renderGanttAxis(scaleMin, scaleSpan)}
     <div class="gantt-rows">${rows}</div>`;
 }
@@ -1768,6 +1785,8 @@ function renderSummary(){
 
 /* ---------- working table ---------- */
 function renderActiveTable(){
+  const legendEl = document.getElementById('workingLegend');
+  if(legendEl) legendEl.innerHTML = statusLegendHtml();
   const tbody = document.getElementById('activeBody');
   const list = getActive();
   if(list.length===0){
@@ -2010,10 +2029,10 @@ function renderCalendar(){
     const dayItems = items.filter(i=> i.due===dateStr);
     const isToday = dateStr===todayStrVal;
     const maxShow = 3;
-    html += `<div class="cal-day ${c.other?'other-month':''} ${isToday?'today':''}" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleCalDrop(event,'${dateStr}')">
+    html += `<div class="cal-day ${c.other?'other-month':''} ${isToday?'today':''}" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleCalDrop(event,'${dateStr}')" onclick="openModal(null,'${dateStr}')" title="Click to add a task due this day">
       <div class="cal-day-num">${c.day}</div>
       ${dayItems.slice(0,maxShow).map(i=>`<div class="cal-chip pr-${i.priority} ${i.status==='Resolved'?'resolved':''}" draggable="true" ondragstart="event.dataTransfer.setData('id','${i.id}')" onclick="event.stopPropagation();openModal('${i.id}')" title="${escapeHtml(i.title)}">${i.taskId?i.taskId+' ':''}${escapeHtml(i.title)}</div>`).join('')}
-      ${dayItems.length>maxShow?`<div class="cal-more" onclick="showDayList('${dateStr}')">+${dayItems.length-maxShow} more</div>`:''}
+      ${dayItems.length>maxShow?`<div class="cal-more" onclick="event.stopPropagation();showDayList('${dateStr}')">+${dayItems.length-maxShow} more</div>`:''}
     </div>`;
   });
   grid.innerHTML = html;
@@ -2146,6 +2165,7 @@ function primaveraRowHtml(item, scaleMin, scaleSpan){
 }
 function renderPrimaveraTable(){
   const items = getPrimaveraItems();
+  document.getElementById('primaveraLegend').innerHTML = barLegendHtml();
   if(items.length===0){
     document.getElementById('primaveraGanttAxis').innerHTML = '';
     document.getElementById('primaveraTable').innerHTML = `<div style="color:var(--text-dim);font-size:12.5px;padding:20px 0;text-align:center">No tasks in the selected pages.</div>`;
@@ -2296,7 +2316,7 @@ function renderAll(){
 }
 
 /* ---------- modal ---------- */
-function openModal(id){
+function openModal(id, presetDue){
   pendingDeleteId = null;
   const page = activePage();
   const overlay = document.getElementById('modalOverlay');
@@ -2307,7 +2327,7 @@ function openModal(id){
   document.getElementById('fParty').value = item ? item.party : '';
   document.getElementById('fTitle').value = item ? item.title : '';
   document.getElementById('fSince').value = item ? item.since : todayStr();
-  document.getElementById('fDue').value = item && item.due ? item.due : '';
+  document.getElementById('fDue').value = item && item.due ? item.due : (presetDue || '');
   document.getElementById('fWeight').value = item && item.weight ? item.weight : 1;
   document.getElementById('fPct').value = item ? (item.pctComplete||0) : 0;
   document.getElementById('fEscalation').value = item ? (item.escalationContact||'') : '';
@@ -2583,9 +2603,22 @@ async function copySummaryText(){
   try{ await navigator.clipboard.writeText(ta.value); showToast('Copied to clipboard'); }
   catch(e){ ta.focus(); ta.select(); showToast('Selected — copy with Ctrl/Cmd+C'); }
 }
+function exportReportToExcel(){
+  const text = document.getElementById('summaryText').value;
+  const savedIdx = document.getElementById('savedReportsList').value;
+  const reportDate = savedIdx!=='' ? currentReportsList[savedIdx].date : todayStr();
+  const lines = text.split('\n').map(l=>[l]);
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([[`Weekly Summary — ${fmtDate(reportDate)}`], [''], ...lines]);
+  ws['!cols'] = [{wch: 100}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Weekly Report');
+  XLSX.writeFile(wb, `weekly-report-${reportDate}.xlsx`);
+  showToast('Exported — check your downloads');
+}
 document.getElementById('btnWeeklySummary').addEventListener('click', openWeeklySummary);
 document.getElementById('btnCloseSummaryModal').addEventListener('click', ()=>document.getElementById('summaryModalOverlay').classList.remove('open'));
 document.getElementById('btnCopySummary').addEventListener('click', copySummaryText);
+document.getElementById('btnExportReportExcel').addEventListener('click', exportReportToExcel);
 document.getElementById('summaryModalOverlay').addEventListener('click', (e)=>{ if(e.target.id==='summaryModalOverlay') e.currentTarget.classList.remove('open'); });
 
 /* ---------- global search ---------- */

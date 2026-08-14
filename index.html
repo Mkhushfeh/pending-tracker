@@ -1941,6 +1941,7 @@ function filterByStatus(status){
     // Resolved items live in the separate Audit Trail table, not the active table.
     filterState.status = new Set(DEFAULT_STATUS_FILTER);
     statusFilterActive = 'Resolved';
+    renderResolvedTable();
     const body = document.getElementById('auditBody');
     const arrow = document.getElementById('auditArrow');
     if(!body.classList.contains('open')){ body.classList.add('open'); arrow.classList.add('open'); }
@@ -2430,6 +2431,11 @@ function openModal(id, presetDue){
   if(id) renderCommentsList(item);
   toggleResolvedField();
   overlay.classList.add('open');
+  setTimeout(()=>{
+    const titleField = document.getElementById('fTitle');
+    titleField.focus();
+    if(!id) titleField.select();
+  }, 50);
 }
 function closeModal(){ document.getElementById('modalOverlay').classList.remove('open'); }
 function toggleResolvedField(){

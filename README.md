@@ -102,6 +102,12 @@ home indicator.
 
 ## Latest updates
 
+- **Add task — auto-focus:** opening "+ Add task" (or clicking an empty calendar day) now puts
+  the cursor straight into the **Item / task** name field, so you can start typing immediately
+  without clicking into it first.
+- **Resolved legend fix:** clicking the Resolved swatch/label now correctly populates and opens
+  the Audit Trail before scrolling to it — previously it could scroll to an empty/stale table if
+  the Working Table hadn't been visited yet in that session.
 - **Clickable status legends:** every status legend (Working Table, Gantt/Summary card, Primavera
   view, and the Status Breakdown donut on Summary) is now clickable per status — click **Identified**,
   **Pending / Stuck**, **In Progress**, or **Resolved** (the swatch or the label, either works) and

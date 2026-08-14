@@ -102,6 +102,14 @@ home indicator.
 
 ## Latest updates
 
+- **Clickable status legends:** every status legend (Working Table, Gantt/Summary card, Primavera
+  view, and the Status Breakdown donut on Summary) is now clickable per status — click **Identified**,
+  **Pending / Stuck**, **In Progress**, or **Resolved** (the swatch or the label, either works) and
+  the Working Table jumps to showing only that status. Clicking **Resolved** opens/scrolls to the
+  Audit Trail section since resolved tasks live there. A small banner appears above the table —
+  "Showing only **X** tasks" — with a **✕ Reset view** button that restores the normal default
+  view (Identified / Pending-Stuck / In Progress, resolved hidden). Switching pages or projects
+  also automatically clears the filter.
 - **Calendar — Start / Finish / Both toggle:** next to the text-size slider, a small button group
   lets you choose what the calendar plots each task by — **Finish** (the due date, previous
   default behavior), **Start**, or **Both** (task appears on both its start and finish day, with

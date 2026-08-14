@@ -115,6 +115,13 @@
   .sum-legend{display:flex;flex-direction:column;gap:7px;font-size:12px;color:var(--text-muted);min-width:150px;}
   .legend-row{display:flex;align-items:center;gap:7px;}
   .legend-row .mono{margin-left:auto;font-family:var(--font-mono);color:var(--text);}
+  .legend-clickable{cursor:pointer;border-radius:5px;padding:2px 6px;margin:-2px -6px;transition:background .12s;}
+  .legend-clickable:hover{background:var(--panel-alt);}
+  .legend-clickable:hover .dot, .bar-legend .legend-clickable:hover i{box-shadow:0 0 0 2px var(--border);}
+  .status-filter-banner{display:flex;align-items:center;gap:10px;background:var(--panel-alt);border:1px solid var(--accent);border-radius:6px;padding:7px 12px;font-size:12px;color:var(--text-muted);margin-bottom:10px;}
+  .status-filter-banner b{color:var(--text);}
+  .status-filter-banner button{background:var(--accent);color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11.5px;cursor:pointer;font-family:var(--font-ui);}
+  .status-filter-banner button:hover{opacity:.88;}
   .dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0;}
   .big-stat{font-family:var(--font-mono);font-size:36px;font-weight:700;color:var(--text);}
   .big-stat .unit{font-size:13px;color:var(--text-dim);font-weight:400;margin-left:6px;}
@@ -423,6 +430,7 @@
 
   <div id="workingView" style="display:none">
     <div id="workingLegend" style="margin-bottom:12px"></div>
+    <div id="statusFilterBanner"></div>
     <div class="toolbar">
       <input type="text" id="filterSearch" placeholder="Search item, party…">
       <select id="sortField">
@@ -1199,6 +1207,7 @@ function switchProject(id){
   const proj = activeProject();
   const newPage = proj.pages.find(p=>p.id===proj.activePageId) || proj.pages[0];
   filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(['Identified','Pending / Stuck','In Progress']), party: new Set(getParties(newPage)) };
+  statusFilterActive = null;
   trendSelected = null;
   primaveraSelectedPages = null;
   summarySelectedPages = null;
@@ -1241,6 +1250,7 @@ function switchPage(id){
   activeProject().activePageId = id;
   const newPage = activeProject().pages.find(p=>p.id===id);
   filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(['Identified','Pending / Stuck','In Progress']), party: new Set(getParties(newPage)) };
+  statusFilterActive = null;
   renderAll();
 }
 function openPageNameModal(){
@@ -1678,10 +1688,10 @@ function ganttRowHtml(i, scaleMin, scaleSpan){
 }
 function barLegendHtml(){
   return `<div class="bar-legend">
-      <span><i class="bar-swatch bar-identified"></i>Identified</span>
-      <span><i class="bar-swatch bar-stuck"></i>Pending / Stuck</span>
-      <span><i class="bar-swatch bar-inprogress"></i>In Progress</span>
-      <span><i class="bar-swatch bar-resolved"></i>Resolved</span>
+      <span class="legend-clickable" onclick="filterByStatus('Identified')" title="Show only Identified tasks"><i class="bar-swatch bar-identified"></i>Identified</span>
+      <span class="legend-clickable" onclick="filterByStatus('Pending / Stuck')" title="Show only Pending / Stuck tasks"><i class="bar-swatch bar-stuck"></i>Pending / Stuck</span>
+      <span class="legend-clickable" onclick="filterByStatus('In Progress')" title="Show only In Progress tasks"><i class="bar-swatch bar-inprogress"></i>In Progress</span>
+      <span class="legend-clickable" onclick="filterByStatus('Resolved')" title="Show only Resolved tasks"><i class="bar-swatch bar-resolved"></i>Resolved</span>
       <span><i class="swatch-plan"></i>Planned duration</span>
       <span><i class="swatch-diamond"></i>Due date</span>
       <span><i class="bar-swatch bar-overrun"></i>Overrun / delay</span>
@@ -1689,10 +1699,10 @@ function barLegendHtml(){
 }
 function statusLegendHtml(){
   return `<div class="bar-legend">
-      <span><i class="bar-swatch bar-identified"></i>Identified</span>
-      <span><i class="bar-swatch bar-stuck"></i>Pending / Stuck</span>
-      <span><i class="bar-swatch bar-inprogress"></i>In Progress</span>
-      <span><i class="bar-swatch bar-resolved"></i>Resolved</span>
+      <span class="legend-clickable" onclick="filterByStatus('Identified')" title="Show only Identified tasks"><i class="bar-swatch bar-identified"></i>Identified</span>
+      <span class="legend-clickable" onclick="filterByStatus('Pending / Stuck')" title="Show only Pending / Stuck tasks"><i class="bar-swatch bar-stuck"></i>Pending / Stuck</span>
+      <span class="legend-clickable" onclick="filterByStatus('In Progress')" title="Show only In Progress tasks"><i class="bar-swatch bar-inprogress"></i>In Progress</span>
+      <span class="legend-clickable" onclick="filterByStatus('Resolved')" title="Show only Resolved tasks"><i class="bar-swatch bar-resolved"></i>Resolved</span>
     </div>`;
 }
 function renderGanttCard(items){
@@ -1752,7 +1762,7 @@ function renderSummary(){
         <div class="sum-donut-wrap">
           ${themeChartSvg(svgDonut(statusData,100,16))}
           <div class="sum-legend">
-            ${statusData.map(s=>`<div class="legend-row"><span class="dot" style="background:${s.color}"></span>${s.label}<span class="mono">${s.count}</span></div>`).join('')}
+            ${statusData.map(s=>`<div class="legend-row legend-clickable" onclick="filterByStatus('${s.label.replace(/'/g,"\\'")}')" title="Show only ${escapeHtml(s.label)} tasks"><span class="dot" style="background:${s.color}"></span>${s.label}<span class="mono">${s.count}</span></div>`).join('')}
           </div>
         </div>
         ${oldest ? `<div style="margin-top:10px;font-size:10.5px;color:var(--text-dim);border-top:1px solid var(--border-soft);padding-top:7px">Oldest open: <span style="color:var(--text)">${escapeHtml(oldest.title)}</span> — <span style="color:var(--red)">${daysStuck(oldest)}d</span></div>` : ''}
@@ -1797,6 +1807,7 @@ function renderSummary(){
 function renderActiveTable(){
   const legendEl = document.getElementById('workingLegend');
   if(legendEl) legendEl.innerHTML = statusLegendHtml();
+  renderStatusFilterBanner();
   const tbody = document.getElementById('activeBody');
   const list = getActive();
   if(list.length===0){
@@ -1920,6 +1931,38 @@ function refreshFilterUI(){
   document.getElementById('fiStatus').classList.toggle('active', filterState.status.size < 3);
   const partyCount = getParties(activePage()).length;
   document.getElementById('fiParty').classList.toggle('active', partyCount>0 && filterState.party.size < partyCount);
+  renderStatusFilterBanner();
+}
+const DEFAULT_STATUS_FILTER = ['Identified','Pending / Stuck','In Progress'];
+let statusFilterActive = null; // label of the single status currently isolated via legend click, or null
+function filterByStatus(status){
+  showView('working');
+  if(status==='Resolved'){
+    // Resolved items live in the separate Audit Trail table, not the active table.
+    filterState.status = new Set(DEFAULT_STATUS_FILTER);
+    statusFilterActive = 'Resolved';
+    const body = document.getElementById('auditBody');
+    const arrow = document.getElementById('auditArrow');
+    if(!body.classList.contains('open')){ body.classList.add('open'); arrow.classList.add('open'); }
+    setTimeout(()=> body.scrollIntoView({behavior:'smooth', block:'start'}), 50);
+  } else {
+    filterState.status = new Set([status]);
+    statusFilterActive = status;
+  }
+  refreshFilterUI();
+  renderActiveTable();
+}
+function resetStatusFilter(){
+  filterState.status = new Set(DEFAULT_STATUS_FILTER);
+  statusFilterActive = null;
+  refreshFilterUI();
+  renderActiveTable();
+}
+function renderStatusFilterBanner(){
+  const el = document.getElementById('statusFilterBanner');
+  if(!el) return;
+  if(!statusFilterActive){ el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="status-filter-banner">Showing only <b>${escapeHtml(statusFilterActive)}</b> tasks${statusFilterActive==='Resolved' ? ' (see Audit Trail below)' : ''}.<button onclick="resetStatusFilter()">✕ Reset view</button></div>`;
 }
 function iconIdFor(field){ return 'fi'+field.charAt(0).toUpperCase()+field.slice(1); }
 function openFilterDropdown(field){
@@ -2683,6 +2726,7 @@ function jumpToItem(pageId, itemId){
   activeProject().activePageId = pageId;
   const pg = activeProject().pages.find(p=>p.id===pageId);
   filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(STATUSES), party: new Set(getParties(pg)) };
+  statusFilterActive = null;
   document.getElementById('globalSearch').value = '';
   document.getElementById('globalSearchResults').classList.remove('open');
   renderAll();
@@ -2722,6 +2766,7 @@ async function confirmResetData(){
   activeProject().activePageId = activeProject().pages[0].id;
   trendSelected = new Set(activeProject().pages.map(p=>p.id));
   filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(['Identified','Pending / Stuck','In Progress']), party: new Set(getParties(activeProject().pages[0])) };
+  statusFilterActive = null;
   sortField = 'days';
   await saveData();
   document.getElementById('resetDataOverlay').classList.remove('open');
@@ -2772,6 +2817,7 @@ function importFromExcel(file){
       data.nextTaskNumber = Math.max(maxTaskNum+1, 1);
       trendSelected = new Set(newPages.map(p=>p.id));
       filterState = { priority: new Set(PRIORITIES), reason: new Set(REASONS), status: new Set(['Identified','Pending / Stuck','In Progress']), party: new Set(getParties(newPages[0])) };
+      statusFilterActive = null;
       ensureTaskIds();
       await saveData();
       showToast(`Imported ${newPages.length} page(s) — ${newPages.reduce((s,p)=>s+p.items.length,0)} tasks total`);

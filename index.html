@@ -157,6 +157,11 @@
   .cal-chip.pr-Medium{border-left-color:var(--amber);}
   .cal-chip.pr-Low{border-left-color:var(--gray);}
   .cal-chip.resolved{opacity:0.55;text-decoration:line-through;}
+  .cal-chip .cal-chip-tag{font-size:9px;font-weight:700;letter-spacing:.3px;opacity:.75;margin-right:3px;}
+  .cal-mode-btn{background:var(--panel-alt);border:none;color:var(--text-muted);padding:6px 11px;cursor:pointer;font-size:11.5px;font-family:var(--font-ui);border-right:1px solid var(--border);}
+  .cal-mode-btn:last-child{border-right:none;}
+  .cal-mode-btn:hover{color:var(--text);}
+  .cal-mode-btn.active{background:var(--accent);color:#fff;}
   .cal-more{font-size:10px;color:var(--accent);cursor:pointer;}
   .cal-unscheduled{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:14px;}
   .cal-unscheduled-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;min-height:30px;}
@@ -367,6 +372,11 @@
           <span style="font-size:10px;color:var(--text-dim)">A</span>
           <input type="range" id="calFontSlider" min="10" max="18" step="1" value="12" style="width:80px;accent-color:var(--accent);cursor:pointer">
           <span style="font-size:14px;color:var(--text-dim)">A</span>
+        </div>
+        <div class="cal-date-mode" id="calDateMode" style="display:flex;align-items:center;gap:0;background:var(--panel-alt);border:1px solid var(--border);border-radius:6px;overflow:hidden;">
+          <button type="button" class="cal-mode-btn" data-mode="finish" title="Show each task on its finish/due date">Finish</button>
+          <button type="button" class="cal-mode-btn" data-mode="start" title="Show each task on its start date">Start</button>
+          <button type="button" class="cal-mode-btn" data-mode="both" title="Show each task on both its start and finish dates">Both</button>
         </div>
         <div class="cal-nav">
           <button id="calPrev">← Prev</button>
@@ -1994,6 +2004,7 @@ document.getElementById('managePartiesOverlay').addEventListener('click', (e)=>{
 
 /* ---------- calendar ---------- */
 let calendarDate = new Date();
+let calDateMode = localStorage.getItem('pending-tracker-cal-datemode') || 'finish';
 function renderCalendar(){
   const grid = document.getElementById('calGrid');
   if(!grid) return;
@@ -2003,7 +2014,7 @@ function renderCalendar(){
   const month = calendarDate.getMonth();
   document.getElementById('calMonthLabel').textContent = calendarDate.toLocaleDateString(undefined,{month:'long',year:'numeric'});
 
-  const unscheduled = items.filter(i=>i.status!=='Resolved' && !i.due);
+  const unscheduled = items.filter(i=>i.status!=='Resolved' && (calDateMode==='start' ? !i.since : !i.due));
   document.getElementById('calUnscheduled').innerHTML = `
     <div style="font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px">Unscheduled — drag onto a day to set its due date</div>
     <div class="cal-unscheduled-list" id="calUnschedList" ondragover="event.preventDefault()" ondrop="handleCalDrop(event,'')">
@@ -2026,16 +2037,34 @@ function renderCalendar(){
   cells.forEach(c=>{
     const y=c.dateObj.getFullYear(), m=String(c.dateObj.getMonth()+1).padStart(2,'0'), d=String(c.dateObj.getDate()).padStart(2,'0');
     const dateStr = `${y}-${m}-${d}`;
-    const dayItems = items.filter(i=> i.due===dateStr);
+    const dayItems = itemsForCalDay(items, dateStr);
     const isToday = dateStr===todayStrVal;
     const maxShow = 3;
     html += `<div class="cal-day ${c.other?'other-month':''} ${isToday?'today':''}" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleCalDrop(event,'${dateStr}')" onclick="openModal(null,'${dateStr}')" title="Click to add a task due this day">
       <div class="cal-day-num">${c.day}</div>
-      ${dayItems.slice(0,maxShow).map(i=>`<div class="cal-chip pr-${i.priority} ${i.status==='Resolved'?'resolved':''}" draggable="true" ondragstart="event.dataTransfer.setData('id','${i.id}')" onclick="event.stopPropagation();openModal('${i.id}')" title="${escapeHtml(i.title)}">${i.taskId?i.taskId+' ':''}${escapeHtml(i.title)}</div>`).join('')}
+      ${dayItems.slice(0,maxShow).map(({item:i,tag})=>`<div class="cal-chip pr-${i.priority} ${i.status==='Resolved'?'resolved':''}" draggable="true" ondragstart="event.dataTransfer.setData('id','${i.id}')" onclick="event.stopPropagation();openModal('${i.id}')" title="${escapeHtml(i.title)}">${tag?`<span class="cal-chip-tag">${tag}</span>`:''}${i.taskId?i.taskId+' ':''}${escapeHtml(i.title)}</div>`).join('')}
       ${dayItems.length>maxShow?`<div class="cal-more" onclick="event.stopPropagation();showDayList('${dateStr}')">+${dayItems.length-maxShow} more</div>`:''}
     </div>`;
   });
   grid.innerHTML = html;
+}
+// Which tasks appear on a given calendar day, based on the Start/Finish/Both display mode.
+// Returns [{item, tag}] where tag is 'S'/'F' (only used in 'both' mode) for a small chip label.
+function itemsForCalDay(items, dateStr){
+  const mode = calDateMode;
+  const out = [];
+  items.forEach(i=>{
+    const isStart = i.since===dateStr;
+    const isFinish = i.due===dateStr;
+    if(mode==='start' && isStart) out.push({item:i, tag:''});
+    else if(mode==='finish' && isFinish) out.push({item:i, tag:''});
+    else if(mode==='both'){
+      if(isStart && isFinish) out.push({item:i, tag:'S/F'});
+      else if(isStart) out.push({item:i, tag:'S'});
+      else if(isFinish) out.push({item:i, tag:'F'});
+    }
+  });
+  return out;
 }
 async function handleCalDrop(ev, dateStr){
   ev.preventDefault();
@@ -2068,6 +2097,16 @@ document.getElementById('calFontSlider').addEventListener('input', (e)=>{
   document.documentElement.style.setProperty('--cal-font-size', px+'px');
   localStorage.setItem('pending-tracker-cal-fontsize', px);
 });
+function setCalDateMode(mode){
+  calDateMode = mode;
+  localStorage.setItem('pending-tracker-cal-datemode', mode);
+  document.querySelectorAll('.cal-mode-btn').forEach(b=> b.classList.toggle('active', b.dataset.mode===mode));
+  renderCalendar();
+}
+document.querySelectorAll('.cal-mode-btn').forEach(b=>{
+  b.addEventListener('click', ()=> setCalDateMode(b.dataset.mode));
+});
+document.querySelectorAll('.cal-mode-btn').forEach(b=> b.classList.toggle('active', b.dataset.mode===calDateMode));
 document.getElementById('calPrev').addEventListener('click', ()=>{ calendarDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth()-1, 1); renderCalendar(); });
 document.getElementById('calNext').addEventListener('click', ()=>{ calendarDate = new Date(calendarDate.getFullYear(), calendarDate.getMonth()+1, 1); renderCalendar(); });
 document.getElementById('calToday').addEventListener('click', ()=>{ calendarDate = new Date(); renderCalendar(); });

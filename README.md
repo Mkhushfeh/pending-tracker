@@ -102,6 +102,13 @@ home indicator.
 
 ## Latest updates
 
+- **Calendar — Start / Finish / Both toggle:** next to the text-size slider, a small button group
+  lets you choose what the calendar plots each task by — **Finish** (the due date, previous
+  default behavior), **Start**, or **Both** (task appears on both its start and finish day, with
+  a small **S** / **F** — or **S/F** if they're the same day — tag on the chip so you can tell
+  which is which). The "Unscheduled" tray above the month also adjusts: in Start mode it lists
+  tasks with no start date, otherwise tasks with no due date. Your choice is remembered per
+  browser.
 - **Calendar:** click any empty day to open Add Task with that due date pre-filled. Text size
   slider next to the month nav.
 - **Tab order:** Summary, Working Table, Trend, Calendar, **Primavera View** (now bold), Sticky

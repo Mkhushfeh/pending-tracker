@@ -142,6 +142,18 @@ button{cursor:pointer}
 .chip-note{font-size:12.5px;color:var(--text-3)}
 .clear{background:none;border:0;color:var(--s-idn-ink);font-weight:600;font-size:12.5px;padding:4px}
 
+/* save / sync */
+.save-wrap{display:flex;flex-direction:column;align-items:center;gap:2px;flex:none}
+.save-btn{display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 16px 0 14px;border-radius:999px;border:1px solid var(--ink);background:var(--ink);color:var(--ink-text);font-weight:600;position:relative}
+.save-btn svg{width:16px;height:16px}
+.save-btn:hover{opacity:.9}
+.sdot{position:absolute;top:2px;right:2px;width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);background:var(--text-3)}
+.save-btn[data-state="ok"] .sdot{background:var(--s-res)}
+.save-btn[data-state="pending"] .sdot{background:var(--s-prg)}
+.save-btn[data-state="warn"] .sdot{background:var(--s-stk)}
+.sync-txt{font-size:10.5px;color:var(--text-3);white-space:nowrap;line-height:1}
+.menu-btn,.tabbar,.fab,.scrim{display:none}
+
 /* grid */
 .panel{background:var(--panel);border:1px solid var(--border-2);border-radius:18px;padding:18px;box-shadow:var(--shadow);min-width:0}
 .ph{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
@@ -282,25 +294,62 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
 }
 @media (max-width:980px){
   .shell{grid-template-columns:1fr}
-  .side{position:static;height:auto;padding:14px 16px;gap:12px}
-  .side .people-block,.side-data h4{display:none}
-  .nav{flex-direction:row;overflow-x:auto;gap:4px}
-  .nav a{width:auto;white-space:nowrap}
-  .streams{flex-direction:row;gap:6px;overflow-x:auto}
-  .streams .stream{width:auto;white-space:nowrap}
-  .side .side-h h4{display:block}
-  .side h4{display:none}
-  .side-data{flex-direction:row;flex-wrap:wrap;border:0;padding:0;margin:0}
+  .side{position:fixed;inset:0 auto 0 0;z-index:90;width:min(300px,86vw);height:100%;padding:calc(18px + env(safe-area-inset-top,0px)) 14px calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-105%);transition:transform .22s ease;box-shadow:8px 0 30px rgba(0,0,0,.25)}
+  .side.open{transform:none}
+  .scrim{display:block;position:fixed;inset:0;background:rgba(8,12,16,.45);z-index:85}
+  .scrim[hidden]{display:none}
+  .side .nav{display:none}
+  .menu-btn{display:grid}
+  .topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--bg);margin:-22px calc(-1 * clamp(16px,2.4vw,32px)) 0;padding:10px clamp(16px,2.4vw,32px);border-bottom:1px solid var(--border-2)}
+  .main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+  .tabbar{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--panel);border-top:1px solid var(--border);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:10px;color:var(--text-3);text-decoration:none;font-size:10.5px;font-weight:600}
+  .tabbar a svg{width:20px;height:20px}
+  .tabbar a.on{color:var(--text)}
+  .tabbar a.on svg{color:var(--s-idn)}
+  .fab{display:grid;place-items:center;position:fixed;right:16px;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:46;width:56px;height:56px;border-radius:18px;border:0;background:var(--ink);color:var(--ink-text);box-shadow:0 8px 22px rgba(0,0,0,.28)}
+  .fab svg{width:24px;height:24px}
+  .hello-r .btn.primary{display:none}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .projects,.filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * clamp(16px,2.4vw,32px));padding-inline:clamp(16px,2.4vw,32px);padding-block:2px}
+  .projects::-webkit-scrollbar,.filters::-webkit-scrollbar{display:none}
+  .ptab,.ptab-add,.filters select{flex:none}
+  .chip-note{white-space:nowrap}
   .row2{grid-template-columns:1fr}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:640px){
+  .main{gap:14px}
   .row3{grid-template-columns:1fr}
+  .row3 > :first-child{grid-column:auto}
+  .panel{padding:15px;border-radius:16px}
+  .kpis{gap:10px}
+  .kpi{gap:4px}
   .kpi .val{font-size:30px}
-  .spark{display:none}
-  .fgrid{grid-template-columns:1fr}
+  .kpi .lab .pill,.spark{display:none}
+  .kpi .foot{font-size:11.5px;line-height:1.35}
+  .hello h1{font-size:24px}
+  .hello p{font-size:13px}
+  .hello-r{width:100%}
+  .date{font-size:13px}
+  .sync-txt{display:none}
+  .save-btn{padding:0 13px 0 11px}
+  .search{padding:8px 12px}
+  .headline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px}
+  .headline b{font-size:20px}
+  .headline small{font-size:11px;line-height:1.25}
+  .ph .hint{width:100%}
+  .modal-actions{position:sticky;bottom:calc(-20px - env(safe-area-inset-bottom,0px));background:var(--panel);margin:0 -20px;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-2)}
+  .hint-desk{display:none}
+  .hint-touch{display:inline!important}
   .bal-row{grid-template-columns:96px minmax(0,1fr) 22px}
-  .hello-r{width:100%;justify-content:space-between}
+  .board-wrap{margin-inline:-15px;padding-inline:15px;scroll-snap-type:x mandatory;scroll-padding-inline:15px}
+  .board{grid-template-columns:repeat(4,82vw);gap:12px}
+  .col{scroll-snap-align:start}
+  .ideas{max-height:none}
+  .modal{border-radius:18px 18px 0 0;max-height:92vh;align-self:end;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+  .overlay{padding:0;place-items:end center}
+  .field input,.field select,.field textarea,.idea-form input,.search input{font-size:16px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -313,9 +362,9 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
       <span class="brand-name">MK Space</span>
     </div>
     <nav class="nav" aria-label="Sections">
-      <a href="#today" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Overview</a>
+      <a href="#today" class="on" data-short="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Overview</a>
       <a href="#trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Trend</a>
-      <a href="#focus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Today's focus</a>
+      <a href="#focus" data-short="Focus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Today's focus</a>
       <a href="#ideas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>Ideas</a>
       <a href="#balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6z"/></svg>Balance</a>
       <a href="#board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>Board</a>
@@ -340,7 +389,9 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
 
   <main class="main">
     <div class="topbar">
-      <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Search tasks, tags, parties, groups…" aria-label="Search"></label>
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Search tasks, tags, parties…" aria-label="Search"></label>
+      <div class="save-wrap"><button class="save-btn" id="saveBtn" data-state="local"><span class="sdot" aria-hidden="true"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3v5h8V3M7 21v-7h10v7"/></svg><span id="saveLbl">Save</span></button><span class="sync-txt" id="syncTxt">This device only</span></div>
       <button class="icon-btn" id="themeBtn" aria-label="Switch light or dark theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
     </div>
 
@@ -416,7 +467,7 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
     </section>
 
     <section class="panel" id="board">
-      <div class="ph"><h2>Task board</h2><span class="hint">Drag cards between columns, or open a card to change its status</span></div>
+      <div class="ph"><h2>Task board</h2><span class="hint"><span class="hint-desk">Drag cards between columns, or open a card to change its status</span><span class="hint-touch" style="display:none">Swipe across the columns. Tap a card to change its status.</span></span></div>
       <div class="board-wrap"><div class="board" id="boardEl"></div></div>
     </section>
   </main>
@@ -445,9 +496,13 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
     <datalist id="grpList"></datalist><datalist id="ptyList"></datalist>
   </form>
 </div>
+<div class="scrim" id="scrim" hidden></div>
+<nav class="tabbar" id="tabbar" aria-label="Sections"></nav>
+<button class="fab" id="fab" aria-label="New task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></button>
 <div class="tip" id="tip" hidden></div>
 <div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="toastUndo" type="button">Undo</button></div>
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 /* ---------- constants ---------- */
 const KEY = 'mkspace-v2';
@@ -580,13 +635,15 @@ function P(){ return D.projects.find(p => p.id===D.active) || D.projects[0]; }
 function streamsOf(p){ const s = [...(p.streams||[])]; p.items.forEach(i => { if (i.stream && !s.includes(i.stream)) s.push(i.stream); }); p.streams = s.length ? s : ['Tasks']; return p.streams; }
 function load(){
   try { const raw = store.get(KEY); if (raw){ D = JSON.parse(raw); if (D && Array.isArray(D.projects) && D.projects.length) return; } } catch(e){}
-  D = seedAll();
+  D = seedAll(); D.seeded = true; D.updatedAt = 0;   // untouched sample: any cloud copy wins over it
   try { const old = JSON.parse(store.get(OLD_KEY)||'null');   // keep anything saved by the first version
-    if (old && Array.isArray(old.items)) Object.assign(D.projects[0], { items: old.items, ideas: old.ideas||[] }); } catch(e){}
-  save();
+    if (old && Array.isArray(old.items)){ Object.assign(D.projects[0], { items: old.items, ideas: old.ideas||[] }); delete D.seeded; } } catch(e){}
+  writeLocal();
 }
 const snapshot = () => JSON.parse(JSON.stringify(D));
-function save(){ store.set(KEY, JSON.stringify(D)); }
+function writeLocal(){ store.set(KEY, JSON.stringify(D)); }
+// Every change: stamp it, keep it on this device right away, then queue a cloud upload.
+function save(){ D.updatedAt = Date.now(); delete D.seeded; writeLocal(); Cloud.queue(); }
 try { Object.assign(UI, JSON.parse(store.get(KEY+'-ui')||'{}'), {q:'', showAll:{}}); } catch(e){}
 const saveUI = () => store.set(KEY+'-ui', JSON.stringify({stream:UI.stream, trendDays:UI.trendDays, balBy:UI.balBy}));
 
@@ -1093,10 +1150,143 @@ $('themeBtn').onclick = () => {
 
 /* ---------- nav highlight ---------- */
 const navLinks = [...document.querySelectorAll('.nav a')];
+
 const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(en => {
-  if (en.isIntersecting) navLinks.forEach(a => a.classList.toggle('on', a.getAttribute('href')==='#'+en.target.id));
+  if (en.isIntersecting) [...navLinks, ...document.querySelectorAll('#tabbar a')].forEach(a => a.classList.toggle('on', a.getAttribute('href')==='#'+en.target.id));
 }), {rootMargin:'-40% 0px -55% 0px'}) : null;
 if (io) ['today','trend','focus','balance','ideas','board'].forEach(id => io.observe(document.getElementById(id)));
+
+/* ---------- cloud sync (Google Drive, same Google app as Pending Tracker) ---------- */
+const GOOGLE_CLIENT_ID = '158976699077-qvd4e845qrmfshqjrv8058djs5kr40tr.apps.googleusercontent.com';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const DRIVE_FILE = 'mk-space-data.json';
+const Cloud = (() => {
+  let token = null, client = null, fileId = store.get(KEY+'-fileId'), timer = null, busy = false, state = 'local', lastAt = 0;
+  const lastSync = () => +(store.get(KEY+'-lastSync') || 0);
+  const setLastSync = v => store.set(KEY+'-lastSync', String(v||0));
+  const dirty = () => !D.seeded && (D.updatedAt||0) > lastSync();
+  const wasConnected = () => store.get(KEY+'-cloud') === '1';
+  const api = (url, opt = {}) => fetch(url, {...opt, headers: {Authorization: 'Bearer '+token, ...(opt.headers||{})}})
+    .then(r => { if (r.status === 401){ dropToken(); throw new Error('expired'); } if (!r.ok) throw new Error('Drive error '+r.status); return r; });
+
+  function status(st){
+    state = st; const t = lastAt ? new Date(lastAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+    const map = {
+      local:    ['Save', 'Saved on this device only. Tap Save to turn on sync with your Google Drive.', 'local'],
+      pending:  ['Save', 'Changes waiting to upload', 'pending'],
+      syncing:  ['Saving…', 'Uploading to Google Drive', 'pending'],
+      synced:   ['Saved', `Synced with Google Drive${t ? ' at '+t : ''}. Other devices get this on open.`, 'ok'],
+      reconnect:['Save', 'Google sign-in expired. Tap Save to reconnect and sync.', 'warn'],
+      error:    ['Retry', 'Could not reach Google Drive. Your changes are safe on this device.', 'warn'],
+    };
+    const [label, title, cls] = map[st];
+    const b = document.getElementById('saveBtn'); if (!b) return;
+    b.dataset.state = cls; b.title = title; b.setAttribute('aria-label', label+'. '+title);
+    document.getElementById('saveLbl').textContent = label;
+    document.getElementById('syncTxt').textContent =
+      st==='synced' ? `Synced ${t}` : st==='local' ? 'This device only' : st==='reconnect' ? 'Sign-in expired' : st==='error' ? 'Offline, saved here' : 'Unsaved changes';
+  }
+  function keepToken(t, sec){ token = t; store.set(KEY+'-token', t); store.set(KEY+'-tokenExp', String(Date.now() + (sec||3500)*1000)); store.set(KEY+'-cloud','1'); }
+  function dropToken(){ token = null; store.set(KEY+'-token',''); status('reconnect'); }
+  function restoreToken(){
+    const t = store.get(KEY+'-token'), exp = +(store.get(KEY+'-tokenExp')||0);
+    if (t && Date.now() < exp - 60000) token = t;
+  }
+  async function findFile(){
+    if (fileId){ try { await api(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,trashed`).then(r=>r.json()).then(j => { if (j.trashed) fileId = null; }); if (fileId) return fileId; } catch(e){ if (e.message==='expired') throw e; fileId = null; } }
+    const j = await api(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`name='${DRIVE_FILE}' and trashed=false`)}&spaces=drive&fields=files(id,modifiedTime)&orderBy=modifiedTime desc`).then(r=>r.json());
+    fileId = j.files && j.files.length ? j.files[0].id : null;
+    if (fileId) store.set(KEY+'-fileId', fileId);
+    return fileId;
+  }
+  async function upload(keepalive){
+    const body = JSON.stringify(D);
+    if (!fileId){
+      const b = 'mk' + Date.now();
+      const multipart = `--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({name: DRIVE_FILE, mimeType:'application/json'})}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`;
+      const j = await api('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id', {method:'POST', headers:{'Content-Type':`multipart/related; boundary=${b}`}, body: multipart}).then(r=>r.json());
+      fileId = j.id; store.set(KEY+'-fileId', fileId);
+    } else {
+      await api(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {method:'PATCH', headers:{'Content-Type':'application/json'}, body, keepalive: !!keepalive && body.length < 60000});
+    }
+  }
+  async function push(){
+    if (!token){ status(wasConnected() ? 'reconnect' : 'local'); return; }
+    if (busy){ queue(); return; }
+    busy = true; status('syncing');
+    const stamp = D.updatedAt;
+    try { if (!fileId) await findFile(); await upload(); setLastSync(stamp); lastAt = Date.now(); status(dirty() ? 'pending' : 'synced'); if (dirty()) queue(); }
+    catch(e){ if (e.message!=='expired') status('error'); }
+    finally { busy = false; }
+  }
+  // Pull the Drive copy; newer side wins. If both sides changed, keep the newer and back up the other.
+  async function pull(){
+    if (!token || busy) return;
+    busy = true; status('syncing');
+    try {
+      await findFile();
+      if (!fileId){ busy = false; if (!D.updatedAt) D.updatedAt = Date.now(); delete D.seeded; writeLocal(); return push(); }
+      const remote = await api(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`).then(r=>r.json());
+      busy = false;
+      if (!remote || !Array.isArray(remote.projects)) return push();
+      const rU = remote.updatedAt||0, lU = D.updatedAt||0, last = lastSync();
+      const remoteChanged = rU > last && rU !== lU;
+      if (D.seeded || (remoteChanged && !dirty())) return apply(remote, 'Updated with changes from your other device');
+      if (remoteChanged && dirty()){
+        const mine = snapshot();
+        if (rU > lU){ store.set(KEY+'-backup', JSON.stringify(mine)); apply(remote, 'Newer changes from another device loaded', () => { D = mine; save(); render(); }); }
+        else push();
+        return;
+      }
+      if (dirty()) return push();
+      lastAt = Date.now(); status('synced');
+    } catch(e){ busy = false; if (e.message!=='expired') status('error'); }
+  }
+  function apply(remote, msg, undo){
+    D = remote; delete D.seeded; writeLocal(); setLastSync(D.updatedAt||0); lastAt = Date.now();
+    if (!D.projects.some(p => p.id===D.active)) D.active = D.projects[0].id;
+    render(); status('synced'); if (msg) toast(msg, undo);
+  }
+  function queue(){ clearTimeout(timer); if (!token){ status(wasConnected() ? 'reconnect' : 'local'); return; } status('pending'); timer = setTimeout(push, 1200); }
+  function flush(){ if (token && dirty()){ clearTimeout(timer); upload(true).then(() => setLastSync(D.updatedAt)).catch(()=>{}); } }
+  function connect(){
+    if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2){
+      toast(location.protocol==='https:' && location.hostname.endsWith('github.io') ? 'Google sign-in is still loading. Try again in a moment.' : 'Cloud sync works on your GitHub Pages link. Saved on this device.');
+      return;
+    }
+    if (!client) client = google.accounts.oauth2.initTokenClient({ client_id: GOOGLE_CLIENT_ID, scope: DRIVE_SCOPE,
+      callback: r => { if (r.error){ status('error'); toast('Google sign-in was cancelled.'); return; } keepToken(r.access_token, r.expires_in); pull(); } });
+    client.requestAccessToken({prompt: wasConnected() ? '' : 'consent'});
+  }
+  // The Save button: store locally now, then sync (asks Google sign-in once if needed).
+  function saveNow(){
+    writeLocal();
+    if (token){ clearTimeout(timer); if (dirty()) push(); else pull(); }
+    else connect();
+  }
+  function init(){
+    restoreToken();
+    if (token) pull(); else status(wasConnected() ? 'reconnect' : 'local');
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState==='hidden') flush(); else if (token) pull(); });
+    addEventListener('pagehide', flush);
+    addEventListener('beforeunload', e => { if (token && dirty()){ flush(); e.preventDefault(); e.returnValue = ''; } });
+    setInterval(() => { if (token && document.visibilityState==='visible' && !dirty()) pull(); }, 60000);
+    addEventListener('online', () => { if (token) (dirty() ? push() : pull()); });
+  }
+  return { queue, saveNow, init };
+})();
+document.getElementById('saveBtn').onclick = () => Cloud.saveNow();
+addEventListener('keydown', e => { if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){ e.preventDefault(); Cloud.saveNow(); } });
+
+/* ---------- mobile: drawer + bottom tabs ---------- */
+const side = document.querySelector('.side'), scrim = document.getElementById('scrim');
+const drawer = open => { side.classList.toggle('open', open); scrim.hidden = !open; document.getElementById('menuBtn').setAttribute('aria-expanded', open); };
+document.getElementById('menuBtn').onclick = () => drawer(!side.classList.contains('open'));
+scrim.onclick = () => drawer(false);
+side.addEventListener('click', e => { if (e.target.closest('.nav a, .stream, .side-btn')) drawer(false); });
+document.getElementById('tabbar').innerHTML = [...document.querySelectorAll('.nav a')].map(a =>
+  `<a href="${a.getAttribute('href')}">${a.querySelector('svg').outerHTML}<span>${a.dataset.short || a.textContent.trim()}</span></a>`).join('');
+document.getElementById('fab').onclick = () => openModal(null);
 
 /* ---------- boot ---------- */
 function render(){
@@ -1105,7 +1295,7 @@ function render(){
   $('dateNow').textContent = new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
   renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard();
 }
-load(); render();
+load(); render(); Cloud.init();
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { renderTrend(); renderGauge(); }, 120); });
 </script>
 </body>

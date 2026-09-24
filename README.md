@@ -157,3 +157,17 @@ tables, charts, badges.
 - `index.html` — the whole app
 - `sw.js` — one-time fix for the stuck-old-version issue, upload alongside index.html
 - `README.md` — this file
+
+## MK Space (new dashboard)
+
+`mk-space/index.html` is the new daily dashboard that replaces Pending Tracker. Open it at
+`https://mkhushfeh.github.io/pending-tracker/mk-space/`.
+
+**Saving and sync:** every change is saved on the device right away. Tap **Save** at the top once
+per device to connect Google Drive (same Google setup as Pending Tracker). After that, changes
+upload automatically about a second after you make them, and again when you close or switch away
+from the page. Other devices pull the latest copy when they open or come back to the foreground,
+and every minute while open. The Drive file is `mk-space-data.json`.
+
+Google sign-in lasts about an hour. When it expires, the Save button's dot turns red. Tap Save to
+reconnect; your edits stay on the device until then.

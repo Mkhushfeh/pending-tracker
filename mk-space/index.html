@@ -89,6 +89,34 @@ button{cursor:pointer}
 .side-btn:hover{border-color:var(--side-muted)}
 .side-btn.legacy{background:var(--s-prg);color:#1b1300;border-color:transparent;font-weight:600}
 
+.side-h{display:flex;align-items:center;justify-content:space-between;padding-right:4px;margin-bottom:8px}
+.side .side-h h4{margin:0}
+.side-add{background:var(--side-2);border:1px solid var(--side-border);color:var(--side-text);width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font-size:16px;line-height:1;padding:0}
+.side-add:hover{border-color:var(--side-muted)}
+.streams{display:flex;flex-direction:column;gap:2px}
+.stream-row{display:flex;align-items:center;gap:2px}
+.stream-row .stream{flex:1;min-width:0}
+.sname{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ren{background:none;border:0;color:var(--side-muted);font-size:13px;padding:6px;border-radius:7px;opacity:.6}
+.ren:hover,.ren:focus-visible{opacity:1;background:var(--side-2)}
+.inline-input{flex:1;min-width:0;width:100%;background:var(--panel);color:var(--text);border:1.5px solid var(--s-idn);border-radius:8px;padding:6px 9px;font-size:13px}
+
+/* projects */
+.projects{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ptab{display:flex;align-items:center;background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:2px 4px 2px 2px}
+.ptab-go{display:flex;align-items:center;gap:8px;background:none;border:0;border-radius:999px;padding:6px 6px 6px 12px;font-weight:600}
+.ptab .pcnt{font-size:11.5px;font-weight:500;color:var(--text-3)}
+.ptab .ren{color:var(--text-3)}
+.ptab .ren:hover{background:var(--panel-2)}
+.ptab.on{background:var(--ink);border-color:var(--ink)}
+.ptab.on .ptab-go,.ptab.on .ren{color:var(--ink-text)}
+.ptab.on .ren:hover{background:transparent}
+.ptab.on .pcnt{color:var(--ink-text);opacity:.7}
+.ptab .inline-input{width:150px;flex:none;margin:2px}
+.ptab-add{background:none;border:1px dashed var(--border);border-radius:999px;padding:7px 14px;color:var(--text-2);font-weight:600}
+.ptab-add:hover{border-color:var(--text-3)}
+.vote small{font-size:9px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em}
+
 /* main */
 .main{padding:22px clamp(16px,2.4vw,32px) 60px;display:flex;flex-direction:column;gap:18px;min-width:0}
 .topbar{display:flex;gap:12px;align-items:center}
@@ -258,8 +286,9 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
   .side .people-block,.side-data h4{display:none}
   .nav{flex-direction:row;overflow-x:auto;gap:4px}
   .nav a{width:auto;white-space:nowrap}
-  .streams{display:flex;gap:6px;overflow-x:auto}
+  .streams{flex-direction:row;gap:6px;overflow-x:auto}
   .streams .stream{width:auto;white-space:nowrap}
+  .side .side-h h4{display:block}
   .side h4{display:none}
   .side-data{flex-direction:row;flex-wrap:wrap;border:0;padding:0;margin:0}
   .row2{grid-template-columns:1fr}
@@ -287,12 +316,12 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
       <a href="#today" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Overview</a>
       <a href="#trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Trend</a>
       <a href="#focus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Today's focus</a>
-      <a href="#balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6z"/></svg>Balance</a>
       <a href="#ideas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>Ideas</a>
+      <a href="#balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6z"/></svg>Balance</a>
       <a href="#board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>Board</a>
     </nav>
     <div>
-      <h4>Workstreams</h4>
+      <div class="side-h"><h4>Workstreams</h4><button class="side-add" id="addStream" aria-label="Add workstream" title="Add workstream">+</button></div>
       <div class="streams" id="streams"></div>
     </div>
     <div class="people-block">
@@ -304,7 +333,7 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
       <button class="side-btn legacy" id="legacyBtn" hidden>Import from Pending Tracker</button>
       <button class="side-btn" id="exportBtn">Export backup (.json)</button>
       <button class="side-btn" id="importBtn">Import backup</button>
-      <button class="side-btn" id="resetBtn">Reset to sample data</button>
+      <button class="side-btn" id="resetBtn">Reset this project</button>
       <input type="file" id="importFile" accept=".json,application/json" hidden>
     </div>
   </aside>
@@ -314,6 +343,8 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
       <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Search tasks, tags, parties, groups…" aria-label="Search"></label>
       <button class="icon-btn" id="themeBtn" aria-label="Switch light or dark theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
     </div>
+
+    <nav class="projects" id="projTabs" aria-label="Projects"></nav>
 
     <section class="hello" id="today">
       <div>
@@ -366,6 +397,14 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
         <div class="ph"><h2>Today's focus</h2><span class="hint">Overdue, due soon, and critical items stuck. Tick to close.</span></div>
         <ul class="focus-list" id="focusList"></ul>
       </div>
+      <div class="panel" id="ideas">
+        <div class="ph"><h2>Ideas board</h2><span class="hint">Upvote to rank, then make it a task</span></div>
+        <form class="idea-form" id="ideaForm">
+          <input id="ideaText" placeholder="New idea or improvement…" aria-label="New idea" autocomplete="off">
+          <button class="btn primary sm" type="submit">Add</button>
+        </form>
+        <ul class="ideas" id="ideaList"></ul>
+      </div>
       <div class="panel" id="balance">
         <div class="ph">
           <h2>Workload balance</h2>
@@ -373,14 +412,6 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
         </div>
         <div class="bal" id="bal"></div>
         <div class="bal-note" id="balNote"></div>
-      </div>
-      <div class="panel" id="ideas">
-        <div class="ph"><h2>Ideas board</h2><span class="hint">Capture now, promote later</span></div>
-        <form class="idea-form" id="ideaForm">
-          <input id="ideaText" placeholder="New idea or improvement…" aria-label="New idea" autocomplete="off">
-          <button class="btn primary sm" type="submit">Add</button>
-        </form>
-        <ul class="ideas" id="ideaList"></ul>
       </div>
     </section>
 
@@ -419,7 +450,8 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
 
 <script>
 /* ---------- constants ---------- */
-const KEY = 'mkspace-v1';
+const KEY = 'mkspace-v2';
+const OLD_KEY = 'mkspace-v1';
 const LEGACY_KEY = 'pending-tracker-pages-v6';
 const STATUSES = ['Identified','Pending / Stuck','In Progress','Resolved'];
 const SLUG = {'Identified':'idn','Pending / Stuck':'stk','In Progress':'prg','Resolved':'res'};
@@ -534,15 +566,26 @@ function seed(){
     {text:'Batch all I&C permit requests into one weekly submission to HSE', tag:'Permits', votes:2},
     {text:'Pre-FAT checklist for RTU cabinets to cut repeat FAT visits', tag:'RTU & SCADA', votes:2},
   ].map((x,i) => ({...x, id:'d'+i, created: addDays(t0, -i*3)}));
-  return { items, ideas, name:'MK' };
+  return { items, ideas };
+}
+const blankProject = (id, name) => ({ id, name, streams:['Tasks'], items:[], ideas:[] });
+function seedAll(){
+  const p1 = { id:'p1', name:'Project 1', streams:['Tasks','Remaining Work','As-Built Drawing'], ...seed() };
+  return { name:'MK', active:'p1', projects:[p1, blankProject('p2','Project 2'), blankProject('p3','Project 3')] };
 }
 
 /* ---------- state ---------- */
 let D, UI = { stream:'all', q:'', group:'', prio:'', party:'', trendDays:30, balBy:'party', showAll:{} };
+function P(){ return D.projects.find(p => p.id===D.active) || D.projects[0]; }
+function streamsOf(p){ const s = [...(p.streams||[])]; p.items.forEach(i => { if (i.stream && !s.includes(i.stream)) s.push(i.stream); }); p.streams = s.length ? s : ['Tasks']; return p.streams; }
 function load(){
-  try { const raw = store.get(KEY); if (raw){ D = JSON.parse(raw); if (D && Array.isArray(D.items)) return; } } catch(e){}
-  D = seed(); save();
+  try { const raw = store.get(KEY); if (raw){ D = JSON.parse(raw); if (D && Array.isArray(D.projects) && D.projects.length) return; } } catch(e){}
+  D = seedAll();
+  try { const old = JSON.parse(store.get(OLD_KEY)||'null');   // keep anything saved by the first version
+    if (old && Array.isArray(old.items)) Object.assign(D.projects[0], { items: old.items, ideas: old.ideas||[] }); } catch(e){}
+  save();
 }
+const snapshot = () => JSON.parse(JSON.stringify(D));
 function save(){ store.set(KEY, JSON.stringify(D)); }
 try { Object.assign(UI, JSON.parse(store.get(KEY+'-ui')||'{}'), {q:'', showAll:{}}); } catch(e){}
 const saveUI = () => store.set(KEY+'-ui', JSON.stringify({stream:UI.stream, trendDays:UI.trendDays, balBy:UI.balBy}));
@@ -550,7 +593,7 @@ const saveUI = () => store.set(KEY+'-ui', JSON.stringify({stream:UI.stream, tren
 const isOpen = i => i.status !== 'Resolved';
 function view(){
   const q = UI.q.trim().toLowerCase();
-  return D.items.filter(i =>
+  return P().items.filter(i =>
     (UI.stream==='all' || i.stream===UI.stream) &&
     (!UI.group || i.group===UI.group) && (!UI.prio || i.priority===UI.prio) && (!UI.party || i.party===UI.party) &&
     (!q || [i.title,i.code,i.group,i.party,i.reason,i.notes].join(' ').toLowerCase().includes(q)));
@@ -578,7 +621,7 @@ document.getElementById('toastUndo').onclick = () => { if (undoFn) undoFn(); doc
 
 /* ---------- mutations ---------- */
 function setStatus(id, status, silent){
-  const it = D.items.find(x => x.id===id); if (!it || it.status===status) return;
+  const it = P().items.find(x => x.id===id); if (!it || it.status===status) return;
   const prev = {...it};
   it.status = status; it.moved = today();
   if (status==='Resolved'){ it.resolved = today(); it.pct = 100; }
@@ -587,27 +630,72 @@ function setStatus(id, status, silent){
   if (!silent) toast(status==='Resolved' ? `Closed ${it.code}` : `${it.code} moved to ${status}`, () => { Object.assign(it, prev); save(); render(); });
 }
 
+/* ---------- inline rename ---------- */
+function inlineEdit(el, value, onSave){
+  const inp = document.createElement('input');
+  inp.className = 'inline-input'; inp.value = value; inp.setAttribute('aria-label','Name');
+  el.replaceWith(inp); inp.focus(); inp.select();
+  let done = false;
+  const finish = ok => { if (done) return; done = true; const v = inp.value.trim();
+    if (ok && v) onSave(v); render(); };
+  inp.addEventListener('keydown', e => { if (e.key==='Enter'){ e.preventDefault(); finish(true); } if (e.key==='Escape') finish(false); });
+  inp.addEventListener('blur', () => finish(true));
+  inp.addEventListener('click', e => e.stopPropagation());
+}
+document.getElementById('addStream').onclick = () => {
+  const box = document.createElement('span'); document.getElementById('streams').appendChild(box);
+  inlineEdit(box, '', name => { const pr = P(); if (pr.streams.includes(name)) return toast(`"${name}" already exists.`);
+    pr.streams.push(name); UI.stream = name; save(); toast(`Added workstream ${name}`); });
+};
+
+/* ---------- render: projects ---------- */
+function renderProjects(){
+  document.getElementById('projTabs').innerHTML = D.projects.map(p => {
+    const open = p.items.filter(isOpen).length;
+    return `<div class="ptab ${p.id===D.active?'on':''}"><button class="ptab-go" data-p="${p.id}"><span class="pname">${esc(p.name)}</span><span class="pcnt num">${p.items.length ? open+' open' : 'empty'}</span></button><button class="ren" data-pren="${p.id}" aria-label="Rename ${esc(p.name)}" title="Rename">✎</button></div>`;
+  }).join('') + `<button class="ptab-add" id="addProj" title="Add project">+ Project</button>`;
+}
+document.getElementById('projTabs').addEventListener('click', e => {
+  const r = e.target.closest('[data-pren]');
+  if (r){ const pr = D.projects.find(p => p.id===r.dataset.pren);
+    return inlineEdit(r.parentElement.querySelector('.ptab-go'), pr.name, name => { pr.name = name; save(); }); }
+  const g = e.target.closest('[data-p]');
+  if (g){ D.active = g.dataset.p; UI.stream='all'; UI.group=UI.prio=UI.party=''; UI.showAll={}; save(); saveUI(); render(); return; }
+  if (e.target.closest('#addProj')){ const id = 'p'+Date.now().toString(36);
+    D.projects.push(blankProject(id, 'Project '+(D.projects.length+1))); D.active = id; UI.stream='all'; save(); render();
+    document.querySelector(`[data-pren="${id}"]`)?.click(); }
+});
+
 /* ---------- render: sidebar ---------- */
 function renderSide(){
-  const streams = [...new Set(D.items.map(i=>i.stream))];
-  const openBy = s => D.items.filter(i => isOpen(i) && (s==='all' || i.stream===s)).length;
+  const streams = streamsOf(P());
+  const openBy = s => P().items.filter(i => isOpen(i) && (s==='all' || i.stream===s)).length;
   document.getElementById('streams').innerHTML = ['all', ...streams].map(s =>
-    `<button class="stream ${UI.stream===s?'on':''}" data-s="${esc(s)}">${s==='all'?'All workstreams':esc(s)}<span class="cnt num">${openBy(s)} open</span></button>`).join('');
+    `<div class="stream-row"><button class="stream ${UI.stream===s?'on':''}" data-s="${esc(s)}"><span class="sname">${s==='all'?'All workstreams':esc(s)}</span><span class="cnt num">${openBy(s)} open</span></button>${s==='all'?'':`<button class="ren" data-ren="${esc(s)}" aria-label="Rename ${esc(s)}" title="Rename">✎</button>`}</div>`).join('');
   const load = {};
-  D.items.filter(isOpen).forEach(i => { load[i.party] = (load[i.party]||0) + 1; });
+  P().items.filter(isOpen).forEach(i => { load[i.party] = (load[i.party]||0) + 1; });
   const top = Object.entries(load).sort((a,b)=>b[1]-a[1]).slice(0,5);
   document.getElementById('people').innerHTML = top.map(([p,c]) =>
     `<div class="person"><span class="avatar" style="background:${avColor(p)}">${initials(p)}</span><div><div class="nm">${esc(p)}</div><div class="sub num">${c} open item${c>1?'s':''}</div></div></div>`).join('');
   document.getElementById('legacyBtn').hidden = !store.get(LEGACY_KEY);
 }
 document.getElementById('streams').addEventListener('click', e => {
+  const r = e.target.closest('[data-ren]');
+  if (r){ const old = r.dataset.ren, label = r.parentElement.querySelector('.stream');
+    return inlineEdit(label, old, name => {
+      const pr = P(); if (name===old) return;
+      if (pr.streams.includes(name)){ toast(`A workstream called "${name}" already exists.`); return; }
+      pr.streams = pr.streams.map(x => x===old ? name : x);
+      pr.items.forEach(i => { if (i.stream===old) i.stream = name; });
+      if (UI.stream===old) UI.stream = name; save(); toast(`Renamed to ${name}`);
+    }); }
   const b = e.target.closest('.stream'); if (!b) return;
   UI.stream = b.dataset.s; UI.group=''; saveUI(); render();
 });
 
 /* ---------- render: filters ---------- */
 function renderFilters(){
-  const base = D.items.filter(i => UI.stream==='all' || i.stream===UI.stream);
+  const base = P().items.filter(i => UI.stream==='all' || i.stream===UI.stream);
   const opt = (id, label, vals, cur) => {
     document.getElementById(id).innerHTML = `<option value="">${label}</option>` + vals.map(v => `<option ${v===cur?'selected':''}>${esc(v)}</option>`).join('');
   };
@@ -830,9 +918,9 @@ document.getElementById('bal').addEventListener('click', e => {
 
 /* ---------- render: ideas ---------- */
 function renderIdeas(){
-  const ideas = [...(D.ideas||[])].sort((a,b) => b.votes - a.votes || b.created.localeCompare(a.created));
+  const ideas = [...(P().ideas||[])].sort((a,b) => b.votes - a.votes || b.created.localeCompare(a.created));
   document.getElementById('ideaList').innerHTML = ideas.length ? ideas.map(d => `
-    <li class="idea"><button class="vote" data-vote="${d.id}" aria-label="Upvote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 15l6-6 6 6"/></svg><span class="num">${d.votes}</span></button>
+    <li class="idea"><button class="vote" data-vote="${d.id}" aria-label="Upvote this idea" title="Upvote: ideas with more votes rise to the top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 15l6-6 6 6"/></svg><span class="num">${d.votes}</span><small>votes</small></button>
       <div><p>${esc(d.text)}</p><div class="idea-actions">${d.tag?`<span>#${esc(d.tag)}</span>`:''}<span>${fmt(d.created)}</span>
         <button class="link" data-promote="${d.id}">Make it a task →</button><button class="link muted" data-drop="${d.id}">Remove</button></div></div></li>`).join('')
     : '<li class="empty">No ideas yet. Type one above.</li>';
@@ -840,15 +928,15 @@ function renderIdeas(){
 document.getElementById('ideaForm').addEventListener('submit', e => {
   e.preventDefault(); const inp = document.getElementById('ideaText'), text = inp.value.trim(); if (!text) return;
   const m = text.match(/#([\w&-]+)/);
-  (D.ideas ||= []).unshift({ id: uid(), text: text.replace(/#[\w&-]+/,'').trim(), tag: m?m[1]:'', votes: 0, created: today() });
+  P().ideas.unshift({ id: uid(), text: text.replace(/#[\w&-]+/,'').trim(), tag: m?m[1]:'', votes: 0, created: today() });
   inp.value = ''; save(); renderIdeas();
 });
 document.getElementById('ideaList').addEventListener('click', e => {
   const v = e.target.closest('[data-vote]'), p = e.target.closest('[data-promote]'), d = e.target.closest('[data-drop]');
-  if (v){ D.ideas.find(x=>x.id===v.dataset.vote).votes++; save(); renderIdeas(); }
-  if (d){ const idx = D.ideas.findIndex(x=>x.id===d.dataset.drop), [gone] = D.ideas.splice(idx,1); save(); renderIdeas();
-    toast('Idea removed', () => { D.ideas.splice(idx,0,gone); save(); renderIdeas(); }); }
-  if (p){ const idea = D.ideas.find(x=>x.id===p.dataset.promote); openModal(null, {title: idea.text, notes: 'From ideas board', ideaId: idea.id}); }
+  if (v){ P().ideas.find(x=>x.id===v.dataset.vote).votes++; save(); renderIdeas(); }
+  if (d){ const idx = P().ideas.findIndex(x=>x.id===d.dataset.drop), [gone] = P().ideas.splice(idx,1); save(); renderIdeas();
+    toast('Idea removed', () => { P().ideas.splice(idx,0,gone); save(); renderIdeas(); }); }
+  if (p){ const idea = P().ideas.find(x=>x.id===p.dataset.promote); openModal(null, {title: idea.text, notes: 'From ideas board', ideaId: idea.id}); }
 });
 
 /* ---------- render: board ---------- */
@@ -894,9 +982,9 @@ boardEl.addEventListener('drop', e => { const col = e.target.closest('.col'); if
 let editing = null, fromIdea = null, delArmed = false;
 const $ = id => document.getElementById(id);
 function openModal(id, preset = {}){
-  editing = id ? D.items.find(i=>i.id===id) : null; fromIdea = preset.ideaId || null;
-  const it = editing || { title:'', stream: UI.stream==='all' ? 'Tasks' : UI.stream, group: UI.group, party:'', priority:'Medium', status:'Identified', due: addDays(today(),7), reason:'Planned', pct:0, notes:'', ...preset };
-  const streams = [...new Set(['Tasks', ...D.items.map(i=>i.stream)])];
+  editing = id ? P().items.find(i=>i.id===id) : null; fromIdea = preset.ideaId || null;
+  const it = editing || { title:'', stream: UI.stream==='all' ? streamsOf(P())[0] : UI.stream, group: UI.group, party:'', priority:'Medium', status:'Identified', due: addDays(today(),7), reason:'Planned', pct:0, notes:'', ...preset };
+  const streams = streamsOf(P());
   $('mTitle').textContent = editing ? `Edit ${editing.code}` : 'New task';
   $('fTitle').value = it.title; $('fGrp').value = it.group||''; $('fPty').value = it.party||'';
   $('fStream').innerHTML = streams.map(s => `<option ${s===it.stream?'selected':''}>${esc(s)}</option>`).join('');
@@ -904,8 +992,8 @@ function openModal(id, preset = {}){
   $('fSt').innerHTML = STATUSES.map(s => `<option ${s===it.status?'selected':''}>${s}</option>`).join('');
   $('fRsn').innerHTML = ['', ...REASONS].map(s => `<option value="${esc(s)}" ${s===it.reason?'selected':''}>${s||'—'}</option>`).join('');
   $('fDue').value = it.due||''; $('fPct').value = it.pct||0; $('pctOut').textContent = (it.pct||0)+'%'; $('fNotes').value = it.notes||'';
-  $('grpList').innerHTML = [...new Set(D.items.map(i=>i.group).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('');
-  $('ptyList').innerHTML = [...new Set(D.items.map(i=>i.party).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('');
+  $('grpList').innerHTML = [...new Set(P().items.map(i=>i.group).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('');
+  $('ptyList').innerHTML = [...new Set(P().items.map(i=>i.party).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('');
   $('delBtn').hidden = !editing; delArmed = false; $('delBtn').textContent = 'Delete';
   $('overlay').hidden = false; setTimeout(() => $('fTitle').focus(), 0);
 }
@@ -916,8 +1004,8 @@ $('overlay').addEventListener('mousedown', e => { if (e.target.id==='overlay') c
 document.addEventListener('keydown', e => { if (e.key==='Escape' && !$('overlay').hidden) closeModal(); });
 $('delBtn').onclick = () => {
   if (!delArmed){ delArmed = true; $('delBtn').textContent = 'Click again to delete'; return; }
-  const idx = D.items.indexOf(editing), gone = editing; D.items.splice(idx,1); save(); closeModal(); render();
-  toast(`Deleted ${gone.code}`, () => { D.items.splice(idx,0,gone); save(); render(); });
+  const idx = P().items.indexOf(editing), gone = editing; P().items.splice(idx,1); save(); closeModal(); render();
+  toast(`Deleted ${gone.code}`, () => { P().items.splice(idx,0,gone); save(); render(); });
 };
 $('taskForm').addEventListener('submit', e => {
   e.preventDefault();
@@ -925,13 +1013,13 @@ $('taskForm').addEventListener('submit', e => {
     priority: $('fPri').value, due: $('fDue').value, reason: $('fRsn').value, pct: +$('fPct').value, notes: $('fNotes').value.trim() };
   if (!vals.title) return;
   const st = $('fSt').value;
-  if (editing){ Object.assign(editing, vals); const id = editing.id; closeModal(); if (st !== D.items.find(i=>i.id===id).status) setStatus(id, st, true); save(); render(); toast('Saved'); }
+  if (editing){ Object.assign(editing, vals); const id = editing.id; closeModal(); if (st !== P().items.find(i=>i.id===id).status) setStatus(id, st, true); save(); render(); toast('Saved'); }
   else {
-    const n = Math.max(100, ...D.items.map(i => +String(i.code).replace(/\D/g,'') || 0)) + 1;
+    const n = Math.max(100, ...P().items.map(i => +String(i.code).replace(/\D/g,'') || 0)) + 1;
     const it = { id: uid(), code: 'MK-'+n, ...vals, status: st, since: today(), moved: today(), resolved: st==='Resolved' ? today() : '' };
     if (st==='Resolved') it.pct = 100;
-    D.items.push(it);
-    if (fromIdea){ D.ideas = D.ideas.filter(x => x.id !== fromIdea); }
+    P().items.push(it);
+    if (fromIdea){ P().ideas = P().ideas.filter(x => x.id !== fromIdea); }
     save(); closeModal(); render(); toast(`Added ${it.code}`);
   }
 });
@@ -952,24 +1040,31 @@ function fromLegacy(obj){
   return items;
 }
 function importObj(obj){
-  if (obj && Array.isArray(obj.items)){ D = {ideas:[], ...obj}; }
-  else { const items = fromLegacy(obj||{}); if (!items.length) throw new Error('no items');
-    const notes = (obj.projects||[]).flatMap(p => (p.stickyNotes||p.notes||[])).filter(x => x && x.text)
-      .map(x => ({ id: uid(), text: x.text, tag:'Sticky note', votes:0, created: today() }));
-    D = { items, ideas: [...notes, ...(D.ideas||[])], name: D.name||'MK' }; }
+  if (obj && Array.isArray(obj.projects) && obj.projects.length && Array.isArray(obj.projects[0].items)){ D = obj; }   // MK Space backup
+  else if (obj && Array.isArray(obj.items)){ P().items = obj.items; P().ideas = obj.ideas||[]; }                   // MK Space v1 backup
+  else {                                                                                                         // Pending Tracker
+    const projects = obj.projects || (obj.pages ? [{name:'Project 1', pages: obj.pages}] : []);
+    if (!projects.some(p => (p.pages||[]).some(pg => (pg.items||[]).length))) throw new Error('no items');
+    projects.forEach((lp, k) => {
+      const items = fromLegacy({projects:[lp]}), streams = (lp.pages||[]).map(pg => pg.name||'Tasks');
+      if (!D.projects[k]) D.projects.push(blankProject('p'+Date.now().toString(36)+k, 'Project '+(k+1)));
+      Object.assign(D.projects[k], { name: lp.name || D.projects[k].name, streams: streams.length ? streams : ['Tasks'], items });
+    });
+  }
   UI.stream = 'all'; save(); render();
 }
+const total = () => D.projects.reduce((a,p) => a + p.items.length, 0);
 $('legacyBtn').onclick = () => {
-  try { const obj = JSON.parse(store.get(LEGACY_KEY)); const before = D; importObj(obj);
-    toast(`Imported ${D.items.length} items from Pending Tracker`, () => { D = before; save(); render(); }); }
+  try { const obj = JSON.parse(store.get(LEGACY_KEY)); const before = snapshot(); importObj(obj);
+    toast(`Imported ${total()} items from Pending Tracker`, () => { D = before; save(); render(); }); }
   catch(e){ toast('Could not read Pending Tracker data in this browser.'); }
 };
 $('importBtn').onclick = () => $('importFile').click();
 $('importFile').onchange = e => {
   const f = e.target.files[0]; if (!f) return;
   const r = new FileReader();
-  r.onload = () => { const before = D;
-    try { importObj(JSON.parse(r.result)); toast(`Imported ${D.items.length} items`, () => { D = before; save(); render(); }); }
+  r.onload = () => { const before = snapshot();
+    try { importObj(JSON.parse(r.result)); toast(`Imported ${total()} items`, () => { D = before; save(); render(); }); }
     catch(err){ toast('That file is not an MK Space or Pending Tracker backup (.json).'); } };
   r.readAsText(f); e.target.value = '';
 };
@@ -978,7 +1073,16 @@ $('exportBtn').onclick = () => {
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `mk-space-${today()}.json`;
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 };
-$('resetBtn').onclick = () => { const before = D; D = seed(); UI.stream='all'; save(); render(); toast('Sample data loaded', () => { D = before; save(); render(); }); };
+let resetArmed = false;
+$('resetBtn').onclick = () => {
+  const pr = P();
+  if (!resetArmed){ resetArmed = true; $('resetBtn').textContent = `Click again to reset ${pr.name}`; setTimeout(() => { resetArmed = false; $('resetBtn').textContent = 'Reset this project'; }, 4000); return; }
+  resetArmed = false; $('resetBtn').textContent = 'Reset this project';
+  const before = snapshot();
+  if (pr.id==='p1') Object.assign(pr, { streams:['Tasks','Remaining Work','As-Built Drawing'], ...seed() });
+  else Object.assign(pr, { streams:['Tasks'], items:[], ideas:[] });
+  UI.stream='all'; save(); render(); toast(`${pr.name} reset`, () => { D = before; save(); render(); });
+};
 
 /* ---------- theme ---------- */
 const savedTheme = store.get(KEY+'-theme'); if (savedTheme) document.documentElement.dataset.theme = savedTheme;
@@ -999,7 +1103,7 @@ function render(){
   const h = new Date().getHours();
   $('greet').textContent = `${h<12?'Good morning':h<17?'Good afternoon':'Good evening'}, ${D.name||'MK'}`;
   $('dateNow').textContent = new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-  renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard();
+  renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard();
 }
 load(); render();
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { renderTrend(); renderGauge(); }, 120); });

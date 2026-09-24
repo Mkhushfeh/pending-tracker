@@ -154,6 +154,20 @@ button{cursor:pointer}
 .sync-txt{font-size:10.5px;color:var(--text-3);white-space:nowrap;line-height:1}
 .menu-btn,.tabbar,.fab,.scrim{display:none}
 
+/* confirmation window */
+.overlay.confirm{z-index:95}
+.cbox{background:var(--panel);border:1px solid var(--border);border-radius:18px;width:min(380px,100%);padding:20px;display:flex;flex-direction:column;gap:10px;box-shadow:0 18px 50px rgba(0,0,0,.3)}
+.c-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--s-stk-bg);color:var(--s-stk-ink)}
+.c-icon svg{width:20px;height:20px}
+.cbox h3{margin:0;font-family:var(--f-display);font-size:19px;text-wrap:balance}
+.c-msg{font-size:14px;color:var(--text-2);line-height:1.5}
+.c-msg ul{margin:8px 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.c-msg b{color:var(--text)}
+.c-note{margin:8px 0 0;font-size:12.5px;color:var(--text-3)}
+.c-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+.btn.danger-fill{background:var(--s-stk);border-color:var(--s-stk);color:#fff}
+.btn.danger-fill:hover{opacity:.9}
+
 /* grid */
 .panel{background:var(--panel);border:1px solid var(--border-2);border-radius:18px;padding:18px;box-shadow:var(--shadow);min-width:0}
 .ph{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
@@ -349,6 +363,7 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
   .ideas{max-height:none}
   .modal{border-radius:18px 18px 0 0;max-height:92vh;align-self:end;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
   .overlay{padding:0;place-items:end center}
+  .overlay.confirm{padding:16px;place-items:center}
   .field input,.field select,.field textarea,.idea-form input,.search input{font-size:16px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -495,6 +510,14 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
     </div>
     <datalist id="grpList"></datalist><datalist id="ptyList"></datalist>
   </form>
+</div>
+<div class="overlay confirm" id="confirm" hidden>
+  <div class="cbox" role="alertdialog" aria-modal="true" aria-labelledby="cTitle" aria-describedby="cMsg">
+    <div class="c-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg></div>
+    <h3 id="cTitle">Are you sure?</h3>
+    <div id="cMsg" class="c-msg"></div>
+    <div class="c-actions"><button type="button" class="btn" id="cCancel">Cancel</button><button type="button" class="btn primary" id="cOk">Continue</button></div>
+  </div>
 </div>
 <div class="scrim" id="scrim" hidden></div>
 <nav class="tabbar" id="tabbar" aria-label="Sections"></nav>
@@ -1111,18 +1134,52 @@ function importObj(obj){
   UI.stream = 'all'; save(); render();
 }
 const total = () => D.projects.reduce((a,p) => a + p.items.length, 0);
+/* ---------- confirmation window ---------- */
+function confirmBox({title, message, ok = 'Continue', danger = false}){
+  return new Promise(resolve => {
+    const box = $('confirm');
+    $('cTitle').textContent = title; $('cMsg').innerHTML = message;
+    const okBtn = $('cOk'); okBtn.textContent = ok; okBtn.className = 'btn ' + (danger ? 'danger-fill' : 'primary');
+    const prevFocus = document.activeElement;
+    box.hidden = false; setTimeout(() => $('cCancel').focus(), 0);
+    const done = v => { box.hidden = true; okBtn.onclick = $('cCancel').onclick = box.onmousedown = null; document.removeEventListener('keydown', key, true); prevFocus?.focus?.(); resolve(v); };
+    const key = e => { if (e.key==='Escape'){ e.stopPropagation(); done(false); } };
+    okBtn.onclick = () => done(true); $('cCancel').onclick = () => done(false);
+    box.onmousedown = e => { if (e.target === box) done(false); };
+    document.addEventListener('keydown', key, true);
+  });
+}
+const plural = (n, w) => `${n} ${w}${n===1?'':'s'}`;
+function describeImport(obj){
+  if (obj && Array.isArray(obj.projects) && obj.projects.length && Array.isArray(obj.projects[0].items)){
+    const n = obj.projects.reduce((a,p)=>a+p.items.length,0);
+    return { msg: `This backup has <b>${plural(obj.projects.length,'project')}</b> and <b>${plural(n,'task')}</b>. It will <b>replace all your projects</b> in MK Space.` };
+  }
+  if (obj && Array.isArray(obj.items)) return { msg: `This backup has <b>${plural(obj.items.length,'task')}</b>. It will <b>replace the tasks in ${esc(P().name)}</b>.` };
+  const projects = (obj && (obj.projects || (obj.pages ? [{name:'Project 1', pages: obj.pages}] : []))) || [];
+  const n = projects.reduce((a,p)=>a+(p.pages||[]).reduce((b,pg)=>b+(pg.items||[]).length,0),0);
+  if (!n) return null;
+  const hit = projects.map((lp,k) => D.projects[k] ? `<li><b>${esc(lp.name||'Project '+(k+1))}</b> replaces <b>${esc(D.projects[k].name)}</b> (${plural(D.projects[k].items.length,'task')} now)</li>` : `<li><b>${esc(lp.name||'Project '+(k+1))}</b> is added as a new project</li>`).join('');
+  return { msg: `Found <b>${plural(n,'task')}</b> in <b>${plural(projects.length,'project')}</b>.<ul>${hit}</ul>Ideas and other projects stay as they are.` };
+}
+async function runImport(obj, sourceLabel){
+  const d = describeImport(obj);
+  if (!d){ toast(`No tasks found in ${sourceLabel}.`); return; }
+  if (!await confirmBox({ title: `Import from ${sourceLabel}?`, message: d.msg + '<p class="c-note">You can undo this right after importing.</p>', ok: 'Import', danger: true })) return;
+  const before = snapshot();
+  try { importObj(obj); toast(`Imported ${total()} tasks`, () => { D = before; save(); render(); }); }
+  catch(e){ D = before; render(); toast(`Could not import from ${sourceLabel}.`); }
+}
 $('legacyBtn').onclick = () => {
-  try { const obj = JSON.parse(store.get(LEGACY_KEY)); const before = snapshot(); importObj(obj);
-    toast(`Imported ${total()} items from Pending Tracker`, () => { D = before; save(); render(); }); }
-  catch(e){ toast('Could not read Pending Tracker data in this browser.'); }
+  let obj; try { obj = JSON.parse(store.get(LEGACY_KEY)); } catch(e){ return toast('Could not read Pending Tracker data in this browser.'); }
+  runImport(obj, 'Pending Tracker');
 };
 $('importBtn').onclick = () => $('importFile').click();
 $('importFile').onchange = e => {
   const f = e.target.files[0]; if (!f) return;
   const r = new FileReader();
-  r.onload = () => { const before = snapshot();
-    try { importObj(JSON.parse(r.result)); toast(`Imported ${total()} items`, () => { D = before; save(); render(); }); }
-    catch(err){ toast('That file is not an MK Space or Pending Tracker backup (.json).'); } };
+  r.onload = () => { let obj; try { obj = JSON.parse(r.result); } catch(err){ return toast('That file is not an MK Space or Pending Tracker backup (.json).'); }
+    runImport(obj, 'backup file'); };
   r.readAsText(f); e.target.value = '';
 };
 $('exportBtn').onclick = () => {
@@ -1130,13 +1187,15 @@ $('exportBtn').onclick = () => {
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `mk-space-${today()}.json`;
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 };
-let resetArmed = false;
-$('resetBtn').onclick = () => {
-  const pr = P();
-  if (!resetArmed){ resetArmed = true; $('resetBtn').textContent = `Click again to reset ${pr.name}`; setTimeout(() => { resetArmed = false; $('resetBtn').textContent = 'Reset this project'; }, 4000); return; }
-  resetArmed = false; $('resetBtn').textContent = 'Reset this project';
+$('resetBtn').onclick = async () => {
+  const pr = P(), sample = pr.id==='p1';
+  const ok = await confirmBox({ title: `Reset ${pr.name}?`,
+    message: `This removes <b>${plural(pr.items.length,'task')}</b>, <b>${plural((pr.ideas||[]).length,'idea')}</b> and custom workstreams from <b>${esc(pr.name)}</b>. ` +
+      (sample ? 'It then loads the sample tasks again.' : 'The project will be empty.') + ' Other projects are not affected.<p class="c-note">You can undo this right after.</p>',
+    ok: `Reset ${pr.name}`, danger: true });
+  if (!ok) return;
   const before = snapshot();
-  if (pr.id==='p1') Object.assign(pr, { streams:['Tasks','Remaining Work','As-Built Drawing'], ...seed() });
+  if (sample) Object.assign(pr, { streams:['Tasks','Remaining Work','As-Built Drawing'], ...seed() });
   else Object.assign(pr, { streams:['Tasks'], items:[], ideas:[] });
   UI.stream='all'; save(); render(); toast(`${pr.name} reset`, () => { D = before; save(); render(); });
 };

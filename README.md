@@ -161,7 +161,8 @@ tables, charts, badges.
 ## MK Space (new dashboard)
 
 `mk-space/index.html` is the new daily dashboard that replaces Pending Tracker. Open it at
-`https://mkhushfeh.github.io/pending-tracker/mk-space/`.
+`https://mkhushfeh.github.io/pending-tracker/mk-space/`. It starts with three empty projects;
+the example tasks from earlier versions are removed automatically on first open.
 
 **Saving and sync:** every change is saved on the device right away. Tap **Save** at the top once
 per device to connect Google Drive (same Google setup as Pending Tracker). After that, changes

@@ -397,7 +397,7 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
       <button class="side-btn legacy" id="legacyBtn" hidden>Import from Pending Tracker</button>
       <button class="side-btn" id="exportBtn">Export backup (.json)</button>
       <button class="side-btn" id="importBtn">Import backup</button>
-      <button class="side-btn" id="resetBtn">Reset this project</button>
+      <button class="side-btn" id="resetBtn">Clear this project</button>
       <input type="file" id="importFile" accept=".json,application/json" hidden>
     </div>
   </aside>
@@ -557,63 +557,44 @@ const store = {
   set(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
 };
 
-/* ---------- sample data (from Pending Tracker's I&C items) ---------- */
-function mulberry(a){ return () => { a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
-function seed(){
-  const r = mulberry(46), ri = (a,b) => a + Math.floor(r()*(b-a+1));
-  const t0 = today();
-  const T = [
-    ['RTU cabinet FAT sign-off','RTU & SCADA Integration','Vendor Eng. Lead','Critical','Pending / Stuck','Awaiting vendor / supplier'],
-    ['RTU firmware version validation','RTU & SCADA Integration','QA Team','High','In Progress','Awaiting internal review'],
-    ['SCADA point-to-point testing','RTU & SCADA Integration','SCADA Integrator','High','In Progress','Planned'],
-    ['Flow meter clamp-on calibration cert','Flow Metering','Calibration Lab','Medium','Pending / Stuck','Awaiting vendor / supplier'],
-    ['Flow meter installation verification','Flow Metering','Instrumentation Tech','Medium','Identified','Planned'],
-    ['Power supply cable delivery','Power Supply','Procurement','High','Pending / Stuck','Material delay'],
-    ['Power supply cable termination','Power Supply','Electrical Contractor','Medium','Identified','Planned'],
-    ['Site access permit for I&C works','Permits','HSE / Site Team','Critical','Pending / Stuck','Permit / site access issue'],
-    ['Instrument air supply commissioning','Field Instrumentation','Commissioning Engineer','High','In Progress','Resource constraint'],
-    ['Pressure transmitter loop check','Field Instrumentation','Instrumentation Tech','Medium','In Progress','Planned'],
-    ['Level transmitter calibration','Field Instrumentation','Calibration Lab','Medium','Identified','Planned'],
-    ['PLC I/O point mapping review','PLC & Panels','Design Team','High','Pending / Stuck','Technical / design issue'],
-    ['Control panel as-built drawings','PLC & Panels','Design Team','Medium','Identified','Awaiting internal review'],
-    ['Cybersecurity compliance checklist','Network & Cyber','Client PM','High','Pending / Stuck','Awaiting client / owner approval'],
-    ['Network switch configuration','Network & Cyber','SCADA Integrator','Medium','In Progress','Planned'],
-    ['UPS battery backup test','Electrical Systems','Electrical Contractor','Medium','Identified','Planned'],
-    ['VFD commissioning','Electrical Systems','Commissioning Engineer','High','Pending / Stuck','Awaiting vendor / supplier'],
-    ['HMI graphics review and sign-off','SCADA HMI & Historian','Client PM','High','Pending / Stuck','Awaiting client / owner approval'],
-    ['Alarm rationalization workshop','SCADA HMI & Historian','SCADA Integrator','Low','Identified','Planned'],
-    ['Emergency shutdown system test','Safety Systems','Commissioning Engineer','Critical','In Progress','Resource constraint'],
-    ['Chlorine dosing system interlock test','Process Interlocks','Commissioning Engineer','High','Identified','Planned'],
-    ['Integration schedule sign-off','RTU & SCADA Integration','Client PM','Medium','Pending / Stuck','Awaiting client / owner approval'],
-  ];
-  const R = [
-    ['Cable tray extension — north wing','North Wing Electrical','Electrical Contractor','Medium','Identified','Resource constraint'],
-    ['Instrument tubing installation','North Wing Electrical','Instrumentation Tech','High','Pending / Stuck','Material delay'],
-    ['Final punch-list walkdown','Project Closeout','Site Supervisor','Medium','Identified','Awaiting internal review'],
-    ['Spare parts handover to client','Project Closeout','Procurement','Low','Pending / Stuck','Awaiting client / owner approval'],
-    ['O&M staff training session','Project Closeout','Commissioning Engineer','Medium','In Progress','Resource constraint'],
-  ];
-  const A = [
-    ['RTU panel as-built markup','RTU Documentation','Design Team','Medium','In Progress','Awaiting internal review'],
-    ['Cable routing as-built drawing','RTU Documentation','Electrical Contractor','High','Pending / Stuck','Technical / design issue'],
-    ['P&ID redline incorporation','Instrumentation Docs','Vendor Eng. Lead','Critical','Pending / Stuck','Awaiting vendor / supplier'],
-    ['As-built drawing client submission','Instrumentation Docs','Client PM','High','Identified','Awaiting client / owner approval'],
-  ];
-  const items = []; let n = 101;
-  const mk = (row, stream) => {
-    const [title, group, party, priority, status, reason] = row;
-    const age = status==='Identified' ? ri(0,5) : status==='In Progress' ? ri(2,16) : ri(3,34);
-    const since = addDays(t0, -age - ri(0,6));
-    const moved = addDays(t0, -age);
-    let due = addDays(since, ri(6,22));
-    if (items.length % 5 === 1) due = addDays(t0, ri(0,2));
-    items.push({ id: uid()+n, code: 'MK-'+(n++), title, stream, group, party, priority, status, reason,
-      since, moved, due, resolved:'', pct: status==='In Progress' ? ri(4,15)*5 : 0, notes:'Follow up to progress this item.' });
-  };
-  T.forEach(r => mk(r,'Tasks')); R.forEach(r => mk(r,'Remaining Work')); A.forEach(r => mk(r,'As-Built Drawing'));
-  // closed history: realistic tag-level items resolved over the last ~80 days
-  const tags = ['PT','LT','FT','TT','AT','PDT','ZSO','XV'];
-  const done = [
+/* ---------- old sample data: recognised so it can be removed once ---------- */
+// Earlier versions pre-filled Project 1 with example I&C tasks. These lists let the app
+// remove exactly those examples (on every device and in the Drive copy) and keep real tasks.
+const SAMPLE = {
+  titles: new Set([
+    'RTU cabinet FAT sign-off',
+    'RTU firmware version validation',
+    'SCADA point-to-point testing',
+    'Flow meter clamp-on calibration cert',
+    'Flow meter installation verification',
+    'Power supply cable delivery',
+    'Power supply cable termination',
+    'Site access permit for I&C works',
+    'Instrument air supply commissioning',
+    'Pressure transmitter loop check',
+    'Level transmitter calibration',
+    'PLC I/O point mapping review',
+    'Control panel as-built drawings',
+    'Cybersecurity compliance checklist',
+    'Network switch configuration',
+    'UPS battery backup test',
+    'VFD commissioning',
+    'HMI graphics review and sign-off',
+    'Alarm rationalization workshop',
+    'Emergency shutdown system test',
+    'Chlorine dosing system interlock test',
+    'Integration schedule sign-off',
+    'Cable tray extension — north wing',
+    'Instrument tubing installation',
+    'Final punch-list walkdown',
+    'Spare parts handover to client',
+    'O&M staff training session',
+    'RTU panel as-built markup',
+    'Cable routing as-built drawing',
+    'P&ID redline incorporation',
+    'As-built drawing client submission'
+  ]),
+  done: [
     ['Loop check {tag}','Field Instrumentation','Instrumentation Tech'],
     ['Calibration certificate {tag}','Field Instrumentation','Calibration Lab'],
     ['SCADA point test {tag}','RTU & SCADA Integration','SCADA Integrator'],
@@ -623,32 +604,30 @@ function seed(){
     ['Alarm limits confirmed {tag}','SCADA HMI & Historian','Client PM'],
     ['Interlock test {tag}','Process Interlocks','Commissioning Engineer'],
     ['Vendor document review VDR-{n}','PLC & Panels','QA Team'],
-    ['Material receipt MRR-{n}','Power Supply','Procurement'],
-  ];
-  for (let k = 0; k < 96; k++){
-    const d = done[ri(0, done.length-1)];
-    const tag = tags[ri(0,tags.length-1)] + '-' + ri(101,348);
-    const title = d[0].replace('{tag}', tag).replace('{n}', ri(10,96));
-    const back = Math.floor(82 * Math.pow(r(), 1.45));
-    const resolved = addDays(t0, -back);
-    const since = addDays(resolved, -ri(2,18));
-    const due = addDays(since, ri(5,16));
-    const stream = d[1]==='Instrumentation Docs' ? 'As-Built Drawing' : d[1]==='Project Closeout' ? 'Remaining Work' : 'Tasks';
-    items.push({ id: uid()+n, code:'MK-'+(n++), title, stream, group:d[1], party:d[2], priority: PRIORITIES[ri(1,3)],
-      status:'Resolved', reason:'', since, moved: resolved, due, resolved, pct:100, notes:'' });
-  }
-  const ideas = [
-    {text:'Standard loop-check sheet template for all transmitters, so every tech records the same fields', tag:'Field Instrumentation', votes:5},
-    {text:'Fixed weekly vendor call slot to unblock pending items before they age past 15 days', tag:'Vendors', votes:4},
-    {text:'QR tags on junction boxes linking to the current as-built drawing', tag:'As-Built Drawing', votes:3},
-    {text:'Batch all I&C permit requests into one weekly submission to HSE', tag:'Permits', votes:2},
-    {text:'Pre-FAT checklist for RTU cabinets to cut repeat FAT visits', tag:'RTU & SCADA', votes:2},
-  ].map((x,i) => ({...x, id:'d'+i, created: addDays(t0, -i*3)}));
-  return { items, ideas };
+    ['Material receipt MRR-{n}','Power Supply','Procurement']
+  ].map(([t,g,p]) => [new RegExp('^' + t.replace(/[.*+?^$()|[\]\\]/g,'\\$&').replace('{tag}','[A-Z]+-\\d+').replace('{n}','\\d+') + '$'), g, p]),
+  ideas: new Set([
+    'Standard loop-check sheet template for all transmitters, so every tech records the same fields',
+    'Fixed weekly vendor call slot to unblock pending items before they age past 15 days',
+    'QR tags on junction boxes linking to the current as-built drawing',
+    'Batch all I&C permit requests into one weekly submission to HSE',
+    'Pre-FAT checklist for RTU cabinets to cut repeat FAT visits'
+  ])
+};
+const isSample = i => SAMPLE.titles.has(i.title) || SAMPLE.done.some(([re,g,p]) => re.test(i.title) && i.group===g && i.party===p);
+function clearSample(data){
+  if (!data || data.sampleCleared) return 0;
+  let n = 0;
+  data.projects.forEach(p => {
+    const before = p.items.length; p.items = p.items.filter(i => !isSample(i)); n += before - p.items.length;
+    p.ideas = (p.ideas||[]).filter(x => !SAMPLE.ideas.has(x.text));
+  });
+  data.sampleCleared = true;
+  return n;
 }
 const blankProject = (id, name) => ({ id, name, streams:['Tasks'], items:[], ideas:[] });
 function seedAll(){
-  const p1 = { id:'p1', name:'Project 1', streams:['Tasks','Remaining Work','As-Built Drawing'], ...seed() };
+  const p1 = { ...blankProject('p1','Project 1'), streams:['Tasks','Remaining Work','As-Built Drawing'] };
   return { name:'MK', active:'p1', projects:[p1, blankProject('p2','Project 2'), blankProject('p3','Project 3')] };
 }
 
@@ -657,8 +636,8 @@ let D, UI = { stream:'all', q:'', group:'', prio:'', party:'', trendDays:30, bal
 function P(){ return D.projects.find(p => p.id===D.active) || D.projects[0]; }
 function streamsOf(p){ const s = [...(p.streams||[])]; p.items.forEach(i => { if (i.stream && !s.includes(i.stream)) s.push(i.stream); }); p.streams = s.length ? s : ['Tasks']; return p.streams; }
 function load(){
-  try { const raw = store.get(KEY); if (raw){ D = JSON.parse(raw); if (D && Array.isArray(D.projects) && D.projects.length) return; } } catch(e){}
-  D = seedAll(); D.seeded = true; D.updatedAt = 0;   // untouched sample: any cloud copy wins over it
+  try { const raw = store.get(KEY); if (raw){ D = JSON.parse(raw); if (D && Array.isArray(D.projects) && D.projects.length){ if (clearSample(D) || !D.sampleCleared) save(); else writeLocal(); return; } } } catch(e){}
+  D = seedAll(); D.seeded = true; D.sampleCleared = true; D.updatedAt = 0;   // untouched new device: any cloud copy wins over it
   try { const old = JSON.parse(store.get(OLD_KEY)||'null');   // keep anything saved by the first version
     if (old && Array.isArray(old.items)){ Object.assign(D.projects[0], { items: old.items, ideas: old.ideas||[] }); delete D.seeded; } } catch(e){}
   writeLocal();
@@ -859,7 +838,7 @@ function renderTrend(){
   document.getElementById('trendHead').innerHTML = `
     <div><b class="num">${sc}</b><small>closed</small></div>
     <div><b class="num">${so}</b><small>opened</small></div>
-    <div><b class="num" style="color:${net>=0?'var(--s-res-ink)':'var(--s-stk-ink)'}">${net>=0?'−':'+'}${Math.abs(net)}</b><small>net backlog change</small></div>
+    <div><b class="num" style="color:${net>0?'var(--s-res-ink)':net<0?'var(--s-stk-ink)':'var(--text)'}">${net>0?'−':net<0?'+':''}${Math.abs(net)}</b><small>net backlog change</small></div>
     <div><b class="num">${(sc/N).toFixed(1)}</b><small>closed per day</small></div>
     <div><b class="num">${pace>=0?'▲':'▼'} ${Math.abs(pace)}%</b><small>closing pace, 2nd half vs 1st</small></div>`;
   const el = document.getElementById('trendChart');
@@ -904,7 +883,7 @@ function renderGauge(){
   const seg = (start, len, col) => len > 0 ? `<path d="${arcPath()}" pathLength="100" fill="none" stroke="${col}" stroke-width="22" stroke-dasharray="${Math.max(0,len-0.8)} 200" stroke-dashoffset="${-start}"/>` : '';
   document.getElementById('gauge').innerHTML =
     `<path d="${arcPath()}" fill="none" stroke="var(--border-2)" stroke-width="22"/>` +
-    seg(0, pRes, 'var(--s-res)') + seg(pRes, pPrg, 'var(--s-prg)') + seg(pRes+pPrg, 100-pRes-pPrg, 'var(--s-stk)');
+    (v.length ? seg(0, pRes, 'var(--s-res)') + seg(pRes, pPrg, 'var(--s-prg)') + seg(pRes+pPrg, 100-pRes-pPrg, 'var(--s-stk)') : '');
   document.getElementById('gaugePct').textContent = Math.round(pRes) + '%';
   document.getElementById('gaugeHint').textContent = `${v.length} items in view`;
   document.getElementById('gaugeLegend').innerHTML =
@@ -1188,16 +1167,14 @@ $('exportBtn').onclick = () => {
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 };
 $('resetBtn').onclick = async () => {
-  const pr = P(), sample = pr.id==='p1';
-  const ok = await confirmBox({ title: `Reset ${pr.name}?`,
-    message: `This removes <b>${plural(pr.items.length,'task')}</b>, <b>${plural((pr.ideas||[]).length,'idea')}</b> and custom workstreams from <b>${esc(pr.name)}</b>. ` +
-      (sample ? 'It then loads the sample tasks again.' : 'The project will be empty.') + ' Other projects are not affected.<p class="c-note">You can undo this right after.</p>',
-    ok: `Reset ${pr.name}`, danger: true });
+  const pr = P();
+  const ok = await confirmBox({ title: `Clear ${pr.name}?`,
+    message: `This removes <b>${plural(pr.items.length,'task')}</b> and <b>${plural((pr.ideas||[]).length,'idea')}</b> from <b>${esc(pr.name)}</b>, in every workstream. The project and its workstream names stay, empty. Other projects are not affected.<p class="c-note">You can undo this right after.</p>`,
+    ok: `Clear ${pr.name}`, danger: true });
   if (!ok) return;
   const before = snapshot();
-  if (sample) Object.assign(pr, { streams:['Tasks','Remaining Work','As-Built Drawing'], ...seed() });
-  else Object.assign(pr, { streams:['Tasks'], items:[], ideas:[] });
-  UI.stream='all'; save(); render(); toast(`${pr.name} reset`, () => { D = before; save(); render(); });
+  pr.items = []; pr.ideas = [];
+  UI.stream='all'; UI.showAll={}; save(); render(); toast(`${pr.name} cleared`, () => { D = before; save(); render(); });
 };
 
 /* ---------- theme ---------- */
@@ -1302,7 +1279,8 @@ const Cloud = (() => {
     } catch(e){ busy = false; if (e.message!=='expired') status('error'); }
   }
   function apply(remote, msg, undo){
-    D = remote; delete D.seeded; writeLocal(); setLastSync(D.updatedAt||0); lastAt = Date.now();
+    D = remote; delete D.seeded; const cleaned = !D.sampleCleared; clearSample(D); writeLocal(); setLastSync(D.updatedAt||0); lastAt = Date.now();
+    if (cleaned) setTimeout(save, 0);
     if (!D.projects.some(p => p.id===D.active)) D.active = D.projects[0].id;
     render(); status('synced'); if (msg) toast(msg, undo);
   }

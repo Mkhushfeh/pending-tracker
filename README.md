@@ -164,11 +164,27 @@ tables, charts, badges.
 `https://mkhushfeh.github.io/pending-tracker/mk-space/`. It starts with three empty projects;
 the example tasks from earlier versions are removed automatically on first open.
 
-**Saving and sync:** every change is saved on the device right away. Tap **Save** at the top once
-per device to connect Google Drive (same Google setup as Pending Tracker). After that, changes
-upload automatically about a second after you make them, and again when you close or switch away
-from the page. Other devices pull the latest copy when they open or come back to the foreground,
-and every minute while open. The Drive file is `mk-space-data.json`.
+**Saving and sync:** every change is saved on the device right away. Tap **Save** (or **Refresh**,
+the circular arrows next to it) once per device to connect Google Drive (same Google setup as
+Pending Tracker). After that:
 
-Google sign-in lasts about an hour. When it expires, the Save button's dot turns red. Tap Save to
-reconnect; your edits stay on the device until then.
+- Changes upload about a second after you make them, and again when you leave or close the page.
+- Each device loads the latest copy when it opens, when you come back to it, every minute while
+  open, and whenever you tap **Refresh**.
+- Devices merge task by task: edits made on different devices are all kept, and a task deleted
+  on one device is deleted everywhere. The Drive file is `mk-space-data.json`.
+- **Refresh** also checks for a newer version of the app and reloads it, so a phone's home-screen
+  app never keeps running an old copy.
+
+Google sign-in lasts about an hour. When it expires, a yellow bar appears; tap **Sync now**.
+
+**iPhone / Android home-screen app (one-time Google setting):** Google's sign-in pop-up does not
+work inside home-screen apps, so there MK Space uses a full-page Google sign-in that comes back
+to the app. For that, add this address once in Google Cloud Console → APIs & Services →
+Credentials → your OAuth client → **Authorized redirect URIs**:
+
+```
+https://mkhushfeh.github.io/pending-tracker/mk-space/
+```
+
+After it works once, the home-screen app signs in again by itself when you open it.

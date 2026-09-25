@@ -153,6 +153,13 @@ button{cursor:pointer}
 .save-btn[data-state="warn"] .sdot{background:var(--s-stk)}
 .sync-txt{font-size:10.5px;color:var(--text-3);white-space:nowrap;line-height:1}
 .menu-btn,.tabbar,.fab,.scrim{display:none}
+#refreshBtn svg{transition:transform .2s}
+#refreshBtn.spin svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sync-banner{display:flex;align-items:center;gap:10px;background:var(--s-prg-bg);color:var(--s-prg-ink);border-radius:14px;padding:10px 12px 10px 16px;font-size:13.5px;font-weight:500}
+.sync-banner span{flex:1;min-width:0}
+.banner-x{background:none;border:0;color:inherit;padding:4px 6px;font-size:14px;opacity:.7}
+.sync-info{margin:0 8px 6px;font-size:12px;color:var(--side-muted);line-height:1.4}
 
 /* confirmation window */
 .overlay.confirm{z-index:95}
@@ -347,6 +354,8 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
   .hello-r{width:100%}
   .date{font-size:13px}
   .sync-txt{display:none}
+  .topbar{gap:8px}
+  .topbar .icon-btn{width:38px;height:38px}
   .save-btn{padding:0 13px 0 11px}
   .search{padding:8px 12px}
   .headline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px}
@@ -394,6 +403,7 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
     </div>
     <div class="side-data">
       <h4>Data</h4>
+      <p class="sync-info" id="syncInfo"></p>
       <button class="side-btn legacy" id="legacyBtn" hidden>Import from Pending Tracker</button>
       <button class="side-btn" id="exportBtn">Export backup (.json)</button>
       <button class="side-btn" id="importBtn">Import backup</button>
@@ -407,8 +417,11 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Search tasks, tags, parties…" aria-label="Search"></label>
       <div class="save-wrap"><button class="save-btn" id="saveBtn" data-state="local"><span class="sdot" aria-hidden="true"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3v5h8V3M7 21v-7h10v7"/></svg><span id="saveLbl">Save</span></button><span class="sync-txt" id="syncTxt">This device only</span></div>
+      <button class="icon-btn" id="refreshBtn" aria-label="Refresh: load the latest data and app version" title="Refresh: load the latest data and app version"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 21v-5h-5"/></svg></button>
       <button class="icon-btn" id="themeBtn" aria-label="Switch light or dark theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
     </div>
+
+    <div class="sync-banner" id="syncBanner" hidden><span id="bannerMsg"></span><button type="button" class="btn sm primary" id="bannerBtn">Sync now</button><button type="button" class="banner-x" id="bannerX" aria-label="Hide this message">✕</button></div>
 
     <nav class="projects" id="projTabs" aria-label="Projects"></nav>
 
@@ -617,10 +630,10 @@ const SAMPLE = {
 const isSample = i => SAMPLE.titles.has(i.title) || SAMPLE.done.some(([re,g,p]) => re.test(i.title) && i.group===g && i.party===p);
 function clearSample(data){
   if (!data || data.sampleCleared) return 0;
-  let n = 0;
+  let n = 0; const del = data.deleted ||= {}, t = Date.now();
   data.projects.forEach(p => {
-    const before = p.items.length; p.items = p.items.filter(i => !isSample(i)); n += before - p.items.length;
-    p.ideas = (p.ideas||[]).filter(x => !SAMPLE.ideas.has(x.text));
+    p.items = p.items.filter(i => { if (!isSample(i)) return true; del['i:'+i.id] = t; n++; return false; });
+    p.ideas = (p.ideas||[]).filter(x => { if (!SAMPLE.ideas.has(x.text)) return true; del['d:'+x.id] = t; return false; });
   });
   data.sampleCleared = true;
   return n;
@@ -636,16 +649,55 @@ let D, UI = { stream:'all', q:'', group:'', prio:'', party:'', trendDays:30, bal
 function P(){ return D.projects.find(p => p.id===D.active) || D.projects[0]; }
 function streamsOf(p){ const s = [...(p.streams||[])]; p.items.forEach(i => { if (i.stream && !s.includes(i.stream)) s.push(i.stream); }); p.streams = s.length ? s : ['Tasks']; return p.streams; }
 function load(){
-  try { const raw = store.get(KEY); if (raw){ D = JSON.parse(raw); if (D && Array.isArray(D.projects) && D.projects.length){ if (clearSample(D) || !D.sampleCleared) save(); else writeLocal(); return; } } } catch(e){}
-  D = seedAll(); D.seeded = true; D.sampleCleared = true; D.updatedAt = 0;   // untouched new device: any cloud copy wins over it
+  try { const raw = store.get(KEY); if (raw){ D = JSON.parse(raw); if (D && Array.isArray(D.projects) && D.projects.length){ clearSample(D); delete D.seeded; if (D.syncV !== 2) D.legacy = true; writeLocal(); known = keysOf(D); return; } } } catch(e){}
+  D = seedAll(); D.sampleCleared = true; D.syncV = 2;   // new device: starts empty, merges with the Drive copy on first sync
   try { const old = JSON.parse(store.get(OLD_KEY)||'null');   // keep anything saved by the first version
-    if (old && Array.isArray(old.items)){ Object.assign(D.projects[0], { items: old.items, ideas: old.ideas||[] }); delete D.seeded; } } catch(e){}
-  writeLocal();
+    if (old && Array.isArray(old.items)) Object.assign(D.projects[0], { items: old.items, ideas: old.ideas||[] }); } catch(e){}
+  writeLocal(); known = keysOf(D);
 }
 const snapshot = () => JSON.parse(JSON.stringify(D));
 function writeLocal(){ store.set(KEY, JSON.stringify(D)); }
-// Every change: stamp it, keep it on this device right away, then queue a cloud upload.
-function save(){ D.updatedAt = Date.now(); delete D.seeded; writeLocal(); Cloud.queue(); }
+
+/* Change tracking: every task, idea and project carries its own "last changed" time (u),
+   and deletions leave a dated marker. Devices then merge item by item instead of one copy
+   overwriting the other. */
+let known = new Map();
+const sig = o => { const {u, ...rest} = o; return JSON.stringify(rest); };
+function keysOf(data){
+  const m = new Map();
+  data.projects.forEach(p => {
+    m.set('p:'+p.id, JSON.stringify([p.name, p.streams]));
+    p.items.forEach(i => m.set('i:'+i.id, sig(i)));
+    (p.ideas||[]).forEach(d => m.set('d:'+d.id, sig(d)));
+  });
+  return m;
+}
+function stamp(){
+  const now = Date.now(), cur = keysOf(D), del = D.deleted ||= {};
+  D.projects.forEach(p => {
+    if (known.get('p:'+p.id) !== cur.get('p:'+p.id)) p.u = now;
+    p.items.forEach(i => { if (known.get('i:'+i.id) !== cur.get('i:'+i.id)) i.u = now; });
+    (p.ideas||[]).forEach(d => { if (known.get('d:'+d.id) !== cur.get('d:'+d.id)) d.u = now; });
+  });
+  known.forEach((_, k) => { if (!cur.has(k)) del[k] = now; });
+  cur.forEach((_, k) => { delete del[k]; });
+  Object.keys(del).forEach(k => { if (now - del[k] > 180*86400000) delete del[k]; });
+  known = cur;
+}
+function mergeData(L, R){
+  const del = {...(R.deleted||{})};
+  Object.entries(L.deleted||{}).forEach(([k,t]) => { if (!(del[k] >= t)) del[k] = t; });
+  const newer = (x, y) => !x ? y : !y ? x : ((y.u||0) > (x.u||0) ? y : x);
+  const list = (a, b, pre) => { const m = new Map(); [...(b||[]), ...(a||[])].forEach(o => m.set(o.id, newer(m.get(o.id), o)));
+    return [...m.values()].filter(o => !(del[pre+o.id] >= (o.u||0))); };
+  const ids = [...new Set([...L.projects.map(p=>p.id), ...R.projects.map(p=>p.id)])];
+  const projects = ids.map(id => { const lp = L.projects.find(p=>p.id===id), rp = R.projects.find(p=>p.id===id), meta = newer(rp, lp);
+    return {...meta, items: list(lp&&lp.items, rp&&rp.items, 'i:'), ideas: list(lp&&lp.ideas, rp&&rp.ideas, 'd:')}; });
+  return {...R, ...L, projects, deleted: del, sampleCleared: L.sampleCleared || R.sampleCleared, updatedAt: Math.max(L.updatedAt||0, R.updatedAt||0)};
+}
+const dataSig = d => JSON.stringify([d.projects, d.deleted||{}]);
+// Every change: stamp it, keep it on this device right away, then queue a cloud sync.
+function save(){ stamp(); D.updatedAt = Date.now(); writeLocal(); Cloud.queue(); }
 try { Object.assign(UI, JSON.parse(store.get(KEY+'-ui')||'{}'), {q:'', showAll:{}}); } catch(e){}
 const saveUI = () => store.set(KEY+'-ui', JSON.stringify({stream:UI.stream, trendDays:UI.trendDays, balBy:UI.balBy}));
 
@@ -670,11 +722,11 @@ const untip = () => { tipEl.hidden = true; };
 
 /* ---------- toast ---------- */
 let toastTimer, undoFn;
-function toast(msg, undo){
+function toast(msg, undo, label = 'Undo'){
   const t = document.getElementById('toast');
   document.getElementById('toastMsg').textContent = msg;
-  document.getElementById('toastUndo').hidden = !undo; undoFn = undo;
-  t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(()=> t.hidden = true, 5000);
+  document.getElementById('toastUndo').hidden = !undo; document.getElementById('toastUndo').textContent = label; undoFn = undo;
+  t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(()=> t.hidden = true, label==='Undo' ? 5000 : 12000);
 }
 document.getElementById('toastUndo').onclick = () => { if (undoFn) undoFn(); document.getElementById('toast').hidden = true; };
 
@@ -1192,47 +1244,70 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.
 }), {rootMargin:'-40% 0px -55% 0px'}) : null;
 if (io) ['today','trend','focus','balance','ideas','board'].forEach(id => io.observe(document.getElementById(id)));
 
+/* ---------- app version (so a home-screen app never runs an old copy) ---------- */
+const APP_VERSION = '2026.09.25-1';
+async function checkForUpdate(){
+  try {
+    const path = location.pathname.replace(/index\.html$/, '');
+    const html = await fetch(path + 'index.html?check=' + Date.now(), {cache:'no-store'}).then(r => r.ok ? r.text() : '');
+    const m = html.match(/const APP_VERSION = '([^']+)'/);
+    if (m && m[1] !== APP_VERSION && sessionStorage.getItem('mk-reloaded') !== m[1]){
+      sessionStorage.setItem('mk-reloaded', m[1]); writeLocal();
+      location.replace(path + 'index.html?v=' + m[1]); return true;
+    }
+  } catch(e){}
+  return false;
+}
+
 /* ---------- cloud sync (Google Drive, same Google app as Pending Tracker) ---------- */
 const GOOGLE_CLIENT_ID = '158976699077-qvd4e845qrmfshqjrv8058djs5kr40tr.apps.googleusercontent.com';
 const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 const DRIVE_FILE = 'mk-space-data.json';
+const STANDALONE = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const Cloud = (() => {
-  let token = null, client = null, fileId = store.get(KEY+'-fileId'), timer = null, busy = false, state = 'local', lastAt = 0;
-  const lastSync = () => +(store.get(KEY+'-lastSync') || 0);
-  const setLastSync = v => store.set(KEY+'-lastSync', String(v||0));
-  const dirty = () => !D.seeded && (D.updatedAt||0) > lastSync();
+  let token = null, client = null, fileId = store.get(KEY+'-fileId'), timer = null, busy = false, again = false, pending = store.get(KEY+'-pending') === '1';
+  let lastAt = +(store.get(KEY+'-lastAt') || 0), onDone = null;
   const wasConnected = () => store.get(KEY+'-cloud') === '1';
+  const setPending = v => { pending = v; store.set(KEY+'-pending', v ? '1' : ''); };
+  const hhmm = t => t ? new Date(t).toLocaleString([], {hour:'2-digit', minute:'2-digit', ...(Date.now()-t > 86400000 ? {day:'numeric', month:'short'} : {})}) : '';
   const api = (url, opt = {}) => fetch(url, {...opt, headers: {Authorization: 'Bearer '+token, ...(opt.headers||{})}})
-    .then(r => { if (r.status === 401){ dropToken(); throw new Error('expired'); } if (!r.ok) throw new Error('Drive error '+r.status); return r; });
+    .then(r => { if (r.status === 401 || r.status === 403){ dropToken(); throw new Error('expired'); } if (!r.ok) throw new Error('Drive error '+r.status); return r; });
 
   function status(st){
-    state = st; const t = lastAt ? new Date(lastAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+    const t = hhmm(lastAt);
     const map = {
-      local:    ['Save', 'Saved on this device only. Tap Save to turn on sync with your Google Drive.', 'local'],
-      pending:  ['Save', 'Changes waiting to upload', 'pending'],
-      syncing:  ['Saving…', 'Uploading to Google Drive', 'pending'],
-      synced:   ['Saved', `Synced with Google Drive${t ? ' at '+t : ''}. Other devices get this on open.`, 'ok'],
-      reconnect:['Save', 'Google sign-in expired. Tap Save to reconnect and sync.', 'warn'],
-      error:    ['Retry', 'Could not reach Google Drive. Your changes are safe on this device.', 'warn'],
+      local:    ['Save', 'Saved on this device only. Tap Save to sync with your Google Drive.', 'local', 'This device only'],
+      pending:  ['Save', 'Changes waiting to upload', 'pending', 'Unsaved changes'],
+      syncing:  ['Saving…', 'Syncing with Google Drive', 'pending', 'Syncing…'],
+      synced:   ['Saved', `Synced with Google Drive${t ? ' at '+t : ''}`, 'ok', `Synced ${t}`],
+      reconnect:['Save', 'Google sign-in expired. Tap Save or Refresh to sync.', 'warn', 'Sign-in expired'],
+      error:    ['Retry', 'Could not reach Google Drive. Your changes are safe on this device.', 'warn', 'Offline, saved here'],
     };
-    const [label, title, cls] = map[st];
-    const b = document.getElementById('saveBtn'); if (!b) return;
-    b.dataset.state = cls; b.title = title; b.setAttribute('aria-label', label+'. '+title);
-    document.getElementById('saveLbl').textContent = label;
-    document.getElementById('syncTxt').textContent =
-      st==='synced' ? `Synced ${t}` : st==='local' ? 'This device only' : st==='reconnect' ? 'Sign-in expired' : st==='error' ? 'Offline, saved here' : 'Unsaved changes';
+    const [label, title, cls, small] = map[st];
+    const b = $('saveBtn'); b.dataset.state = cls; b.title = title; b.setAttribute('aria-label', label+'. '+title);
+    $('saveLbl').textContent = label; $('syncTxt').textContent = small;
+    $('refreshBtn').classList.toggle('spin', st === 'syncing');
+    $('syncInfo').textContent = st==='synced' ? `Google Drive: synced ${t}` : st==='local' ? 'Google Drive: not connected on this device' : `Google Drive: ${small.toLowerCase()}${t ? ' (last sync '+t+')' : ''}`;
+    const showBanner = (st === 'reconnect' || st === 'error' || (st === 'local' && store.get(KEY+'-bannerOff') !== '1'));
+    $('syncBanner').hidden = !showBanner;
+    $('bannerMsg').textContent = st==='local' ? 'This device is not syncing yet. Connect Google Drive to see the same tasks on every device.'
+      : st==='error' ? 'Could not reach Google Drive. Your changes are kept on this device.'
+      : 'Sign in again to load your latest tasks from other devices.';
+    $('bannerBtn').textContent = st==='error' ? 'Retry' : st==='local' ? 'Connect' : 'Sync now';
   }
-  function keepToken(t, sec){ token = t; store.set(KEY+'-token', t); store.set(KEY+'-tokenExp', String(Date.now() + (sec||3500)*1000)); store.set(KEY+'-cloud','1'); }
+  function keepToken(t, sec){ token = t; store.set(KEY+'-token', t); store.set(KEY+'-tokenExp', String(Date.now() + (+sec||3500)*1000)); store.set(KEY+'-cloud','1'); }
   function dropToken(){ token = null; store.set(KEY+'-token',''); status('reconnect'); }
-  function restoreToken(){
-    const t = store.get(KEY+'-token'), exp = +(store.get(KEY+'-tokenExp')||0);
-    if (t && Date.now() < exp - 60000) token = t;
-  }
+  function restoreToken(){ const t = store.get(KEY+'-token'), exp = +(store.get(KEY+'-tokenExp')||0); if (t && Date.now() < exp - 60000) token = t; }
+
   async function findFile(){
-    if (fileId){ try { await api(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,trashed`).then(r=>r.json()).then(j => { if (j.trashed) fileId = null; }); if (fileId) return fileId; } catch(e){ if (e.message==='expired') throw e; fileId = null; } }
+    if (fileId){
+      try { const j = await api(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,trashed`).then(r=>r.json()); if (!j.trashed) return fileId; }
+      catch(e){ if (e.message==='expired') throw e; }
+      fileId = null;
+    }
     const j = await api(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`name='${DRIVE_FILE}' and trashed=false`)}&spaces=drive&fields=files(id,modifiedTime)&orderBy=modifiedTime desc`).then(r=>r.json());
     fileId = j.files && j.files.length ? j.files[0].id : null;
-    if (fileId) store.set(KEY+'-fileId', fileId);
+    store.set(KEY+'-fileId', fileId || '');
     return fileId;
   }
   async function upload(keepalive){
@@ -1246,72 +1321,117 @@ const Cloud = (() => {
       await api(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {method:'PATCH', headers:{'Content-Type':'application/json'}, body, keepalive: !!keepalive && body.length < 60000});
     }
   }
-  async function push(){
-    if (!token){ status(wasConnected() ? 'reconnect' : 'local'); return; }
-    if (busy){ queue(); return; }
-    busy = true; status('syncing');
-    const stamp = D.updatedAt;
-    try { if (!fileId) await findFile(); await upload(); setLastSync(stamp); lastAt = Date.now(); status(dirty() ? 'pending' : 'synced'); if (dirty()) queue(); }
-    catch(e){ if (e.message!=='expired') status('error'); }
-    finally { busy = false; }
-  }
-  // Pull the Drive copy; newer side wins. If both sides changed, keep the newer and back up the other.
-  async function pull(){
-    if (!token || busy) return;
-    busy = true; status('syncing');
+  // One sync round: read the Drive copy, merge it with this device item by item, save both.
+  async function sync(){
+    if (!token){ status(wasConnected() ? 'reconnect' : 'local'); return null; }
+    if (busy){ again = true; return null; }
+    busy = true; clearTimeout(timer); status('syncing');
+    const editsAtStart = D.updatedAt;
     try {
       await findFile();
-      if (!fileId){ busy = false; if (!D.updatedAt) D.updatedAt = Date.now(); delete D.seeded; writeLocal(); return push(); }
-      const remote = await api(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`).then(r=>r.json());
-      busy = false;
-      if (!remote || !Array.isArray(remote.projects)) return push();
-      const rU = remote.updatedAt||0, lU = D.updatedAt||0, last = lastSync();
-      const remoteChanged = rU > last && rU !== lU;
-      if (D.seeded || (remoteChanged && !dirty())) return apply(remote, 'Updated with changes from your other device');
-      if (remoteChanged && dirty()){
-        const mine = snapshot();
-        if (rU > lU){ store.set(KEY+'-backup', JSON.stringify(mine)); apply(remote, 'Newer changes from another device loaded', () => { D = mine; save(); render(); }); }
-        else push();
-        return;
+      let remote = null;
+      if (fileId){ try { remote = await api(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`).then(r=>r.json()); } catch(e){ if (e.message==='expired') throw e; } }
+      if (remote && !Array.isArray(remote.projects)) remote = null;
+      if (remote) clearSample(remote);
+      const localSig = dataSig(D);
+      let base = D, backup = null;
+      if (D.legacy){
+        // First sync after the update on a device that had never synced: the Drive copy is the
+        // reference. This device's older copy is kept as a backup the user can bring back.
+        if (remote && !(+(store.get(KEY+'-lastSync')||0) > 0)){
+          backup = snapshot(); delete backup.legacy;
+          base = {...D, projects: D.projects.map(p => ({...p, items: p.items.filter(i => i.u), ideas: (p.ideas||[]).filter(d => d.u)}))};
+          store.set(KEY+'-backup', JSON.stringify(backup));
+        }
+        delete D.legacy; delete base.legacy; D.syncV = base.syncV = 2;
       }
-      if (dirty()) return push();
-      lastAt = Date.now(); status('synced');
-    } catch(e){ busy = false; if (e.message!=='expired') status('error'); }
+      const merged = remote ? mergeData(base, remote) : D;
+      const mergedSig = dataSig(merged), changedHere = mergedSig !== localSig;
+      if (changedHere){
+        const active = D.active; D = merged; D.active = D.projects.some(p => p.id===active) ? active : D.projects[0].id;
+        writeLocal(); known = keysOf(D); render();
+      }
+      if (!remote || mergedSig !== dataSig(remote)) await upload();
+      if (D.updatedAt === editsAtStart) setPending(false);
+      lastAt = Date.now(); store.set(KEY+'-lastAt', String(lastAt));
+      status(pending ? 'pending' : 'synced');
+      if (backup){
+        const extra = backup.projects.reduce((n,bp) => { const p = D.projects.find(x => x.id===bp.id); return n + bp.items.filter(i => !p || !p.items.some(x => x.id===i.id)).length; }, 0);
+        if (extra) toast(`Loaded your tasks from Google Drive. This device had ${extra} other task${extra>1?'s':''}.`, () => {
+          backup.projects.forEach(bp => { let p = D.projects.find(x => x.id===bp.id); if (!p){ p = {...bp, items:[], ideas:[]}; D.projects.push(p); }
+            bp.items.forEach(i => { if (!p.items.some(x => x.id===i.id)) p.items.push(i); }); });
+          save(); render(); }, 'Add them');
+        else toast('Loaded your tasks from Google Drive');
+        return null;
+      }
+      return { changedHere };
+    } catch(e){ if (e.message !== 'expired') status('error'); return null; }
+    finally { busy = false; if (again){ again = false; queue(); } }
   }
-  function apply(remote, msg, undo){
-    D = remote; delete D.seeded; const cleaned = !D.sampleCleared; clearSample(D); writeLocal(); setLastSync(D.updatedAt||0); lastAt = Date.now();
-    if (cleaned) setTimeout(save, 0);
-    if (!D.projects.some(p => p.id===D.active)) D.active = D.projects[0].id;
-    render(); status('synced'); if (msg) toast(msg, undo);
+  function queue(){ setPending(true); clearTimeout(timer); if (!token){ status(wasConnected() ? 'reconnect' : 'local'); return; } status('pending'); timer = setTimeout(sync, 1200); }
+  function flush(){ if (token && pending){ clearTimeout(timer); upload(true).then(() => setPending(false)).catch(()=>{}); } }
+
+  // Sign-in. Normal browsers: Google pop-up. Home-screen app: full-page sign-in that returns here.
+  function redirectUri(){ return location.origin + location.pathname.replace(/index\.html$/, ''); }
+  function signInRedirect(){
+    const state = Math.random().toString(36).slice(2);
+    store.set(KEY+'-oauthState', state); writeLocal();
+    const q = new URLSearchParams({ client_id: GOOGLE_CLIENT_ID, redirect_uri: redirectUri(), response_type: 'token', scope: DRIVE_SCOPE, include_granted_scopes: 'true', state });
+    if (!wasConnected()) q.set('prompt', 'consent');
+    location.assign('https://accounts.google.com/o/oauth2/v2/auth?' + q);
   }
-  function queue(){ clearTimeout(timer); if (!token){ status(wasConnected() ? 'reconnect' : 'local'); return; } status('pending'); timer = setTimeout(push, 1200); }
-  function flush(){ if (token && dirty()){ clearTimeout(timer); upload(true).then(() => setLastSync(D.updatedAt)).catch(()=>{}); } }
+  function readRedirectResult(){
+    if (!location.hash.includes('access_token=') && !location.hash.includes('error=')) return false;
+    const h = new URLSearchParams(location.hash.slice(1));
+    history.replaceState(null, '', location.pathname + location.search);
+    if (h.get('state') !== store.get(KEY+'-oauthState')) return false;
+    store.set(KEY+'-oauthState', '');
+    if (h.get('error')){ toast('Google sign-in was cancelled.'); return false; }
+    keepToken(h.get('access_token'), h.get('expires_in')); store.set(KEY+'-redirectOk', '1');
+    return true;
+  }
   function connect(){
-    if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2){
-      toast(location.protocol==='https:' && location.hostname.endsWith('github.io') ? 'Google sign-in is still loading. Try again in a moment.' : 'Cloud sync works on your GitHub Pages link. Saved on this device.');
-      return;
-    }
+    if (!/github\.io$/.test(location.hostname) && location.protocol !== 'http:'){ toast('Sync works on your GitHub Pages link. Everything is saved on this device.'); return; }
+    if (STANDALONE) return signInRedirect();
+    if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2){ toast('Google sign-in is still loading. Try again in a moment.'); return; }
     if (!client) client = google.accounts.oauth2.initTokenClient({ client_id: GOOGLE_CLIENT_ID, scope: DRIVE_SCOPE,
-      callback: r => { if (r.error){ status('error'); toast('Google sign-in was cancelled.'); return; } keepToken(r.access_token, r.expires_in); pull(); } });
+      callback: r => { if (r.error){ status('error'); toast('Google sign-in was cancelled.'); return; } keepToken(r.access_token, r.expires_in); sync().then(res => onDone && onDone(res)); } });
     client.requestAccessToken({prompt: wasConnected() ? '' : 'consent'});
   }
-  // The Save button: store locally now, then sync (asks Google sign-in once if needed).
-  function saveNow(){
-    writeLocal();
-    if (token){ clearTimeout(timer); if (dirty()) push(); else pull(); }
-    else connect();
+  function report(res){
+    if (!res) return;
+    toast(res.changedHere ? 'Loaded the latest changes from your other devices' : `Up to date. Synced at ${hhmm(lastAt)}`);
+  }
+  // Save button: keep it here, then sync (signs in first if needed).
+  function saveNow(){ writeLocal(); if (token) sync().then(report); else { onDone = report; connect(); } }
+  // Refresh button: get the newest app version, then the newest data.
+  async function refresh(){
+    if (await checkForUpdate()) return;
+    if (token) sync().then(report); else { onDone = report; connect(); }
   }
   function init(){
+    const back = readRedirectResult();
     restoreToken();
-    if (token) pull(); else status(wasConnected() ? 'reconnect' : 'local');
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState==='hidden') flush(); else if (token) pull(); });
+    if (token) sync().then(res => { if (back) report(res); });
+    else {
+      status(wasConnected() ? 'reconnect' : 'local');
+      // Home-screen app: sign in again automatically on open, at most once every 10 minutes.
+      const last = +(store.get(KEY+'-autoAuth') || 0);
+      if (STANDALONE && wasConnected() && store.get(KEY+'-redirectOk') === '1' && navigator.onLine && Date.now() - last > 600000){
+        store.set(KEY+'-autoAuth', String(Date.now())); signInRedirect(); return;
+      }
+    }
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState==='hidden') flush(); else if (token) sync(); });
     addEventListener('pagehide', flush);
-    addEventListener('beforeunload', e => { if (token && dirty()){ flush(); e.preventDefault(); e.returnValue = ''; } });
-    setInterval(() => { if (token && document.visibilityState==='visible' && !dirty()) pull(); }, 60000);
-    addEventListener('online', () => { if (token) (dirty() ? push() : pull()); });
+    addEventListener('beforeunload', e => { if (token && pending){ flush(); e.preventDefault(); e.returnValue = ''; } });
+    setInterval(() => { if (token && document.visibilityState==='visible' && !pending) sync(); }, 60000);
+    addEventListener('online', () => { if (token) sync(); });
+    $('bannerBtn').onclick = () => { if (token) sync().then(report); else { onDone = report; connect(); } };
+    $('bannerX').onclick = () => { store.set(KEY+'-bannerOff','1'); $('syncBanner').hidden = true; };
   }
-  return { queue, saveNow, init };
+  return { queue, saveNow, refresh, init };
 })();
+$('refreshBtn').onclick = () => Cloud.refresh();
 document.getElementById('saveBtn').onclick = () => Cloud.saveNow();
 addEventListener('keydown', e => { if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){ e.preventDefault(); Cloud.saveNow(); } });
 
@@ -1332,7 +1452,8 @@ function render(){
   $('dateNow').textContent = new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
   renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard();
 }
-load(); render(); Cloud.init();
+if (matchMedia('(max-width:640px)').matches) $('q').placeholder = 'Search';
+load(); render(); Cloud.init(); checkForUpdate();
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { renderTrend(); renderGauge(); }, 120); });
 </script>
 </body>

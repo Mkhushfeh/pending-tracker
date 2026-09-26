@@ -192,3 +192,10 @@ https://mkhushfeh.github.io/pending-tracker/mk-space/
 
 Until it's added, the laptop falls back to the Google pop-up and asks you to tap **Sync now** about
 once an hour.
+
+**Time needed:** each task can have a *Time needed* (15 min, 30 min, 1 hour, 2 hours, 4 hours,
+1 day, 2 days; a day counts as 8 hours), set in the task form. To pick work for the time you have,
+use the **Time I have** chips in *Today's focus* (lists open tasks that fit, most urgent first, with
+the total time), or the **Any time needed** filter at the top, which filters the whole dashboard
+and board. Board columns show the total time of their open tasks.
+

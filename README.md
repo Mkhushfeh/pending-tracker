@@ -195,8 +195,6 @@ once an hour.
 
 **Time needed:** each task can have a *Time needed*: 15 min, 30 min, 1H, 2H, 4H, 1D or 2D (a day
 counts as 8 hours). Set it in the task form, or tap the ⏱ chip on a card (*Set time* if it has none)
-and pick a value. To pick work by time, tap a time in the **⏱ Time needed** chips under the filters
-(filters the whole dashboard and board; each chip shows how many open tasks have exactly that time)
-or in *Today's focus* (lists those tasks, most urgent first, with their total). Each time shows only
-tasks with exactly that time; *Not set* shows tasks still to estimate. Board columns show the total
+and pick a value. To pick work by time, tap a time in the **⏱ Time needed** chips in *Today's focus*: it
+lists the open tasks with exactly that time, most urgent first, with their total. Board columns show the total
 time of their open tasks.

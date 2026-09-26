@@ -159,6 +159,9 @@ button{cursor:pointer}
 .sync-banner{display:flex;align-items:center;gap:10px;background:var(--s-prg-bg);color:var(--s-prg-ink);border-radius:14px;padding:10px 12px 10px 16px;font-size:13.5px;font-weight:500}
 .sync-banner span{flex:1;min-width:0}
 .banner-x{background:none;border:0;color:inherit;padding:4px 6px;font-size:14px;opacity:.7}
+.connecting{position:fixed;inset:0;z-index:99;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--bg);color:var(--text-2);font-weight:600}
+.connecting[hidden]{display:none}
+.dot-spin{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--border);border-top-color:var(--s-idn);animation:spin .8s linear infinite}
 .sync-info{margin:0 8px 6px;font-size:12px;color:var(--side-muted);line-height:1.4}
 
 /* confirmation window */
@@ -532,6 +535,7 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
     <div class="c-actions"><button type="button" class="btn" id="cCancel">Cancel</button><button type="button" class="btn primary" id="cOk">Continue</button></div>
   </div>
 </div>
+<div class="connecting" id="connecting" hidden><span class="dot-spin" aria-hidden="true"></span>Connecting to Google Drive…</div>
 <div class="scrim" id="scrim" hidden></div>
 <nav class="tabbar" id="tabbar" aria-label="Sections"></nav>
 <button class="fab" id="fab" aria-label="New task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -1245,7 +1249,7 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.
 if (io) ['today','trend','focus','balance','ideas','board'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.09.25-1';
+const APP_VERSION = '2026.09.26-1';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');
@@ -1271,7 +1275,7 @@ const Cloud = (() => {
   const setPending = v => { pending = v; store.set(KEY+'-pending', v ? '1' : ''); };
   const hhmm = t => t ? new Date(t).toLocaleString([], {hour:'2-digit', minute:'2-digit', ...(Date.now()-t > 86400000 ? {day:'numeric', month:'short'} : {})}) : '';
   const api = (url, opt = {}) => fetch(url, {...opt, headers: {Authorization: 'Bearer '+token, ...(opt.headers||{})}})
-    .then(r => { if (r.status === 401 || r.status === 403){ dropToken(); throw new Error('expired'); } if (!r.ok) throw new Error('Drive error '+r.status); return r; });
+    .then(r => { if (r.status === 401){ dropToken(); renewSoon(); throw new Error('expired'); } if (!r.ok) throw new Error('Drive error '+r.status); return r; });
 
   function status(st){
     const t = hhmm(lastAt);
@@ -1292,10 +1296,11 @@ const Cloud = (() => {
     $('syncBanner').hidden = !showBanner;
     $('bannerMsg').textContent = st==='local' ? 'This device is not syncing yet. Connect Google Drive to see the same tasks on every device.'
       : st==='error' ? 'Could not reach Google Drive. Your changes are kept on this device.'
-      : 'Sign in again to load your latest tasks from other devices.';
+      : redirectWorks() ? 'Sign in again to load your latest tasks from other devices.'
+      : 'Sign in again to sync. For automatic sign-in, add the MK Space address in Google Cloud (see README).';
     $('bannerBtn').textContent = st==='error' ? 'Retry' : st==='local' ? 'Connect' : 'Sync now';
   }
-  function keepToken(t, sec){ token = t; store.set(KEY+'-token', t); store.set(KEY+'-tokenExp', String(Date.now() + (+sec||3500)*1000)); store.set(KEY+'-cloud','1'); }
+  function keepToken(t, sec){ token = t; store.set(KEY+'-token', t); store.set(KEY+'-tokenExp', String(Date.now() + (+sec||3500)*1000)); store.set(KEY+'-cloud','1'); planRenewal(); rememberAccount(); }
   function dropToken(){ token = null; store.set(KEY+'-token',''); status('reconnect'); }
   function restoreToken(){ const t = store.get(KEY+'-token'), exp = +(store.get(KEY+'-tokenExp')||0); if (t && Date.now() < exp - 60000) token = t; }
 
@@ -1373,26 +1378,60 @@ const Cloud = (() => {
 
   // Sign-in. Normal browsers: Google pop-up. Home-screen app: full-page sign-in that returns here.
   function redirectUri(){ return location.origin + location.pathname.replace(/index\.html$/, ''); }
-  function signInRedirect(){
+  /* Staying connected. Google's access pass for a website lasts about an hour and cannot be
+     renewed in the background. So the app renews it by a quick trip to Google and back
+     (no taps while you stay signed in to Google): when it opens without a valid pass, and
+     shortly before the pass runs out, at a moment you are not typing. */
+  const redirectWorks = () => !(Date.now() - (+(store.get(KEY+'-redirectBroken')||0)) < 86400000);   // retried after a day
+  function signInRedirect(silent){
     const state = Math.random().toString(36).slice(2);
-    store.set(KEY+'-oauthState', state); writeLocal();
+    store.set(KEY+'-oauthState', state); store.set(KEY+'-redirectPending', String(Date.now())); writeLocal(); flush();
+    try { sessionStorage.setItem('mk-scroll', String(scrollY)); } catch(e){}
     const q = new URLSearchParams({ client_id: GOOGLE_CLIENT_ID, redirect_uri: redirectUri(), response_type: 'token', scope: DRIVE_SCOPE, include_granted_scopes: 'true', state });
-    if (!wasConnected()) q.set('prompt', 'consent');
+    const hint = store.get(KEY+'-account'); if (hint) q.set('login_hint', hint);
+    if (silent) q.set('prompt', 'none'); else if (!wasConnected()) q.set('prompt', 'consent');
+    try { sessionStorage.setItem('mk-silent', silent ? '1' : ''); } catch(e){}
+    if (silent) $('connecting').hidden = false;
     location.assign('https://accounts.google.com/o/oauth2/v2/auth?' + q);
   }
   function readRedirectResult(){
-    if (!location.hash.includes('access_token=') && !location.hash.includes('error=')) return false;
+    const started = +(store.get(KEY+'-redirectPending') || 0); store.set(KEY+'-redirectPending', '');
+    const hasResult = location.hash.includes('access_token=') || location.hash.includes('error=');
+    // Went to Google but came back without an answer (e.g. Google showed an error page and the
+    // user went back): the return address is not set up, so stop using the full-page sign-in.
+    if (!hasResult){ if (started && Date.now() - started < 15*60000) store.set(KEY+'-redirectBroken', String(Date.now())); return false; }
     const h = new URLSearchParams(location.hash.slice(1));
     history.replaceState(null, '', location.pathname + location.search);
+    try { const y = +sessionStorage.getItem('mk-scroll'); if (y) setTimeout(() => scrollTo(0, y), 0); } catch(e){}
     if (h.get('state') !== store.get(KEY+'-oauthState')) return false;
-    store.set(KEY+'-oauthState', '');
-    if (h.get('error')){ toast('Google sign-in was cancelled.'); return false; }
-    keepToken(h.get('access_token'), h.get('expires_in')); store.set(KEY+'-redirectOk', '1');
+    store.set(KEY+'-oauthState', ''); store.set(KEY+'-redirectBroken', '');
+    const err = h.get('error');
+    if (err){ if (!/interaction_required|login_required|consent_required|account_selection_required/.test(err)) toast('Google sign-in was cancelled.'); return false; }
+    keepToken(h.get('access_token'), h.get('expires_in'));
     return true;
+  }
+  let renewTimer = null;
+  function planRenewal(){
+    clearTimeout(renewTimer);
+    const exp = +(store.get(KEY+'-tokenExp') || 0);
+    renewTimer = setTimeout(renewSoon, Math.max(5000, exp - Date.now() - 4*60000));
+  }
+  const busyTyping = () => !$('overlay').hidden || !$('confirm').hidden || (document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName));
+  function renewSoon(){
+    if (!wasConnected() || !redirectWorks() || !navigator.onLine) return;
+    if (document.visibilityState !== 'visible' || busyTyping()){ clearTimeout(renewTimer); renewTimer = setTimeout(renewSoon, 30000); return; }
+    const last = +(store.get(KEY+'-autoAuth') || 0);
+    if (Date.now() - last < 120000) return;            // never loop: at most one automatic trip per 2 minutes
+    store.set(KEY+'-autoAuth', String(Date.now())); signInRedirect(true);
+  }
+  function rememberAccount(){
+    if (store.get(KEY+'-account')) return;
+    fetch('https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)', {headers:{Authorization:'Bearer '+token}})
+      .then(r => r.ok ? r.json() : null).then(j => { const e = j && j.user && j.user.emailAddress; if (e) store.set(KEY+'-account', e); }).catch(()=>{});
   }
   function connect(){
     if (!/github\.io$/.test(location.hostname) && location.protocol !== 'http:'){ toast('Sync works on your GitHub Pages link. Everything is saved on this device.'); return; }
-    if (STANDALONE) return signInRedirect();
+    if (redirectWorks() || STANDALONE) return signInRedirect(false);
     if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2){ toast('Google sign-in is still loading. Try again in a moment.'); return; }
     if (!client) client = google.accounts.oauth2.initTokenClient({ client_id: GOOGLE_CLIENT_ID, scope: DRIVE_SCOPE,
       callback: r => { if (r.error){ status('error'); toast('Google sign-in was cancelled.'); return; } keepToken(r.access_token, r.expires_in); sync().then(res => onDone && onDone(res)); } });
@@ -1412,16 +1451,17 @@ const Cloud = (() => {
   function init(){
     const back = readRedirectResult();
     restoreToken();
-    if (token) sync().then(res => { if (back) report(res); });
+    let quiet = false; try { quiet = sessionStorage.getItem('mk-silent') === '1'; sessionStorage.removeItem('mk-silent'); } catch(e){}
+    if (token){ planRenewal(); sync().then(res => { if (back && (!quiet || (res && res.changedHere))) report(res); }); }
     else {
       status(wasConnected() ? 'reconnect' : 'local');
-      // Home-screen app: sign in again automatically on open, at most once every 10 minutes.
-      const last = +(store.get(KEY+'-autoAuth') || 0);
-      if (STANDALONE && wasConnected() && store.get(KEY+'-redirectOk') === '1' && navigator.onLine && Date.now() - last > 600000){
-        store.set(KEY+'-autoAuth', String(Date.now())); signInRedirect(); return;
-      }
+      if (wasConnected()) renewSoon();                  // opened without a valid pass: renew it automatically
     }
-    document.addEventListener('visibilitychange', () => { if (document.visibilityState==='hidden') flush(); else if (token) sync(); });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState==='hidden') return flush();
+      restoreToken();
+      if (token) sync(); else renewSoon();
+    });
     addEventListener('pagehide', flush);
     addEventListener('beforeunload', e => { if (token && pending){ flush(); e.preventDefault(); e.returnValue = ''; } });
     setInterval(() => { if (token && document.visibilityState==='visible' && !pending) sync(); }, 60000);

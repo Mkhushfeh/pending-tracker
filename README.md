@@ -200,7 +200,7 @@ lists the open tasks with exactly that time, most urgent first, with their total
 time of their open tasks.
 
 **Previous design:** the design before the blue-and-white refresh is kept at
-`mk-space-v1/` (open `https://mkhushfeh.github.io/pending-tracker/mk-space-v1/`) and as the git tag
-`mk-space-design-v1`. Both versions use the same saved data, so you can switch between them. To go
+`mk-space-v1/` (open `https://mkhushfeh.github.io/pending-tracker/mk-space-v1/`), and in git history
+at commit `9fa8890`. Both versions use the same saved data, so you can switch between them. To go
 back for good, copy `mk-space-v1/index.html` over `mk-space/index.html`.
 

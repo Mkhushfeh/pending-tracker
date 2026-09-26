@@ -257,7 +257,7 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
 .idea-form{display:flex;gap:8px;margin-bottom:10px}
 .idea-form input{flex:1;min-width:0;border:1px solid var(--border);background:var(--panel-2);border-radius:10px;padding:8px 11px}
 .ideas{display:flex;flex-direction:column;gap:8px;list-style:none;margin:0;padding:0;max-height:330px;overflow-y:auto}
-.idea{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:10px;border-radius:12px;border:1px dashed var(--border)}
+.idea{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding:10px;border-radius:12px;border:1px dashed var(--border)}
 .vote{display:flex;flex-direction:column;align-items:center;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:3px 8px;font-weight:700;font-size:13px;line-height:1.1}
 .vote:hover{border-color:var(--text-3)}
 .vote svg{width:12px;height:12px}
@@ -265,6 +265,17 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
 .idea-actions{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--text-3);flex-wrap:wrap}
 .link{background:none;border:0;padding:0;color:var(--s-idn-ink);font-weight:600;font-size:12px}
 .link.muted{color:var(--text-3);font-weight:500}
+
+/* time needed */
+.time-have{display:flex;align-items:center;gap:10px;margin:-2px 0 12px;flex-wrap:wrap}
+.th-label{white-space:nowrap;font-size:12px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--border);background:var(--panel);color:var(--text-2);border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:600;white-space:nowrap}
+.chip:hover{border-color:var(--text-3)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--ink-text)}
+.effort{color:var(--text-2);font-weight:600}
+.effort-chip{font-size:11px;font-weight:600;color:var(--text-2);background:var(--panel-2);border:1px solid var(--border-2);border-radius:999px;padding:1px 7px;white-space:nowrap}
+.col-time{font-size:11.5px;color:var(--text-3);font-weight:600;white-space:nowrap}
 
 /* board */
 .board-wrap{overflow-x:auto;margin:0 -4px;padding:2px 4px 6px}
@@ -365,6 +376,9 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
   .headline b{font-size:20px}
   .headline small{font-size:11px;line-height:1.25}
   .ph .hint{width:100%}
+  .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-15px;padding-right:15px}
+  .chips::-webkit-scrollbar{display:none}
+  .time-have{flex-wrap:nowrap}
   .modal-actions{position:sticky;bottom:calc(-20px - env(safe-area-inset-bottom,0px));background:var(--panel);margin:0 -20px;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border-2)}
   .hint-desk{display:none}
   .hint-touch{display:inline!important}
@@ -443,6 +457,7 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
       <select id="fGroup" aria-label="Filter by group"></select>
       <select id="fPrio" aria-label="Filter by priority"></select>
       <select id="fParty" aria-label="Filter by party"></select>
+      <select id="fEffort" aria-label="Filter by time needed"></select>
       <span class="chip-note" id="filterNote"></span>
       <button class="clear" id="clearF" hidden>Clear filters</button>
     </div>
@@ -476,11 +491,15 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
 
     <section class="row3">
       <div class="panel" id="focus">
-        <div class="ph"><h2>Today's focus</h2><span class="hint">Overdue, due soon, and critical items stuck. Tick to close.</span></div>
+        <div class="ph"><h2>Today's focus</h2><span class="hint" id="focusHint">Overdue, due soon, and critical items stuck. Tick to close.</span></div>
+        <div class="time-have" role="group" aria-label="Time I have">
+          <span class="th-label">Time I have</span>
+          <div class="chips" id="focusTime"></div>
+        </div>
         <ul class="focus-list" id="focusList"></ul>
       </div>
       <div class="panel" id="ideas">
-        <div class="ph"><h2>Ideas board</h2><span class="hint">Upvote to rank, then make it a task</span></div>
+        <div class="ph"><h2>Ideas board</h2><span class="hint">Jot it down, turn it into a task later</span></div>
         <form class="idea-form" id="ideaForm">
           <input id="ideaText" placeholder="New idea or improvement…" aria-label="New idea" autocomplete="off">
           <button class="btn primary sm" type="submit">Add</button>
@@ -513,6 +532,7 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
       <label class="field">Group / system<input id="fGrp" list="grpList" autocomplete="off"></label>
       <label class="field">Responsible party<input id="fPty" list="ptyList" autocomplete="off"></label>
       <label class="field">Priority<select id="fPri"></select></label>
+      <label class="field">Time needed<select id="fEff"></select></label>
       <label class="field">Status<select id="fSt"></select></label>
       <label class="field">Due date<input id="fDue" type="date"></label>
       <label class="field">Reason pending<select id="fRsn"></select></label>
@@ -551,6 +571,15 @@ const LEGACY_KEY = 'pending-tracker-pages-v6';
 const STATUSES = ['Identified','Pending / Stuck','In Progress','Resolved'];
 const SLUG = {'Identified':'idn','Pending / Stuck':'stk','In Progress':'prg','Resolved':'res'};
 const PRIORITIES = ['Critical','High','Medium','Low'];
+// Time needed per task. A working day counts as 8 hours.
+const EFFORTS = [['15m',15,'15 min'],['30m',30,'30 min'],['1h',60,'1 hour'],['2h',120,'2 hours'],['4h',240,'4 hours'],['1d',480,'1 day'],['2d',960,'2 days']];
+const EFFORT_MIN = Object.fromEntries(EFFORTS.map(([k,m]) => [k,m]));
+const EFFORT_LABEL = Object.fromEntries(EFFORTS.map(([k,,l]) => [k,l]));
+function fmtMins(m){
+  if (m < 60) return `${m} min`;
+  if (m < 480){ const h = Math.floor(m/60), r = m%60; return r ? `${h} h ${r} min` : `${h} h`; }
+  const d = Math.floor(m/480), h = Math.round((m%480)/60); return `${d} day${d>1?'s':''}${h ? ' '+h+' h' : ''}`;
+}
 const REASONS = ['Awaiting client / owner approval','Awaiting vendor / supplier','Material delay','Permit / site access issue',
   'Technical / design issue','Resource constraint','Awaiting internal review','Planned','Other'];
 const AV_COLORS = ['#2a78d6','#eb6834','#1baf7a','#4a3aa7','#e87ba4','#008300','#c98500','#e34948'];
@@ -649,7 +678,7 @@ function seedAll(){
 }
 
 /* ---------- state ---------- */
-let D, UI = { stream:'all', q:'', group:'', prio:'', party:'', trendDays:30, balBy:'party', showAll:{} };
+let D, UI = { stream:'all', q:'', group:'', prio:'', party:'', effort:'', focusTime:'', trendDays:30, balBy:'party', showAll:{} };
 function P(){ return D.projects.find(p => p.id===D.active) || D.projects[0]; }
 function streamsOf(p){ const s = [...(p.streams||[])]; p.items.forEach(i => { if (i.stream && !s.includes(i.stream)) s.push(i.stream); }); p.streams = s.length ? s : ['Tasks']; return p.streams; }
 function load(){
@@ -703,7 +732,7 @@ const dataSig = d => JSON.stringify([d.projects, d.deleted||{}]);
 // Every change: stamp it, keep it on this device right away, then queue a cloud sync.
 function save(){ stamp(); D.updatedAt = Date.now(); writeLocal(); Cloud.queue(); }
 try { Object.assign(UI, JSON.parse(store.get(KEY+'-ui')||'{}'), {q:'', showAll:{}}); } catch(e){}
-const saveUI = () => store.set(KEY+'-ui', JSON.stringify({stream:UI.stream, trendDays:UI.trendDays, balBy:UI.balBy}));
+const saveUI = () => store.set(KEY+'-ui', JSON.stringify({stream:UI.stream, trendDays:UI.trendDays, balBy:UI.balBy, focusTime:UI.focusTime}));
 
 const isOpen = i => i.status !== 'Resolved';
 function view(){
@@ -711,6 +740,7 @@ function view(){
   return P().items.filter(i =>
     (UI.stream==='all' || i.stream===UI.stream) &&
     (!UI.group || i.group===UI.group) && (!UI.prio || i.priority===UI.prio) && (!UI.party || i.party===UI.party) &&
+    (!UI.effort || (UI.effort==='none' ? !i.effort : i.effort && EFFORT_MIN[i.effort] <= EFFORT_MIN[UI.effort])) &&
     (!q || [i.title,i.code,i.group,i.party,i.reason,i.notes].join(' ').toLowerCase().includes(q)));
 }
 
@@ -775,7 +805,7 @@ document.getElementById('projTabs').addEventListener('click', e => {
   if (r){ const pr = D.projects.find(p => p.id===r.dataset.pren);
     return inlineEdit(r.parentElement.querySelector('.ptab-go'), pr.name, name => { pr.name = name; save(); }); }
   const g = e.target.closest('[data-p]');
-  if (g){ D.active = g.dataset.p; UI.stream='all'; UI.group=UI.prio=UI.party=''; UI.showAll={}; save(); saveUI(); render(); return; }
+  if (g){ D.active = g.dataset.p; UI.stream='all'; UI.group=UI.prio=UI.party=UI.effort=''; UI.showAll={}; save(); saveUI(); render(); return; }
   if (e.target.closest('#addProj')){ const id = 'p'+Date.now().toString(36);
     D.projects.push(blankProject(id, 'Project '+(D.projects.length+1))); D.active = id; UI.stream='all'; save(); render();
     document.querySelector(`[data-pren="${id}"]`)?.click(); }
@@ -817,13 +847,17 @@ function renderFilters(){
   opt('fGroup','All groups',[...new Set(base.map(i=>i.group).filter(Boolean))].sort(), UI.group);
   opt('fPrio','All priorities',PRIORITIES, UI.prio);
   opt('fParty','All parties',[...new Set(base.map(i=>i.party).filter(Boolean))].sort(), UI.party);
-  const active = UI.group || UI.prio || UI.party || UI.q;
+  document.getElementById('fEffort').innerHTML = `<option value="">Any time needed</option>` +
+    EFFORTS.map(([k,,l]) => `<option value="${k}" ${k===UI.effort?'selected':''}>${k==='15m' ? 'Only 15 min tasks' : 'Up to '+l}</option>`).join('') +
+    `<option value="none" ${UI.effort==='none'?'selected':''}>Time not set</option>`;
+  const active = UI.group || UI.prio || UI.party || UI.effort || UI.q;
   document.getElementById('clearF').hidden = !active;
   const v = view();
   document.getElementById('filterNote').textContent = active ? `Showing ${v.filter(isOpen).length} open of ${v.length} matching items` : '';
 }
 ['fGroup','fPrio','fParty'].forEach((id,k) => document.getElementById(id).onchange = e => { UI[['group','prio','party'][k]] = e.target.value; render(); });
-document.getElementById('clearF').onclick = () => { UI.group=UI.prio=UI.party=UI.q=''; document.getElementById('q').value=''; render(); };
+document.getElementById('fEffort').onchange = e => { UI.effort = e.target.value; render(); };
+document.getElementById('clearF').onclick = () => { UI.group=UI.prio=UI.party=UI.effort=UI.q=''; document.getElementById('q').value=''; render(); };
 document.getElementById('q').addEventListener('input', e => { UI.q = e.target.value; render(); });
 
 /* ---------- render: KPIs ---------- */
@@ -982,18 +1016,33 @@ function renderFocus(){
     if (i.status==='Pending / Stuck' && diff(i.moved,t) >= 15) return 4;
     return 9;
   };
-  const list = open.filter(i => score(i) < 9).sort((a,b) => score(a)-score(b) || (a.due||'9').localeCompare(b.due||'9')).slice(0,8);
+  const cap = UI.focusTime ? EFFORT_MIN[UI.focusTime] : 0;
+  document.getElementById('focusTime').innerHTML = [['','Any'], ...EFFORTS.map(([k,,l]) => [k, l.replace(' hours',' h').replace(' hour',' h').replace(' days',' days')])]
+    .map(([k,l]) => `<button type="button" class="chip ${UI.focusTime===k?'on':''}" data-ft="${k}">${l}</button>`).join('');
+  const prioRank = i => PRIORITIES.indexOf(i.priority);
+  const list = cap
+    // Tasks that fit in the time you have, most urgent first.
+    ? open.filter(i => i.effort && EFFORT_MIN[i.effort] <= cap).sort((a,b) => score(a)-score(b) || prioRank(a)-prioRank(b) || (a.due||'9').localeCompare(b.due||'9'))
+    : open.filter(i => score(i) < 9).sort((a,b) => score(a)-score(b) || (a.due||'9').localeCompare(b.due||'9')).slice(0,8);
+  const unset = open.filter(i => !i.effort).length;
+  document.getElementById('focusHint').textContent = cap
+    ? `${list.length} task${list.length===1?'':'s'} of ${EFFORT_LABEL[UI.focusTime]} or less${list.length ? ', about '+fmtMins(list.reduce((a,i)=>a+EFFORT_MIN[i.effort],0))+' in total' : ''}.${unset ? ` ${unset} open task${unset===1?' has':'s have'} no time set.` : ''}`
+    : 'Overdue, due soon, and critical items stuck. Tick to close.';
   const why = i => { const s = score(i);
     if (s===0) return `<span class="pill bad">${diff(i.due,t)}d overdue</span>`;
     if (s===1) return `<span class="pill warn">Due today</span>`;
     if (s===2) return `<span class="pill warn">Due ${fmt(i.due)}</span>`;
     if (s===3) return `<span class="pill bad">Critical</span>`;
-    return `<span class="pill neutral">Stuck ${diff(i.moved,t)}d</span>`; };
+    if (s===4) return `<span class="pill neutral">Stuck ${diff(i.moved,t)}d</span>`;
+    return `<span class="pill neutral">${i.priority}</span>`; };
   document.getElementById('focusList').innerHTML = list.length ? list.map(i => `
     <li class="focus-item"><button class="check" data-close="${i.id}" aria-label="Close ${esc(i.title)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></button>
-      <div style="min-width:0"><div class="fi-title" data-open="${i.id}">${esc(i.title)}</div><div class="fi-meta"><span class="mono">${i.code}</span> · ${esc(i.party)} · ${esc(i.status)}</div></div>${why(i)}</li>`).join('')
-    : `<li class="empty">Nothing urgent. Pick something from the board.</li>`;
+      <div style="min-width:0"><div class="fi-title" data-open="${i.id}">${esc(i.title)}</div><div class="fi-meta">${i.effort ? `<span class="effort">⏱ ${EFFORT_LABEL[i.effort]}</span> · ` : ''}<span class="mono">${i.code}</span> · ${esc(i.party||'No party')} · ${esc(i.status)}</div></div>${why(i)}</li>`).join('')
+    : `<li class="empty">${cap ? `No open tasks of ${EFFORT_LABEL[UI.focusTime]} or less. Set "Time needed" on your tasks to use this.` : 'Nothing urgent. Pick something from the board.'}</li>`;
 }
+document.getElementById('focusTime').addEventListener('click', e => {
+  const b = e.target.closest('[data-ft]'); if (!b) return; UI.focusTime = b.dataset.ft; saveUI(); renderFocus();
+});
 document.getElementById('focusList').addEventListener('click', e => {
   const c = e.target.closest('[data-close]'); if (c) return setStatus(c.dataset.close, 'Resolved');
   const o = e.target.closest('[data-open]'); if (o) openModal(o.dataset.open);
@@ -1033,9 +1082,9 @@ document.getElementById('bal').addEventListener('click', e => {
 
 /* ---------- render: ideas ---------- */
 function renderIdeas(){
-  const ideas = [...(P().ideas||[])].sort((a,b) => b.votes - a.votes || b.created.localeCompare(a.created));
+  const ideas = [...(P().ideas||[])].sort((a,b) => (b.created||'').localeCompare(a.created||''));
   document.getElementById('ideaList').innerHTML = ideas.length ? ideas.map(d => `
-    <li class="idea"><button class="vote" data-vote="${d.id}" aria-label="Upvote this idea" title="Upvote: ideas with more votes rise to the top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M6 15l6-6 6 6"/></svg><span class="num">${d.votes}</span><small>votes</small></button>
+    <li class="idea">
       <div><p>${esc(d.text)}</p><div class="idea-actions">${d.tag?`<span>#${esc(d.tag)}</span>`:''}<span>${fmt(d.created)}</span>
         <button class="link" data-promote="${d.id}">Make it a task →</button><button class="link muted" data-drop="${d.id}">Remove</button></div></div></li>`).join('')
     : '<li class="empty">No ideas yet. Type one above.</li>';
@@ -1043,12 +1092,11 @@ function renderIdeas(){
 document.getElementById('ideaForm').addEventListener('submit', e => {
   e.preventDefault(); const inp = document.getElementById('ideaText'), text = inp.value.trim(); if (!text) return;
   const m = text.match(/#([\w&-]+)/);
-  P().ideas.unshift({ id: uid(), text: text.replace(/#[\w&-]+/,'').trim(), tag: m?m[1]:'', votes: 0, created: today() });
+  P().ideas.unshift({ id: uid(), text: text.replace(/#[\w&-]+/,'').trim(), tag: m?m[1]:'', created: today() });
   inp.value = ''; save(); renderIdeas();
 });
 document.getElementById('ideaList').addEventListener('click', e => {
-  const v = e.target.closest('[data-vote]'), p = e.target.closest('[data-promote]'), d = e.target.closest('[data-drop]');
-  if (v){ P().ideas.find(x=>x.id===v.dataset.vote).votes++; save(); renderIdeas(); }
+  const p = e.target.closest('[data-promote]'), d = e.target.closest('[data-drop]');
   if (d){ const idx = P().ideas.findIndex(x=>x.id===d.dataset.drop), [gone] = P().ideas.splice(idx,1); save(); renderIdeas();
     toast('Idea removed', () => { P().ideas.splice(idx,0,gone); save(); renderIdeas(); }); }
   if (p){ const idea = P().ideas.find(x=>x.id===p.dataset.promote); openModal(null, {title: idea.text, notes: 'From ideas board', ideaId: idea.id}); }
@@ -1059,7 +1107,7 @@ function card(i){
   const t = today(), late = i.due && i.due < t && isOpen(i);
   const age = isOpen(i) ? diff(i.moved, t) : null;
   return `<article class="card" draggable="true" data-id="${i.id}" tabindex="0">
-    <div class="card-top"><span class="mono">${i.code}</span><span class="prio ${i.priority}">${i.priority}</span></div>
+    <div class="card-top"><span class="mono">${i.code}</span>${i.effort ? `<span class="effort-chip" title="Time needed">⏱ ${EFFORT_LABEL[i.effort]}</span>` : ''}<span class="prio ${i.priority}">${i.priority}</span></div>
     <h4>${esc(i.title)}</h4>
     <div class="grp">${esc(i.group || 'No group')} · ${esc(i.stream)}</div>
     ${i.status==='In Progress' ? `<div class="bar" title="${i.pct}% complete"><i style="width:${i.pct}%"></i></div>` : ''}
@@ -1075,7 +1123,7 @@ function renderBoard(){
     list.sort(s==='Resolved' ? (a,b)=>b.resolved.localeCompare(a.resolved) : (a,b)=> PRIORITIES.indexOf(a.priority)-PRIORITIES.indexOf(b.priority) || (a.due||'9').localeCompare(b.due||'9'));
     const lim = s==='Resolved' ? 5 : 8, all = UI.showAll[s];
     const shown = all ? list : list.slice(0, lim);
-    return `<div class="col" data-s="${s}"><div class="col-h"><span class="dot" style="background:var(--s-${SLUG[s]})"></span><h3>${s}</h3><span class="n num">${list.length}</span><button class="add" data-add="${s}" aria-label="Add to ${s}">+</button></div>
+    return `<div class="col" data-s="${s}"><div class="col-h"><span class="dot" style="background:var(--s-${SLUG[s]})"></span><h3>${s}</h3><span class="n num">${list.length}</span>${s!=='Resolved' && list.some(i=>i.effort) ? `<span class="col-time" title="Total time needed">⏱ ${fmtMins(list.reduce((a,i)=>a+(EFFORT_MIN[i.effort]||0),0))}</span>` : ''}<button class="add" data-add="${s}" aria-label="Add to ${s}">+</button></div>
       <div class="cards">${shown.map(card).join('') || '<div class="empty">Drop cards here</div>'}
       ${list.length > lim ? `<button class="more-btn" data-more="${s}">${all ? 'Show less' : `Show ${list.length-lim} more`}</button>` : ''}</div></div>`;
   }).join('');
@@ -1104,6 +1152,7 @@ function openModal(id, preset = {}){
   $('fTitle').value = it.title; $('fGrp').value = it.group||''; $('fPty').value = it.party||'';
   $('fStream').innerHTML = streams.map(s => `<option ${s===it.stream?'selected':''}>${esc(s)}</option>`).join('');
   $('fPri').innerHTML = PRIORITIES.map(s => `<option ${s===it.priority?'selected':''}>${s}</option>`).join('');
+  $('fEff').innerHTML = `<option value="">Not set</option>` + EFFORTS.map(([k,,l]) => `<option value="${k}" ${k===it.effort?'selected':''}>${l}</option>`).join('');
   $('fSt').innerHTML = STATUSES.map(s => `<option ${s===it.status?'selected':''}>${s}</option>`).join('');
   $('fRsn').innerHTML = ['', ...REASONS].map(s => `<option value="${esc(s)}" ${s===it.reason?'selected':''}>${s||'—'}</option>`).join('');
   $('fDue').value = it.due||''; $('fPct').value = it.pct||0; $('pctOut').textContent = (it.pct||0)+'%'; $('fNotes').value = it.notes||'';
@@ -1125,7 +1174,7 @@ $('delBtn').onclick = () => {
 $('taskForm').addEventListener('submit', e => {
   e.preventDefault();
   const vals = { title: $('fTitle').value.trim(), stream: $('fStream').value, group: $('fGrp').value.trim(), party: $('fPty').value.trim(),
-    priority: $('fPri').value, due: $('fDue').value, reason: $('fRsn').value, pct: +$('fPct').value, notes: $('fNotes').value.trim() };
+    priority: $('fPri').value, effort: $('fEff').value, due: $('fDue').value, reason: $('fRsn').value, pct: +$('fPct').value, notes: $('fNotes').value.trim() };
   if (!vals.title) return;
   const st = $('fSt').value;
   if (editing){ Object.assign(editing, vals); const id = editing.id; closeModal(); if (st !== P().items.find(i=>i.id===id).status) setStatus(id, st, true); save(); render(); toast('Saved'); }
@@ -1249,7 +1298,7 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.
 if (io) ['today','trend','focus','balance','ideas','board'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.09.26-1';
+const APP_VERSION = '2026.09.27-1';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');

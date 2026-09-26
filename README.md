@@ -193,11 +193,10 @@ https://mkhushfeh.github.io/pending-tracker/mk-space/
 Until it's added, the laptop falls back to the Google pop-up and asks you to tap **Sync now** about
 once an hour.
 
-**Time needed:** each task can have a *Time needed* (15 min, 30 min, 1 hour, 2 hours, 4 hours,
-1 day, 2 days; a day counts as 8 hours), set in the task form. To pick work for the time you have,
-use the **Time I have** chips in *Today's focus* (lists open tasks that fit, most urgent first, with
-the total time), or the **Time needed, up to** chips under the filters, which filter the whole
-dashboard and board and show how many open tasks each would keep. To set the time quickly, tap the
-⏱ chip on a card (or *Set time* if it has none) and pick a value. Board columns show the total time
-of their open tasks.
-
+**Time needed:** each task can have a *Time needed*: 15 min, 30 min, 1H, 2H, 4H, 1D or 2D (a day
+counts as 8 hours). Set it in the task form, or tap the ⏱ chip on a card (*Set time* if it has none)
+and pick a value. To pick work by time, tap a time in the **⏱ Time needed** chips under the filters
+(filters the whole dashboard and board; each chip shows how many open tasks have exactly that time)
+or in *Today's focus* (lists those tasks, most urgent first, with their total). Each time shows only
+tasks with exactly that time; *Not set* shows tasks still to estimate. Board columns show the total
+time of their open tasks.

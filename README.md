@@ -176,15 +176,19 @@ Pending Tracker). After that:
 - **Refresh** also checks for a newer version of the app and reloads it, so a phone's home-screen
   app never keeps running an old copy.
 
-Google sign-in lasts about an hour. When it expires, a yellow bar appears; tap **Sync now**.
+**Staying connected:** Google's access pass for a website lasts about an hour and can't be renewed
+in the background. MK Space renews it by itself with a quick trip to Google and back (a
+"Connecting to Google Drive…" screen for a second, no taps): every time you open it without a
+valid pass, and a few minutes before the pass runs out (it waits until you're not typing). This
+works as long as you stay signed in to Google in that browser or app. If Google needs you to sign
+in again, a yellow bar appears; tap **Sync now**.
 
-**iPhone / Android home-screen app (one-time Google setting):** Google's sign-in pop-up does not
-work inside home-screen apps, so there MK Space uses a full-page Google sign-in that comes back
-to the app. For that, add this address once in Google Cloud Console → APIs & Services →
+**One-time Google setting (needed for automatic sign-in on every device):** add this address once in Google Cloud Console → APIs & Services →
 Credentials → your OAuth client → **Authorized redirect URIs**:
 
 ```
 https://mkhushfeh.github.io/pending-tracker/mk-space/
 ```
 
-After it works once, the home-screen app signs in again by itself when you open it.
+Until it's added, the laptop falls back to the Google pop-up and asks you to tap **Sync now** about
+once an hour.

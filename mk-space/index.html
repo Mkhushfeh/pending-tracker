@@ -347,6 +347,30 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 .eff-pop .link{align-self:flex-start}
 .col-time{font-size:11.5px;color:var(--text-3);font-weight:600;white-space:nowrap}
 
+/* quick add */
+.quick{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px 10px;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:8px 8px 8px 14px;transition:border-color .15s,box-shadow .15s}
+.quick:focus-within{border-color:var(--ink);box-shadow:0 0 0 3px var(--ink-soft)}
+.q-ico{width:18px;height:18px;color:var(--ink)}
+.quick input{border:0;outline:0;background:none;font-size:14.5px;min-width:0;color:var(--text)}
+.q-preview{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--text-3);padding:0 2px 2px}
+.quick:not(:focus-within) .q-preview:has(.qp-help){display:none}
+.qp-title{font-weight:600;color:var(--text);margin-right:4px}
+.qp-help b{color:var(--text-2);font-weight:600}
+/* checklist */
+.cl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-weight:400}
+.cl li{display:flex;align-items:center;gap:8px;background:var(--panel-2);border-radius:9px;padding:6px 8px}
+.cl li label{display:flex;align-items:center;gap:8px;flex:1;min-width:0;color:var(--text);font-size:14px}
+.cl li.done span{text-decoration:line-through;color:var(--text-3)}
+.cl-del{background:none;border:0;color:var(--text-3);padding:2px 6px;border-radius:6px}
+.cl-del:hover{color:var(--s-stk-ink);background:var(--s-stk-bg)}
+.cl-add{display:flex;gap:6px}
+.cl-add input{flex:1;min-width:0}
+.cl-count{font-weight:500;color:var(--text-3);margin-left:6px}
+.card-extra{display:flex;gap:6px;flex-wrap:wrap}
+.cl-chip,.rep-chip{font-size:11px;font-weight:600;color:var(--text-2);background:var(--panel-2);border:1px solid var(--border-2);border-radius:999px;padding:1px 8px}
+.cl-chip.all{background:var(--s-res-bg);color:var(--s-res-ink);border-color:transparent}
+.rep-chip{color:var(--link)}
+
 /* calendar */
 .cal-bar{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:0;text-align:left;color:var(--text)}
 .cal-ico{width:20px;height:20px;color:var(--ink);flex:none}
@@ -673,6 +697,13 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       </div>
     </section>
 
+    <form class="quick" id="quickForm" autocomplete="off">
+      <svg class="q-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      <input id="quickIn" aria-label="Quick add a task" placeholder="Quick add: Loop check PT-101 tomorrow 30m !high @Vendor #Tasks">
+      <button type="submit" class="btn primary sm" id="quickGo">Add</button>
+      <div class="q-preview" id="quickPrev" aria-live="polite"></div>
+    </form>
+
     <div class="filters">
       <select id="fGroup" aria-label="Filter by group"></select>
       <select id="fPrio" aria-label="Filter by priority"></select>
@@ -790,6 +821,11 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       <label class="field">Due date<input id="fDue" type="date"></label>
       <label class="field">Reason pending<select id="fRsn"></select></label>
       <label class="field">Progress <span id="pctOut">0%</span><input id="fPct" type="range" min="0" max="100" step="5"></label>
+      <label class="field">Repeat<select id="fRep"></select></label>
+      <div class="field full"><span>Checklist <span class="cl-count" id="clCount"></span></span>
+        <ul class="cl" id="clList"></ul>
+        <div class="cl-add"><input id="clNew" placeholder="Add a step and press Enter" aria-label="Add a checklist step"><button type="button" class="btn sm" id="clAddBtn">Add</button></div>
+      </div>
       <label class="field full">Notes / next action<textarea id="fNotes"></textarea></label>
       <label class="field full" id="closeNoteWrap">What was done (closing note)<textarea id="fClose" placeholder="Optional. Shown in History."></textarea></label>
       <div class="field full" id="trailWrap"><span>Status history</span><ol class="trail" id="trail"></ol></div>
@@ -822,6 +858,7 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 /* ---------- constants ---------- */
+const $ = id => document.getElementById(id);
 const KEY = 'mkspace-v2';
 const OLD_KEY = 'mkspace-v1';
 const LEGACY_KEY = 'pending-tracker-pages-v6';
@@ -1044,15 +1081,42 @@ document.getElementById('toastUndo').onclick = () => { if (undoFn) undoFn(); doc
 /* ---------- mutations ---------- */
 // Find a task in any project (History lists all spaces).
 function findItem(id){ for (const p of D.projects){ const it = p.items.find(x => x.id===id); if (it) return [it, p]; } return [null, null]; }
+function nextDue(from, rep){
+  const anchor = parse(from).getDate();
+  const step = d => {
+    if (rep==='daily') return addDays(d, 1);
+    if (rep==='weekdays'){ let x = addDays(d, 1); while ([0,6].includes(parse(x).getDay())) x = addDays(x, 1); return x; }
+    if (rep==='weekly') return addDays(d, 7);
+    const x = parse(d), day = anchor;
+    if (rep==='monthly'){ const y = new Date(x.getFullYear(), x.getMonth()+1, 1); y.setDate(Math.min(day, new Date(y.getFullYear(), y.getMonth()+1, 0).getDate())); return iso(y); }
+    if (rep==='yearly'){ const y = new Date(x.getFullYear()+1, x.getMonth(), 1); y.setDate(Math.min(day, new Date(y.getFullYear(), y.getMonth()+1, 0).getDate())); return iso(y); }
+    return addDays(d, 1);
+  };
+  let n = step(from); const t = today(); let guard = 0;
+  while (n < t && guard++ < 1000) n = step(n);          // closed late: jump to the next date from today on
+  return n;
+}
 function setStatus(id, status, silent){
-  const [it] = findItem(id); if (!it || it.status===status) return;
+  const [it, proj] = findItem(id); if (!it || it.status===status) return;
+  let spawned = null;
+  if (status==='Resolved' && it.repeat){
+    // Recurring: the closed task stays in History, a fresh copy is created for the next date.
+    const next = { ...it, id: uid(), code: 'MK-'+(Math.max(100, ...proj.items.map(i => +String(i.code).replace(/\D/g,'') || 0)) + 1),
+      status: 'Identified', since: today(), moved: today(), resolved: '', pct: 0, closeNote: '', u: 0,
+      due: nextDue(it.due || today(), it.repeat), checklist: (it.checklist||[]).map(c => ({...c, id: uid(), done: false})),
+      history: [{ t: Date.now(), to: 'Identified', note: 'Repeats ' + REPEAT_LABEL[it.repeat].toLowerCase() }] };
+    proj.items.push(next); spawned = next;
+  }
   const prev = {...it, history: [...(it.history||[])]};
   (it.history ||= []).push({ t: Date.now(), from: it.status, to: status });
+  if (spawned) it.repeat = '';
   it.status = status; it.moved = today();
   if (status==='Resolved'){ it.resolved = today(); it.pct = 100; }
   else { it.resolved = ''; if (it.pct===100) it.pct = 80; }
   save(); render();
-  if (!silent) toast(status==='Resolved' ? `Closed ${it.code}` : `${it.code} moved to ${status}`, () => { Object.assign(it, prev); save(); render(); });
+  const undo = () => { Object.assign(it, prev); if (spawned) proj.items = proj.items.filter(x => x.id !== spawned.id); save(); render(); };
+  if (!silent) toast(status==='Resolved' ? `Closed ${it.code}${spawned ? ` · next one ${spawned.code} due ${parse(spawned.due).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})}` : ''}` : `${it.code} moved to ${status}`, undo);
+  else if (spawned) toast(`Next ${spawned.code} due ${parse(spawned.due).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})}`);
 }
 
 /* ---------- inline rename ---------- */
@@ -1434,6 +1498,81 @@ document.getElementById('ideaList').addEventListener('click', e => {
   if (p){ const idea = P().ideas.find(x=>x.id===p.dataset.promote); openModal(null, {title: idea.text, notes: 'From ideas board', ideaId: idea.id}); }
 });
 
+/* ---------- quick add (type one line) ---------- */
+const WEEKDAYS = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+const REPEATS = [['','Does not repeat'],['daily','Every day'],['weekdays','Every weekday (Mon–Fri)'],['weekly','Every week'],['monthly','Every month'],['yearly','Every year']];
+const REPEAT_LABEL = Object.fromEntries(REPEATS);
+function parseQuick(text){
+  const t = today(), out = { title: '' };
+  let rest = ' ' + text + ' ';
+  const take = (re, fn) => { rest = rest.replace(re, (...m) => { const r = fn(...m); return r === false ? m[0] : ' '; }); };
+  // repeat
+  take(/\severy\s+day\s/i, () => { out.repeat = 'daily'; });
+  take(/\severy\s+weekday\s/i, () => { out.repeat = 'weekdays'; });
+  take(/\severy\s+week\s/i, () => { out.repeat = 'weekly'; });
+  take(/\severy\s+month\s/i, () => { out.repeat = 'monthly'; });
+  take(/\severy\s+year\s/i, () => { out.repeat = 'yearly'; });
+  take(/\sin\s+(\d+)\s*(d|days?|w|weeks?)\s/i, (m, n, u) => { out.due = addDays(t, +n * (u[0].toLowerCase()==='w' ? 7 : 1)); });
+  take(/\severy\s+(mon|monday|tue|tues|tuesday|wed|wednesday|thu|thur|thurs|thursday|fri|friday|sat|saturday|sun|sunday)\s/i, (m, d) => { out.repeat = 'weekly'; const k = WEEKDAYS.findIndex(w => w.startsWith(d.toLowerCase())); let x = addDays(t, 1); while (parse(x).getDay() !== k) x = addDays(x, 1); out.due = x; });
+  // time needed
+  take(/\s(15m|30m|1h|2h|4h|1d|2d)\s/i, (m, e) => { out.effort = e.toLowerCase(); });
+  // priority
+  take(/\s!(critical|crit|c|1|high|h|2|medium|med|m|3|low|l|4)\s/i, (m, p) => { const k = p.toLowerCase()[0]; out.priority = ({c:'Critical','1':'Critical',h:'High','2':'High',m:'Medium','3':'Medium',l:'Low','4':'Low'})[k]; });
+  // party (@Name, underscores for spaces) and workstream (#Name)
+  take(/\s@([^\s]+)\s/, (m, n) => { const name = n.replace(/_/g,' '); const known = [...new Set(P().items.map(i => i.party).filter(Boolean))]; out.party = known.find(x => x.toLowerCase().startsWith(name.toLowerCase())) || name; });
+  take(/\s#([^\s]+)\s/, (m, n) => { const name = n.replace(/_/g,' '); const ws = streamsOf(P()).find(x => x.toLowerCase().startsWith(name.toLowerCase())); if (ws) out.stream = ws; else out.group = name; });
+  // dates
+  if (!out.due){
+    take(/\s(today|tod)\s/i, () => { out.due = t; });
+    take(/\s(tomorrow|tmr|tmrw)\s/i, () => { out.due = addDays(t,1); });
+    take(/\snext\s+week\s/i, () => { out.due = addDays(mondayOf(t), 7); });
+    take(/\s(?:on\s+)?(mon|monday|tue|tues|tuesday|wed|wednesday|thu|thur|thurs|thursday|fri|friday|sat|saturday|sun|sunday)\s/i, (m, d) => { const k = WEEKDAYS.findIndex(w => w.startsWith(d.toLowerCase())); let x = addDays(t, 1); while (parse(x).getDay() !== k) x = addDays(x, 1); out.due = x; });
+    take(/\s(\d{4})-(\d{2})-(\d{2})\s/, (m, y, mo, d) => { out.due = `${y}-${mo}-${d}`; });
+    take(/\s(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\s/, (m, d, mo, y) => { const yy = y ? (y.length===2 ? '20'+y : y) : String(new Date().getFullYear()); let x = `${yy}-${pad(+mo)}-${pad(+d)}`; if (!y && x < t) x = `${+yy+1}-${pad(+mo)}-${pad(+d)}`; out.due = x; });
+    const MON = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+    const md = (d, mo) => { const k = MON.indexOf(mo.slice(0,3).toLowerCase()); if (k < 0) return false; const yy = new Date().getFullYear(); let x = `${yy}-${pad(k+1)}-${pad(+d)}`; if (x < t) x = `${yy+1}-${pad(k+1)}-${pad(+d)}`; out.due = x; };
+    take(/\s(\d{1,2})\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s/i, (m, d, mo) => md(d, mo));
+    take(/\s(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+(\d{1,2})\s/i, (m, mo, d) => md(d, mo));
+  }
+  out.title = rest.replace(/\s+/g,' ').trim();
+  if (out.repeat && !out.due) out.due = t;
+  return out;
+}
+function renderQuickPreview(){
+  const v = $('quickIn').value.trim(), el = $('quickPrev');
+  if (!v){ el.innerHTML = '<span class="qp-help">Type a task and add details in the same line: <b>today</b>, <b>tomorrow</b>, <b>fri</b>, <b>30 sep</b>, <b>in 3d</b> · <b>15m 30m 1h 2h 4h 1d 2d</b> · <b>!high</b> · <b>@party</b> · <b>#workstream</b> · <b>every week</b> / <b>every monday</b> / <b>every month</b></span>'; return; }
+  const q = parseQuick(v), bits = [];
+  bits.push(`<span class="qp-title">${esc(q.title || 'Untitled')}</span>`);
+  if (q.due) bits.push(`<span class="pill neutral">📅 ${parse(q.due).toLocaleDateString(undefined,{weekday:'short', day:'numeric', month:'short'})}</span>`);
+  if (q.effort) bits.push(`<span class="pill neutral">⏱ ${EFFORT_LABEL[q.effort]}</span>`);
+  if (q.priority) bits.push(`<span class="pill ${q.priority==='Critical'||q.priority==='High' ? 'bad' : 'neutral'}">${q.priority}</span>`);
+  if (q.party) bits.push(`<span class="pill neutral">@ ${esc(q.party)}</span>`);
+  if (q.stream) bits.push(`<span class="pill neutral"># ${esc(q.stream)}</span>`);
+  if (q.group) bits.push(`<span class="pill neutral">Group: ${esc(q.group)}</span>`);
+  if (q.repeat) bits.push(`<span class="pill good">↻ ${REPEAT_LABEL[q.repeat]}</span>`);
+  bits.push(`<button type="button" class="link" id="quickMore">More details…</button>`);
+  el.innerHTML = bits.join('');
+}
+function quickFields(){ const q = parseQuick($('quickIn').value.trim()); return { title: q.title, ...(q.due ? {due:q.due} : {due:''}), ...(q.effort?{effort:q.effort}:{}), ...(q.priority?{priority:q.priority}:{}), ...(q.party?{party:q.party}:{}), ...(q.stream?{stream:q.stream}:{}), ...(q.group?{group:q.group}:{}), ...(q.repeat?{repeat:q.repeat}:{}) }; }
+$('quickIn').addEventListener('input', renderQuickPreview);
+$('quickIn').addEventListener('focus', renderQuickPreview);
+$('quickPrev').addEventListener('click', e => { if (e.target.id === 'quickMore'){ const f = quickFields(); $('quickIn').value = ''; renderQuickPreview(); openModal(null, f); } });
+$('quickForm').addEventListener('submit', e => {
+  e.preventDefault(); const f = quickFields(); if (!f.title) return;
+  const it = newItem({ stream: UI.stream==='all' ? streamsOf(P())[0] : UI.stream, group:'', party:'', priority:'Medium', reason:'Planned', pct:0, notes:'', ...f }, 'Identified');
+  P().items.push(it); save(); render();
+  $('quickIn').value = ''; renderQuickPreview();
+  toast(`Added ${it.code}${it.due ? ', due '+parse(it.due).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'}) : ''}`, () => { P().items = P().items.filter(x => x.id !== it.id); save(); render(); });
+});
+renderQuickPreview();
+// A new task in the current project, numbered after the highest MK number.
+function newItem(vals, st){
+  const n = Math.max(100, ...P().items.map(i => +String(i.code).replace(/\D/g,'') || 0)) + 1;
+  const it = { id: uid(), code: 'MK-'+n, checklist: [], ...vals, status: st, since: today(), moved: today(), resolved: st==='Resolved' ? today() : '', history: [{ t: Date.now(), to: st }] };
+  if (st==='Resolved') it.pct = 100;
+  return it;
+}
+
 /* ---------- quick "time needed" picker ---------- */
 const effortBtn = i => `<button type="button" class="effort-chip ${i.effort ? '' : 'unset'}" data-effort-for="${i.id}" title="Set time needed" aria-label="Time needed: ${i.effort ? EFFORT_LABEL[i.effort] : 'not set'}. Tap to change">⏱ ${i.effort ? EFFORT_LABEL[i.effort] : 'Set time'}</button>`;
 const effPop = document.getElementById('effPop');
@@ -1698,6 +1837,7 @@ function card(i){
     <h4>${esc(i.title)}</h4>
     <div class="grp">${esc(i.group || 'No group')} · ${esc(i.stream)}</div>
     ${i.status==='In Progress' ? `<div class="bar" title="${i.pct}% complete"><i style="width:${i.pct}%"></i></div>` : ''}
+    ${(i.checklist||[]).length || i.repeat ? `<div class="card-extra">${(i.checklist||[]).length ? `<span class="cl-chip ${i.checklist.every(c=>c.done)?'all':''}" title="Checklist">☑ ${i.checklist.filter(c=>c.done).length}/${i.checklist.length}</span>` : ''}${i.repeat ? `<span class="rep-chip" title="${REPEAT_LABEL[i.repeat]}">↻ ${REPEAT_LABEL[i.repeat].replace('Every ','')}</span>` : ''}</div>` : ''}
     ${i.status==='Pending / Stuck' && i.reason ? `<div class="grp">⏸ ${esc(i.reason)}</div>` : ''}
     <div class="card-foot"><span class="avatar" style="background:${avColor(i.party)}" title="${esc(i.party)}">${initials(i.party)}</span>
       ${i.status==='Resolved' ? `<span class="due">Closed ${fmt(i.resolved)}</span>` : `<span class="due ${late?'late':''}">${late?'Overdue · ':'Due '}${fmt(i.due)}</span>`}
@@ -1730,7 +1870,6 @@ boardEl.addEventListener('drop', e => { const col = e.target.closest('.col'); if
 
 /* ---------- modal ---------- */
 let editing = null, fromIdea = null, delArmed = false;
-const $ = id => document.getElementById(id);
 function openModal(id, preset = {}){
   editing = id ? P().items.find(i=>i.id===id) : null; fromIdea = preset.ideaId || null;
   const it = editing || { title:'', stream: UI.stream==='all' ? streamsOf(P())[0] : UI.stream, group: UI.group, party:'', priority:'Medium', status:'Identified', due: addDays(today(),7), reason:'Planned', pct:0, notes:'', ...preset };
@@ -1745,14 +1884,27 @@ function openModal(id, preset = {}){
   $('fDue').value = it.due||''; $('fPct').value = it.pct||0; $('pctOut').textContent = (it.pct||0)+'%'; $('fNotes').value = it.notes||'';
   $('grpList').innerHTML = [...new Set(P().items.map(i=>i.group).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('');
   $('ptyList').innerHTML = [...new Set(P().items.map(i=>i.party).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('');
+  $('fRep').innerHTML = REPEATS.map(([k,l]) => `<option value="${k}" ${k===(it.repeat||'')?'selected':''}>${l}</option>`).join('');
+  CL = (it.checklist || []).map(c => ({...c})); renderCL(); $('clNew').value = '';
   $('fClose').value = (editing && editing.closeNote) || '';
   $('closeNoteWrap').hidden = it.status !== 'Resolved';
   $('trailWrap').hidden = !editing;
-  if (editing) $('trail').innerHTML = trailOf(editing).map(h => `<li><span class="tr-when">${h.dateOnly ? new Date(h.t).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}) : fmtWhen(h.t)}</span><span>${h.due ? `Due date ${h.due[0] ? 'moved '+fmt(h.due[0])+' → ' : 'set to '}<b>${h.due[1] ? fmt(h.due[1]) : 'no date'}</b>` : h.closed ? '<b>Closed</b>' : h.from ? `${esc(h.from)} → <b>${esc(h.to)}</b>` : `Created as <b>${esc(h.to)}</b>`}</span></li>`).join('');
+  if (editing) $('trail').innerHTML = trailOf(editing).map(h => `<li><span class="tr-when">${h.dateOnly ? new Date(h.t).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}) : fmtWhen(h.t)}</span><span>${h.due ? `Due date ${h.due[0] ? 'moved '+fmt(h.due[0])+' → ' : 'set to '}<b>${h.due[1] ? fmt(h.due[1]) : 'no date'}</b>` : h.closed ? '<b>Closed</b>' : h.from ? `${esc(h.from)} → <b>${esc(h.to)}</b>` : `Created as <b>${esc(h.to)}</b>${h.note ? ' · '+esc(h.note) : ''}`}</span></li>`).join('');
   $('delBtn').hidden = !editing; delArmed = false; $('delBtn').textContent = 'Delete';
   $('overlay').hidden = false; setTimeout(() => $('fTitle').focus(), 0);
 }
 const closeModal = () => { $('overlay').hidden = true; editing = null; };
+// checklist editor (kept in CL until Save)
+let CL = [];
+function renderCL(){
+  $('clList').innerHTML = CL.map((c,k) => `<li class="${c.done?'done':''}"><label><input type="checkbox" data-clk="${k}" ${c.done?'checked':''}><span>${esc(c.text)}</span></label><button type="button" class="cl-del" data-cldel="${k}" aria-label="Remove step">✕</button></li>`).join('');
+  const d = CL.filter(c => c.done).length; $('clCount').textContent = CL.length ? `${d} of ${CL.length} done` : '';
+}
+function addCL(){ const v = $('clNew').value.trim(); if (!v) return; CL.push({ id: uid(), text: v, done: false }); $('clNew').value = ''; renderCL(); }
+$('clAddBtn').onclick = addCL;
+$('clNew').addEventListener('keydown', e => { if (e.key==='Enter'){ e.preventDefault(); addCL(); } });
+$('clList').addEventListener('change', e => { const k = e.target.dataset.clk; if (k !== undefined){ CL[k].done = e.target.checked; renderCL(); } });
+$('clList').addEventListener('click', e => { const k = e.target.closest('[data-cldel]'); if (k){ CL.splice(+k.dataset.cldel, 1); renderCL(); } });
 $('fPct').oninput = e => $('pctOut').textContent = e.target.value + '%';
 $('fSt').addEventListener('change', e => { $('closeNoteWrap').hidden = e.target.value !== 'Resolved'; });
 $('cancelBtn').onclick = closeModal;
@@ -1766,14 +1918,12 @@ $('delBtn').onclick = () => {
 $('taskForm').addEventListener('submit', e => {
   e.preventDefault();
   const vals = { title: $('fTitle').value.trim(), stream: $('fStream').value, group: $('fGrp').value.trim(), party: $('fPty').value.trim(),
-    priority: $('fPri').value, effort: $('fEff').value, due: $('fDue').value, reason: $('fRsn').value, pct: +$('fPct').value, notes: $('fNotes').value.trim(), closeNote: $('fClose').value.trim() };
+    priority: $('fPri').value, effort: $('fEff').value, due: $('fDue').value, reason: $('fRsn').value, pct: +$('fPct').value, notes: $('fNotes').value.trim(), closeNote: $('fClose').value.trim(), repeat: $('fRep').value, checklist: CL.map(c => ({...c})) };
   if (!vals.title) return;
   const st = $('fSt').value;
   if (editing){ Object.assign(editing, vals); const id = editing.id; closeModal(); if (st !== P().items.find(i=>i.id===id).status) setStatus(id, st, true); save(); render(); toast('Saved'); }
   else {
-    const n = Math.max(100, ...P().items.map(i => +String(i.code).replace(/\D/g,'') || 0)) + 1;
-    const it = { id: uid(), code: 'MK-'+n, ...vals, status: st, since: today(), moved: today(), resolved: st==='Resolved' ? today() : '', history: [{ t: Date.now(), to: st }] };
-    if (st==='Resolved') it.pct = 100;
+    const it = newItem(vals, st);
     P().items.push(it);
     if (fromIdea){ P().ideas = P().ideas.filter(x => x.id !== fromIdea); }
     save(); closeModal(); render(); toast(`Added ${it.code}`);
@@ -1893,7 +2043,7 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.
 if (io) ['today','trend','focus','balance','ideas','calendar','board','history'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.10.01-2';
+const APP_VERSION = '2026.10.02-1';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');

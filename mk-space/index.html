@@ -347,6 +347,67 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 .eff-pop .link{align-self:flex-start}
 .col-time{font-size:11.5px;color:var(--text-3);font-weight:600;white-space:nowrap}
 
+/* calendar */
+.cal-head{align-items:center}
+.cal-nav{display:flex;align-items:center;gap:8px}
+.cal-nav h2{min-width:170px;text-align:center}
+.icon-btn.sm{width:34px;height:34px}
+.icon-btn.sm svg{width:16px;height:16px}
+.cal-opts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.cal-done{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text-2);font-weight:600}
+.cal-hint{margin:-4px 0 10px;font-size:12.5px;color:var(--text-3)}
+.cal-tray{display:flex;align-items:center;gap:10px;background:var(--panel-2);border:1px dashed var(--border);border-radius:12px;padding:8px 10px;margin-bottom:12px}
+.tray-label{font-size:12.5px;font-weight:600;color:var(--text-2);white-space:nowrap}
+.tray-label .num{color:var(--text-3);font-weight:500;margin-left:2px}
+.tray-chips{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-height:28px;align-items:center;border-radius:8px}
+.tray-chips .cal-chip{max-width:220px}
+.tray-empty{font-size:12px;color:var(--text-3)}
+.cal-dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-bottom:6px}
+.cal-dow span{font-size:12px;font-weight:600;color:var(--text-3);padding-left:6px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal-cell{background:var(--panel);border:1px solid var(--border-2);border-radius:12px;padding:6px;min-height:108px;display:flex;flex-direction:column;gap:5px;cursor:pointer;min-width:0;transition:border-color .12s,background .12s}
+.cal-grid.week .cal-cell{min-height:260px}
+.cal-cell:hover{border-color:var(--border)}
+.cal-cell.out{background:var(--panel-2);opacity:.7}
+.cal-cell.today{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.cal-cell.sel{background:var(--ink-soft)}
+.cal-cell.drop,.tray-chips.drop{background:var(--ink-soft);border-color:var(--ink)}
+.cal-dn{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2);padding:0 2px}
+.cal-dn b{font-size:14px;color:var(--text)}
+.cal-cell.today .cal-dn b{background:var(--ink);color:var(--ink-text);border-radius:999px;min-width:24px;height:24px;display:inline-grid;place-items:center;padding:0 6px}
+.cal-wd{display:none}
+.cal-grid.week .cal-wd{display:inline}
+.cal-cnt{font-size:11px;font-weight:600;background:var(--panel-2);color:var(--text-2);border-radius:999px;padding:0 6px}
+.cal-cnt.late{background:var(--s-stk-bg);color:var(--s-stk-ink)}
+.cal-add{margin-left:auto;width:22px;height:22px;border-radius:7px;display:grid;place-items:center;color:var(--text-3);font-size:16px;opacity:0;transition:opacity .12s}
+.cal-cell:hover .cal-add{opacity:1}
+.cal-add:hover{background:var(--panel-2);color:var(--ink)}
+.cal-chips{display:flex;flex-direction:column;gap:4px;min-width:0}
+.cal-chip{display:flex;align-items:center;gap:5px;width:100%;min-width:0;border:0;border-left:3px solid var(--text-3);background:var(--panel-2);border-radius:6px;padding:3px 6px;font-size:12px;font-weight:500;color:var(--text);text-align:left;cursor:grab;line-height:1.35}
+.cal-chip:hover{background:var(--ink-soft)}
+.cal-chip.dragging{opacity:.4}
+.cal-chip.st-idn{border-left-color:var(--s-idn)} .cal-chip.st-stk{border-left-color:var(--s-stk)} .cal-chip.st-prg{border-left-color:var(--s-prg)} .cal-chip.st-res{border-left-color:var(--s-res)}
+.cal-chip.late{background:var(--s-stk-bg);box-shadow:inset 0 0 0 1px var(--s-stk)}
+.cal-chip.done .cc-t{text-decoration:line-through;color:var(--text-3)}
+.cc-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.cc-e{font-size:10.5px;color:var(--text-3);font-weight:600;white-space:nowrap}
+.cal-more{font-size:11.5px;color:var(--link);font-weight:600;padding-left:4px}
+.cal-day{margin-top:12px;border-top:1px solid var(--border-2);padding-top:12px}
+.cd-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.cd-head h3{margin:0;font-size:15px;margin-right:auto}
+.cd-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.cd-list li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}
+.cd-list .cal-chip{font-size:13px;padding:6px 8px}
+.cd-meta{font-size:12px;color:var(--text-3);white-space:nowrap}
+.cal-pop{width:270px}
+.cp-title{font-weight:600;font-size:14px;line-height:1.3}
+.cp-sub{font-size:12px;color:var(--text-3);margin-top:-4px}
+.cp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cp-grid .chip{padding:6px 4px;text-align:center}
+.cp-pick{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;font-weight:600;color:var(--text-2)}
+.cp-pick input{border:1px solid var(--border);background:var(--panel-2);border-radius:8px;padding:5px 7px;font-size:13px;color:var(--text)}
+.cp-acts{display:flex;gap:6px;justify-content:flex-end}
+
 /* history */
 .hist-intro{margin:-4px 0 12px;color:var(--text-2);font-size:13px;max-width:70ch}
 .hist-controls{display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
@@ -433,12 +494,11 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
   .side.open{transform:none}
   .scrim{display:block;position:fixed;inset:0;background:rgba(8,12,16,.45);z-index:85}
   .scrim[hidden]{display:none}
-  .side .nav{display:none}
   .menu-btn{display:grid}
   .topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--bg);margin:-22px calc(-1 * clamp(16px,2.4vw,32px)) 0;padding:10px clamp(16px,2.4vw,32px);border-bottom:1px solid var(--border-2)}
   .main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
-  .tabbar{display:grid;grid-template-columns:repeat(7,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--panel);border-top:1px solid var(--border);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
-  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:10px;color:var(--text-3);text-decoration:none;font-size:10px;font-weight:600}
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--panel);border-top:1px solid var(--border);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:10px;color:var(--text-3);text-decoration:none;font-size:10.5px;font-weight:600}
   .tabbar a svg{width:20px;height:20px}
   .tabbar a.on{color:var(--text)}
   .tabbar a.on svg{color:var(--ink)}
@@ -493,6 +553,28 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
   .hint-touch{display:inline!important}
   .bal-row{grid-template-columns:96px minmax(0,1fr) 22px}
   .hist-sum{grid-template-columns:1fr 1fr}
+  .cal-nav h2{min-width:0;flex:1;font-size:15px}
+  .cal-nav{width:100%}
+  .cal-opts{width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-right:-15px;padding-right:15px}
+  .cal-opts::-webkit-scrollbar{display:none}
+  .cal-opts > *{flex:none}
+  .cal-hint{display:none}
+  .cal-opts .seg{flex-wrap:nowrap}
+  .cal-opts .seg button{padding:4px 9px}
+  .cal-grid,.cal-dow{gap:3px}
+  .cal-grid.month .cal-cell{min-height:52px;padding:4px 3px;border-radius:9px;align-items:center}
+  .cal-grid.month .cal-chips{display:none}
+  .cal-grid.month .cal-dn{flex-direction:column;gap:2px;padding:0}
+  .cal-grid.month .cal-add{display:none}
+  .cal-dow span{padding-left:0;text-align:center;font-size:11px}
+  .cal-grid.week{grid-template-columns:1fr}
+  .cal-grid.week .cal-cell{min-height:0}
+  .cal-dow:has(+ .cal-grid.week){display:none}
+  .cal-add{opacity:1}
+  .cd-list li{grid-template-columns:1fr}
+  .cd-meta{white-space:normal}
+  .tray-chips{flex-wrap:nowrap;overflow-x:auto}
+  .tray-label{font-size:12px}
   .h-item{grid-template-columns:1fr}
   .h-tags{justify-content:flex-start}
   .h-day{grid-template-columns:40px minmax(0,1fr);gap:10px}
@@ -521,13 +603,14 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
     <div class="spaces" id="spaces" role="group" aria-label="Choose a space"></div>
     <button class="today-card" id="todayCard" type="button"></button>
     <nav class="nav" aria-label="Sections">
-      <a href="#today" class="on" data-short="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Overview</a>
+      <a href="#today" class="on" data-short="Home" data-tab="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Overview</a>
       <a href="#trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Trend</a>
-      <a href="#focus" data-short="Focus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Today's focus<span class="badge num" id="bFocus"></span></a>
+      <a href="#focus" data-short="Focus" data-tab="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Today's focus<span class="badge num" id="bFocus"></span></a>
       <a href="#ideas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>Ideas<span class="badge num" id="bIdeas"></span></a>
       <a href="#balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6z"/></svg>Balance</a>
-      <a href="#history" data-short="History"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>History<span class="badge num" id="bHist"></span></a>
-      <a href="#board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>Board<span class="badge num" id="bBoard"></span></a>
+      <a href="#calendar" data-short="Calendar" data-tab="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendar<span class="badge num" id="bCal"></span></a>
+      <a href="#board" data-tab="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>Board<span class="badge num" id="bBoard"></span></a>
+      <a href="#history" data-short="History" data-tab="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>History<span class="badge num" id="bHist"></span></a>
     </nav>
     <div>
       <div class="side-h"><button class="fold" type="button" data-fold="streams" aria-expanded="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>Workstreams</button><button class="side-add" id="addStream" aria-label="Add workstream" title="Add workstream">+</button></div>
@@ -638,6 +721,26 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       </div>
     </section>
 
+    <section class="panel" id="calendar">
+      <div class="ph cal-head">
+        <div class="cal-nav"><button class="icon-btn sm" id="calPrev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg></button><h2 id="calTitle">Calendar</h2><button class="icon-btn sm" id="calNext" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 6l6 6-6 6"/></svg></button><button class="btn sm" id="calToday" type="button">Today</button></div>
+        <div class="cal-opts">
+          <div class="seg" id="calView"><button data-cv="month">Month</button><button data-cv="week">Week</button></div>
+          <div class="seg" id="calScope"><button data-cs="project">This project</button><button data-cs="space">This space</button><button data-cs="all">All spaces</button></div>
+          <label class="cal-done"><input type="checkbox" id="calDone"> Show closed</label>
+        </div>
+      </div>
+      <p class="cal-hint"><span class="hint-desk">Drag a task to another day to change its due date, or click it for more options. Click a day to see its list.</span><span class="hint-touch" style="display:none">Tap a task to move it to another day. Tap a day to see its list.</span></p>
+      <div class="cal-tray" id="calTray"></div>
+      <div class="cal-grid-wrap"><div class="cal-dow" id="calDow"></div><div class="cal-grid" id="calGrid"></div></div>
+      <div class="cal-day" id="calDay" hidden></div>
+    </section>
+
+    <section class="panel" id="board">
+      <div class="ph"><h2>Task board</h2><span class="hint"><span class="hint-desk">Drag cards between columns, or open a card to change its status</span><span class="hint-touch" style="display:none">Swipe across the columns. Tap a card to change its status.</span></span></div>
+      <div class="board-wrap"><div class="board" id="boardEl"></div></div>
+    </section>
+
     <section class="panel" id="history">
       <div class="ph"><h2>History</h2><button class="btn sm" id="histExport" type="button">Export (CSV)</button></div>
       <p class="hist-intro">Everything you have closed, newest first. Search, filter by period and space, reopen a task, or add a note on what was done.</p>
@@ -648,11 +751,6 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       </div>
       <div class="hist-sum" id="histSum"></div>
       <div id="histList"></div>
-    </section>
-
-    <section class="panel" id="board">
-      <div class="ph"><h2>Task board</h2><span class="hint"><span class="hint-desk">Drag cards between columns, or open a card to change its status</span><span class="hint-touch" style="display:none">Swipe across the columns. Tap a card to change its status.</span></span></div>
-      <div class="board-wrap"><div class="board" id="boardEl"></div></div>
     </section>
   </main>
 </div>
@@ -696,6 +794,7 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 <nav class="tabbar" id="tabbar" aria-label="Sections"></nav>
 <button class="fab" id="fab" aria-label="New task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></button>
 <div class="eff-pop" id="effPop" role="dialog" aria-label="Time needed" hidden></div>
+<div class="eff-pop cal-pop" id="calPop" role="dialog" aria-label="Move task" hidden></div>
 <div class="tip" id="tip" hidden></div>
 <div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="toastUndo" type="button">Undo</button></div>
 
@@ -890,7 +989,7 @@ const dataSig = d => JSON.stringify([d.projects, d.spaces||[], d.deleted||{}]);
 // Every change: stamp it, keep it on this device right away, then queue a cloud sync.
 function save(){ stamp(); D.updatedAt = Date.now(); writeLocal(); Cloud.queue(); }
 try { Object.assign(UI, JSON.parse(store.get(KEY+'-ui')||'{}'), {q:'', showAll:{}}); } catch(e){}
-const saveUI = () => store.set(KEY+'-ui', JSON.stringify({stream:UI.stream, trendDays:UI.trendDays, balBy:UI.balBy, focusTime:UI.focusTime}));
+const saveUI = () => store.set(KEY+'-ui', JSON.stringify({stream:UI.stream, trendDays:UI.trendDays, balBy:UI.balBy, focusTime:UI.focusTime, calView:UI.calView, calScope:UI.calScope, calDone:UI.calDone}));
 
 const isOpen = i => i.status !== 'Resolved';
 function view(){
@@ -1344,12 +1443,133 @@ addEventListener('keydown', e => { if (e.key==='Escape' && !effPop.hidden) close
 addEventListener('scroll', () => { if (!effPop.hidden) closeEffort(); }, true);
 addEventListener('resize', () => { if (!effPop.hidden) closeEffort(); });
 
+/* ---------- calendar ---------- */
+UI.calView = UI.calView || (matchMedia('(max-width:640px)').matches ? 'week' : 'month');
+UI.calRef = today(); UI.calScope = UI.calScope || 'project'; UI.calDone = !!UI.calDone; UI.calDay = '';
+const mondayOf = d => { const x = parse(d), k = (x.getDay()+6)%7; return addDays(d, -k); };
+function calItems(){
+  const q = UI.q.trim().toLowerCase(), out = [];
+  if (UI.calScope === 'project') view().forEach(i => out.push({ i, p: P() }));
+  else D.projects.forEach(p => {
+    if (UI.calScope === 'space' && p.space !== D.activeSpace) return;
+    p.items.forEach(i => { if (!q || [i.title,i.code,i.party,i.group].join(' ').toLowerCase().includes(q)) out.push({ i, p }); });
+  });
+  return out.filter(r => UI.calDone || isOpen(r.i));
+}
+function calChip(r, compact){
+  const { i, p } = r, t = today(), late = isOpen(i) && i.due && i.due < t;
+  return `<button type="button" class="cal-chip st-${SLUG[i.status]} ${late?'late':''} ${isOpen(i)?'':'done'}" draggable="true" data-cal="${i.id}" title="${esc(i.title)}${i.effort ? ' · '+EFFORT_LABEL[i.effort] : ''}">${UI.calScope!=='project' ? `<i class="sq-${p.space} chip-sq" aria-hidden="true"></i>` : ''}<span class="cc-t">${esc(i.title)}</span>${!compact && i.effort ? `<span class="cc-e">${EFFORT_LABEL[i.effort]}</span>` : ''}</button>`;
+}
+function renderCalendar(){
+  const t = today(), ref = UI.calRef, rows = calItems();
+  document.querySelectorAll('#calView button').forEach(b => b.classList.toggle('on', b.dataset.cv===UI.calView));
+  document.querySelectorAll('#calScope button').forEach(b => b.classList.toggle('on', b.dataset.cs===UI.calScope));
+  document.getElementById('calDone').checked = UI.calDone;
+  const byDay = {}; rows.forEach(r => { if (r.i.due) (byDay[r.i.due] ||= []).push(r); });
+  Object.values(byDay).forEach(l => l.sort((a,b) => (isOpen(b.i)-isOpen(a.i)) || PRIORITIES.indexOf(a.i.priority)-PRIORITIES.indexOf(b.i.priority)));
+  // unscheduled tray
+  const noDate = rows.filter(r => !r.i.due && isOpen(r.i));
+  document.getElementById('calTray').innerHTML = `<span class="tray-label">No due date <span class="num">${noDate.length}</span></span><div class="tray-chips" data-day="">${noDate.map(r => calChip(r, true)).join('') || '<span class="tray-empty">Drag a task here to remove its date</span>'}</div>`;
+  let start, days, title;
+  if (UI.calView === 'week'){
+    start = mondayOf(ref); days = 7;
+    const end = addDays(start, 6);
+    title = `${parse(start).toLocaleDateString(undefined,{day:'numeric',month:'short'})} – ${parse(end).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})}`;
+  } else {
+    const first = ref.slice(0,8)+'01'; start = mondayOf(first);
+    const last = addDays(ref.slice(0,8) + '01', new Date(parse(first).getFullYear(), parse(first).getMonth()+1, 0).getDate() - 1);
+    days = diff(start, addDays(mondayOf(last), 6)) + 1;
+    title = parse(first).toLocaleDateString(undefined,{month:'long', year:'numeric'});
+  }
+  document.getElementById('calTitle').textContent = title;
+  const month = ref.slice(0,7), max = UI.calView==='week' ? 99 : 3;
+  document.getElementById('calDow').innerHTML = Array.from({length:7}, (_,k) => `<span>${parse(addDays(start,k)).toLocaleDateString(undefined,{weekday:'short'})}</span>`).join('');
+  const grid = document.getElementById('calGrid'); grid.className = 'cal-grid ' + UI.calView;
+  grid.innerHTML = Array.from({length:days}, (_,k) => {
+    const d = addDays(start, k), list = byDay[d] || [], out = UI.calView==='month' && d.slice(0,7) !== month;
+    const openN = list.filter(r => isOpen(r.i)).length, lateN = list.filter(r => isOpen(r.i) && d < t).length;
+    return `<div class="cal-cell ${d===t?'today':''} ${out?'out':''} ${d===UI.calDay?'sel':''}" data-day="${d}" role="button" tabindex="0" aria-label="${parse(d).toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'})}, ${list.length} task${list.length===1?'':'s'}">
+      <div class="cal-dn"><span class="cal-wd">${parse(d).toLocaleDateString(undefined,{weekday:'short'})}</span><b class="num">${parse(d).getDate()}</b>${openN ? `<span class="cal-cnt ${lateN?'late':''} num">${openN}</span>` : ''}<span class="cal-add" data-caladd="${d}" title="Add a task on this day" aria-hidden="true">+</span></div>
+      <div class="cal-chips">${list.slice(0,max).map(r => calChip(r, UI.calView==='month')).join('')}${list.length > max ? `<span class="cal-more">+${list.length-max} more</span>` : ''}</div>
+    </div>`;
+  }).join('');
+  renderCalDay(byDay);
+  const weekOpen = rows.filter(r => isOpen(r.i) && r.i.due && r.i.due >= t && r.i.due <= addDays(t,6)).length;
+  const b = document.getElementById('bCal'); if (b) b.textContent = weekOpen || '';
+}
+function renderCalDay(byDay){
+  const el = document.getElementById('calDay'), d = UI.calDay;
+  if (!d){ el.hidden = true; return; }
+  const list = byDay[d] || [];
+  el.hidden = false;
+  el.innerHTML = `<div class="cd-head"><h3>${parse(d).toLocaleDateString(undefined,{weekday:'long', day:'numeric', month:'long'})}</h3><button type="button" class="btn sm primary" data-caladd="${d}">+ Add task</button><button type="button" class="icon-btn sm" id="calDayClose" aria-label="Close day list">✕</button></div>` +
+    (list.length ? `<ul class="cd-list">${list.map(r => `<li>${calChip(r)}<span class="cd-meta">${esc(r.p.name)}${r.i.party ? ' · '+esc(r.i.party) : ''} · ${esc(r.i.status)}</span></li>`).join('')}</ul>` : '<p class="empty">Nothing due on this day.</p>');
+}
+function moveDue(id, date){
+  const [it] = findItem(id); if (!it || (it.due||'') === (date||'')) return;
+  const prev = {...it, history: [...(it.history||[])]}, old = it.due || '';
+  (it.history ||= []).push({ t: Date.now(), due: [old, date || ''] });
+  it.due = date || '';
+  save(); render();
+  toast(date ? `${it.code} due ${parse(date).toLocaleDateString(undefined,{weekday:'short', day:'numeric', month:'short'})}` : `${it.code} has no due date now`, () => { Object.assign(it, prev); save(); render(); });
+}
+// quick move menu
+const calPop = document.getElementById('calPop');
+function openCalPop(btn){
+  const [it, p] = findItem(btn.dataset.cal); if (!it) return;
+  const t = today(), base = it.due || t, nextMon = addDays(mondayOf(t), 7);
+  const opt = (d, l) => `<button type="button" class="chip" data-mv="${d}">${l}</button>`;
+  calPop.dataset.id = it.id;
+  calPop.innerHTML = `<div class="cp-title">${esc(it.title)}</div><div class="cp-sub">${it.due ? 'Due '+parse(it.due).toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'}) : 'No due date'} · ${esc(p.name)}</div>
+    <div class="ep-title">Move to</div>
+    <div class="cp-grid">${opt(t,'Today')}${opt(addDays(t,1),'Tomorrow')}${opt(addDays(base,1),'+1 day')}${opt(addDays(base,7),'+1 week')}${opt(nextMon,'Next Monday')}${it.due ? opt('', 'No date') : ''}</div>
+    <label class="cp-pick">Pick a date <input type="date" id="cpDate" value="${it.due||''}"></label>
+    <div class="cp-acts"><button type="button" class="btn sm" data-cpopen="1">Open task</button>${isOpen(it) ? '<button type="button" class="btn sm primary" data-cpdone="1">Mark done</button>' : ''}</div>`;
+  calPop.hidden = false;
+  const r = btn.getBoundingClientRect(), w = calPop.offsetWidth, h = calPop.offsetHeight;
+  let x = Math.min(Math.max(8, r.left), innerWidth - w - 8), y = r.bottom + 6;
+  if (y + h > innerHeight - 8) y = Math.max(8, r.top - h - 6);
+  calPop.style.left = x+'px'; calPop.style.top = y+'px';
+  calPop.querySelector('#cpDate').onchange = e => { const v = e.target.value; calPop.hidden = true; if (v) moveDue(it.id, v); };
+}
+calPop.addEventListener('click', e => {
+  const id = calPop.dataset.id, mv = e.target.closest('[data-mv]');
+  if (mv){ calPop.hidden = true; return moveDue(id, mv.dataset.mv); }
+  if (e.target.closest('[data-cpopen]')){ calPop.hidden = true; const it = goToItem(id); if (it) openModal(it.id); return; }
+  if (e.target.closest('[data-cpdone]')){ calPop.hidden = true; setStatus(id, 'Resolved'); }
+});
+document.addEventListener('click', e => { if (!calPop.hidden && !calPop.contains(e.target) && !e.target.closest('[data-cal]')) calPop.hidden = true; }, true);
+addEventListener('keydown', e => { if (e.key==='Escape') calPop.hidden = true; });
+addEventListener('scroll', () => { calPop.hidden = true; }, {passive:true});
+const calSec = document.getElementById('calendar');
+calSec.addEventListener('click', e => {
+  const chip = e.target.closest('[data-cal]'); if (chip){ e.stopPropagation(); return calPop.hidden || calPop.dataset.id !== chip.dataset.cal ? openCalPop(chip) : (calPop.hidden = true); }
+  const add = e.target.closest('[data-caladd]'); if (add){ return openModal(null, { due: add.dataset.caladd }); }
+  if (e.target.closest('#calDayClose')){ UI.calDay = ''; return renderCalendar(); }
+  const cell = e.target.closest('.cal-cell'); if (cell){ UI.calDay = UI.calDay === cell.dataset.day ? '' : cell.dataset.day; renderCalendar(); if (UI.calDay) document.getElementById('calDay').scrollIntoView({block:'nearest', behavior:'smooth'}); }
+});
+calSec.addEventListener('keydown', e => { const cell = e.target.closest('.cal-cell'); if (cell && (e.key==='Enter' || e.key===' ') && e.target===cell){ e.preventDefault(); cell.click(); } });
+calSec.addEventListener('dragstart', e => { const c = e.target.closest('[data-cal]'); if (!c) return; e.dataTransfer.setData('text/plain', c.dataset.cal); e.dataTransfer.effectAllowed = 'move'; c.classList.add('dragging'); calPop.hidden = true; });
+calSec.addEventListener('dragend', e => { e.target.closest('[data-cal]')?.classList.remove('dragging'); calSec.querySelectorAll('.drop').forEach(x => x.classList.remove('drop')); });
+calSec.addEventListener('dragover', e => { const z = e.target.closest('.cal-cell, .tray-chips'); if (!z) return; e.preventDefault(); calSec.querySelectorAll('.drop').forEach(x => x !== z && x.classList.remove('drop')); z.classList.add('drop'); });
+calSec.addEventListener('drop', e => { const z = e.target.closest('.cal-cell, .tray-chips'); if (!z) return; e.preventDefault(); z.classList.remove('drop'); moveDue(e.dataTransfer.getData('text/plain'), z.dataset.day); });
+const calStep = dir => { UI.calRef = UI.calView==='week' ? addDays(UI.calRef, 7*dir) : (() => { const d = parse(UI.calRef.slice(0,8)+'01'); d.setMonth(d.getMonth()+dir); return iso(d); })(); renderCalendar(); };
+document.getElementById('calPrev').onclick = () => calStep(-1);
+document.getElementById('calNext').onclick = () => calStep(1);
+document.getElementById('calToday').onclick = () => { UI.calRef = today(); UI.calDay = today(); renderCalendar(); };
+document.getElementById('calView').onclick = e => { const b = e.target.closest('[data-cv]'); if (b){ UI.calView = b.dataset.cv; saveUI(); renderCalendar(); } };
+document.getElementById('calScope').onclick = e => { const b = e.target.closest('[data-cs]'); if (b){ UI.calScope = b.dataset.cs; saveUI(); renderCalendar(); } };
+document.getElementById('calDone').onchange = e => { UI.calDone = e.target.checked; saveUI(); renderCalendar(); };
+
 /* ---------- history ---------- */
 const HIST_PERIODS = [['7','7 days'],['30','30 days'],['90','90 days'],['year','This year'],['all','All']];
 UI.histPeriod = UI.histPeriod || '30'; UI.histSpace = UI.histSpace || 'all'; UI.histQ = '';
 const fmtWhen = t => new Date(t).toLocaleString(undefined, {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
 function trailOf(it){
-  if (it.history && it.history.length) return it.history;
+  if (it.history && it.history.length){
+    const h = it.history, hasStart = h.some(x => !x.from && !x.due && x.to);
+    return hasStart ? h : [{ t: parse(it.since||today()).getTime(), to: 'Identified', dateOnly: true }, ...h];
+  }
   const h = [{ t: parse(it.since||today()).getTime(), to: 'Identified', dateOnly: true }];      // older tasks: rebuilt from their dates
   if (it.resolved) h.push({ t: parse(it.resolved).getTime(), to: 'Resolved', closed: true, dateOnly: true });
   return h;
@@ -1494,7 +1714,7 @@ function openModal(id, preset = {}){
   $('fClose').value = (editing && editing.closeNote) || '';
   $('closeNoteWrap').hidden = it.status !== 'Resolved';
   $('trailWrap').hidden = !editing;
-  if (editing) $('trail').innerHTML = trailOf(editing).map(h => `<li><span class="tr-when">${h.dateOnly ? new Date(h.t).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}) : fmtWhen(h.t)}</span><span>${h.closed ? '<b>Closed</b>' : h.from ? `${esc(h.from)} → <b>${esc(h.to)}</b>` : `Created as <b>${esc(h.to)}</b>`}</span></li>`).join('');
+  if (editing) $('trail').innerHTML = trailOf(editing).map(h => `<li><span class="tr-when">${h.dateOnly ? new Date(h.t).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}) : fmtWhen(h.t)}</span><span>${h.due ? `Due date ${h.due[0] ? 'moved '+fmt(h.due[0])+' → ' : 'set to '}<b>${h.due[1] ? fmt(h.due[1]) : 'no date'}</b>` : h.closed ? '<b>Closed</b>' : h.from ? `${esc(h.from)} → <b>${esc(h.to)}</b>` : `Created as <b>${esc(h.to)}</b>`}</span></li>`).join('');
   $('delBtn').hidden = !editing; delArmed = false; $('delBtn').textContent = 'Delete';
   $('overlay').hidden = false; setTimeout(() => $('fTitle').focus(), 0);
 }
@@ -1636,10 +1856,10 @@ const navLinks = [...document.querySelectorAll('.nav a')];
 const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(en => {
   if (en.isIntersecting) [...navLinks, ...document.querySelectorAll('#tabbar a')].forEach(a => a.classList.toggle('on', a.getAttribute('href')==='#'+en.target.id));
 }), {rootMargin:'-40% 0px -55% 0px'}) : null;
-if (io) ['today','trend','focus','balance','ideas','history','board'].forEach(id => io.observe(document.getElementById(id)));
+if (io) ['today','trend','focus','balance','ideas','calendar','board','history'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.09.30-1';
+const APP_VERSION = '2026.10.01-1';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');
@@ -1871,7 +2091,7 @@ const drawer = open => { side.classList.toggle('open', open); scrim.hidden = !op
 document.getElementById('menuBtn').onclick = () => drawer(!side.classList.contains('open'));
 scrim.onclick = () => drawer(false);
 side.addEventListener('click', e => { if (e.target.closest('.nav a, .stream, .side-btn, .person, .today-card, .sadd')) drawer(false); });
-document.getElementById('tabbar').innerHTML = [...document.querySelectorAll('.nav a')].map(a =>
+document.getElementById('tabbar').innerHTML = [...document.querySelectorAll('.nav a[data-tab]')].map(a =>
   `<a href="${a.getAttribute('href')}">${a.querySelector('svg').outerHTML}<span>${a.dataset.short || [...a.childNodes].filter(n => n.nodeType===3).map(n => n.textContent).join('').trim()}</span></a>`).join('');
 document.getElementById('fab').onclick = () => openModal(null);
 
@@ -1880,7 +2100,7 @@ function render(){
   const h = new Date().getHours();
   $('greet').textContent = `${h<12?'Good morning':h<17?'Good afternoon':'Good evening'}, ${D.name||'MK'}`;
   $('dateNow').textContent = new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-  renderSpaces(); renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard(); renderHistory();
+  renderSpaces(); renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard(); renderCalendar(); renderHistory();
 }
 if (matchMedia('(max-width:640px)').matches) $('q').placeholder = 'Search';
 load(); render(); Cloud.init(); checkForUpdate();

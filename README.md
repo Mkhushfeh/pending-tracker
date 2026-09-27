@@ -176,12 +176,11 @@ Pending Tracker). After that:
 - **Refresh** also checks for a newer version of the app and reloads it, so a phone's home-screen
   app never keeps running an old copy.
 
-**Staying connected:** Google's access pass for a website lasts about an hour and can't be renewed
-in the background. MK Space renews it by itself with a quick trip to Google and back (a
-"Connecting to Google Drive…" screen for a second, no taps): every time you open it without a
-valid pass, and a few minutes before the pass runs out (it waits until you're not typing). This
-works as long as you stay signed in to Google in that browser or app. If Google needs you to sign
-in again, a yellow bar appears; tap **Sync now**.
+**Staying connected:** MK Space always opens instantly with the tasks saved on the device. While
+its Google access is valid (about an hour after a sign-in) it syncs automatically. After that, a
+slim bar shows when it last synced with a **Sync** button: one tap goes to Google and back (a few
+seconds) and loads changes from your other devices. If you prefer it to do that trip by itself every
+time it opens, tick *Sign in to Google automatically when opening* under *Backup and data*.
 
 **One-time Google setting (needed for automatic sign-in on every device):** add this address once in Google Cloud Console → APIs & Services →
 Credentials → your OAuth client → **Authorized redirect URIs**:

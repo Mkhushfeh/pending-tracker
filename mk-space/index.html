@@ -347,6 +347,49 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 .eff-pop .link{align-self:flex-start}
 .col-time{font-size:11.5px;color:var(--text-3);font-weight:600;white-space:nowrap}
 
+/* focus timer */
+.timer{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:65;display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--ink);border-radius:18px;padding:8px 10px 8px 12px;box-shadow:0 10px 30px rgba(15,43,72,.22);max-width:calc(100vw - 32px)}
+.tm-ring{--p:0;width:34px;height:34px;border-radius:50%;flex:none;background:conic-gradient(var(--ink) calc(var(--p)*1%), var(--border-2) 0);-webkit-mask:radial-gradient(circle 12px,transparent 98%,#000);mask:radial-gradient(circle 12px,transparent 98%,#000)}
+.tm-main{display:flex;flex-direction:column;min-width:0}
+.tm-task{background:none;border:0;padding:0;font-size:12px;color:var(--text-2);text-align:left;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tm-task:hover{color:var(--link);text-decoration:underline}
+.timer:not([hidden]) ~ .toast{bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+.tm-clock{font-family:var(--f-display);font-size:22px;font-weight:700;line-height:1.1}
+.timer.paused .tm-clock{color:var(--text-3)}
+.tm-acts{display:flex;gap:6px}
+.play{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--panel);color:var(--ink);display:grid;place-items:center;padding:0;flex:none}
+.play svg{width:12px;height:12px;margin-left:2px}
+.play:hover{background:var(--ink);color:var(--ink-text);border-color:var(--ink)}
+.fi-r{display:flex;align-items:center;gap:8px}
+.focus-box{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--ink-soft);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--text)}
+.fb-acts{display:flex;gap:6px;align-items:center}
+.fb-acts select{border:1px solid var(--border);background:var(--panel);border-radius:999px;padding:5px 8px;font-size:12.5px}
+.fb-acts svg{width:11px;height:11px}
+/* templates */
+.m-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.m-head h3{margin-right:auto}
+.tpl-pick{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--text-2)}
+.tpl-pick select{border:1px solid var(--border);background:var(--panel-2);border-radius:999px;padding:5px 10px;font-size:13px;max-width:200px}
+/* table */
+.tbl-opts{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border-2);border-radius:12px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:1000px}
+.tbl th{position:sticky;top:0;background:var(--panel-2);text-align:left;font-weight:600;border-bottom:1px solid var(--border)}
+.tbl th button{background:none;border:0;padding:9px 8px;font-weight:600;color:var(--text-2);width:100%;text-align:left;white-space:nowrap}
+.tbl th button.on{color:var(--ink)}
+.tbl td{border-bottom:1px solid var(--border-2);padding:3px 4px;vertical-align:middle}
+.tbl td.mono,.tbl td.num{padding:0 8px;color:var(--text-2);white-space:nowrap}
+.tbl tr:hover td{background:var(--panel-2)}
+.tbl tr.late td:first-child{box-shadow:inset 3px 0 0 var(--s-stk)}
+.tbl tr.closed td{opacity:.6}
+.tbl input,.tbl select{width:100%;border:1px solid transparent;background:transparent;border-radius:7px;padding:6px 6px;font-size:13px;color:var(--text)}
+.tbl input:hover,.tbl select:hover{border-color:var(--border)}
+.tbl input:focus,.tbl select:focus{border-color:var(--ink);background:var(--panel);outline:0}
+.tbl td:nth-child(2){min-width:240px}
+.tbl td:nth-child(3){min-width:140px} .tbl td:nth-child(4){min-width:105px} .tbl td:nth-child(5){min-width:100px} .tbl td:nth-child(6){min-width:150px} .tbl td:nth-child(8){min-width:140px} .tbl td:nth-child(10){min-width:120px}
+.tbl{min-width:1250px}
+.tbl select.st-idn{color:var(--s-idn-ink);font-weight:600} .tbl select.st-stk{color:var(--s-stk-ink);font-weight:600} .tbl select.st-prg{color:var(--s-prg-ink);font-weight:600} .tbl select.st-res{color:var(--s-res-ink);font-weight:600}
+
 /* quick add */
 .quick{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px 10px;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:8px 8px 8px 14px;transition:border-color .15s,box-shadow .15s}
 .quick:focus-within{border-color:var(--ink);box-shadow:0 0 0 3px var(--ink-soft)}
@@ -380,11 +423,11 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 .cal-bar:hover .cal-bar-a{border-color:var(--ink)}
 .cal-bar-a svg{width:14px;height:14px;transition:transform .2s;transform:rotate(180deg)}
 .cb-open{display:none}
-#calendar.folded .cb-open{display:inline} #calendar.folded .cb-close{display:none}
-#calendar.folded .cal-bar-a svg{transform:none}
-#calendar.folded .cal-body{display:none}
-#calendar:not(.folded) .cal-bar{margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border-2)}
-#calendar.folded{padding-block:14px}
+.folded .cb-open{display:inline} .folded .cb-close{display:none}
+.folded .cal-bar-a svg{transform:none}
+.folded .cal-body{display:none}
+.panel:not(.folded) > .cal-bar{margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border-2)}
+.panel.folded{padding-block:14px}
 .cal-head{align-items:center}
 .cal-nav{display:flex;align-items:center;gap:8px}
 .cal-nav h2{min-width:170px;text-align:center}
@@ -543,6 +586,9 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
   .fab svg{width:24px;height:24px}
   .hello-r .btn.primary{display:none}
   .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .timer{bottom:calc(84px + env(safe-area-inset-bottom,0px));left:16px;right:88px;transform:none;flex-wrap:wrap;gap:8px}
+  .tm-task{max-width:none}
+  .timer:not([hidden]) ~ .toast{bottom:calc(186px + env(safe-area-inset-bottom,0px))}
     .space-strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * clamp(16px,2.4vw,32px));padding-inline:clamp(16px,2.4vw,32px)}
   .space-strip::-webkit-scrollbar{display:none}
   .space-strip .space{flex:none;background:var(--panel);border-color:var(--border);color:var(--text)}
@@ -648,6 +694,7 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       <a href="#balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6z"/></svg>Balance</a>
       <a href="#calendar" data-short="Calendar" data-tab="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Calendar<span class="badge num" id="bCal"></span></a>
       <a href="#board" data-tab="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>Board<span class="badge num" id="bBoard"></span></a>
+      <a href="#table"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 10h18M3 15h18M9 4v16"/></svg>Table</a>
       <a href="#history" data-short="History" data-tab="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>History<span class="badge num" id="bHist"></span></a>
     </nav>
     <div>
@@ -788,6 +835,18 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       </div>
     </section>
 
+    <section class="panel folded" id="table">
+      <button type="button" class="cal-bar" id="tblBar" aria-expanded="false">
+        <svg class="cal-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 10h18M3 15h18M9 4v16"/></svg>
+        <span class="cal-bar-t">Table</span><span class="cal-bar-s" id="tblSum"></span>
+        <span class="cal-bar-a"><span class="cb-open">Open</span><span class="cb-close">Fold</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6"/></svg></span>
+      </button>
+      <div class="cal-body">
+        <div class="tbl-opts"><span class="hint">Edit any cell directly; changes save straight away. Click a column name to sort.</span><label class="cal-done"><input type="checkbox" id="tblDone"> Show closed</label></div>
+        <div class="tbl-wrap"><table class="tbl" id="tbl"></table></div>
+      </div>
+    </section>
+
     <section class="panel" id="board">
       <div class="ph"><h2>Task board</h2><span class="hint"><span class="hint-desk">Drag cards between columns, or open a card to change its status</span><span class="hint-touch" style="display:none">Swipe across the columns. Tap a card to change its status.</span></span></div>
       <div class="board-wrap"><div class="board" id="boardEl"></div></div>
@@ -809,7 +868,13 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 
 <div class="overlay" id="overlay" hidden>
   <form class="modal" id="taskForm" role="dialog" aria-modal="true" aria-labelledby="mTitle">
-    <h3 id="mTitle">New task</h3>
+    <div class="m-head"><h3 id="mTitle">New task</h3>
+      <label class="tpl-pick" id="tplPickWrap">Start from template <select id="tplPick"></select></label>
+      <button type="button" class="link muted" id="tplDel" hidden>Delete this template</button></div>
+    <div class="focus-box" id="focusBox" hidden>
+      <span id="spentTxt"></span>
+      <span class="fb-acts"><select id="focusLen" aria-label="Focus length"><option value="15">15 min</option><option value="25" selected>25 min</option><option value="50">50 min</option></select><button type="button" class="btn sm primary" id="focusStart"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg> Start focus</button></span>
+    </div>
     <div class="fgrid">
       <label class="field full">Item / task<input id="fTitle" required autocomplete="off"></label>
       <label class="field">Workstream<select id="fStream"></select></label>
@@ -832,6 +897,7 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
     </div>
     <div class="modal-actions">
       <button type="button" class="btn danger left" id="delBtn">Delete</button>
+      <button type="button" class="btn" id="tplSave" title="Save title, time, priority, party, group, repeat and checklist as a template">Save as template</button>
       <button type="button" class="btn" id="cancelBtn">Cancel</button>
       <button type="submit" class="btn primary">Save</button>
     </div>
@@ -851,6 +917,11 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 <nav class="tabbar" id="tabbar" aria-label="Sections"></nav>
 <button class="fab" id="fab" aria-label="New task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg></button>
 <div class="eff-pop" id="effPop" role="dialog" aria-label="Time needed" hidden></div>
+<div class="timer" id="timer" role="timer" aria-live="off" hidden>
+  <span class="tm-ring" id="tmRing" aria-hidden="true"></span>
+  <span class="tm-main"><button type="button" class="tm-task" id="tmTask" title="Open task"></button><span class="tm-clock num" id="tmClock">25:00</span></span>
+  <span class="tm-acts"><button type="button" class="btn sm" id="tmPause">Pause</button><button type="button" class="btn sm" id="tmAdd" title="Add 5 minutes">+5</button><button type="button" class="btn sm primary" id="tmStop" title="Stop and log the time so far">Stop &amp; log</button></span>
+</div>
 <div class="eff-pop cal-pop" id="calPop" role="dialog" aria-label="Move task" hidden></div>
 <div class="tip" id="tip" hidden></div>
 <div class="toast" id="toast" hidden><span id="toastMsg"></span><button id="toastUndo" type="button">Undo</button></div>
@@ -1012,6 +1083,7 @@ const sig = o => { const {u, ...rest} = o; return JSON.stringify(rest); };
 function keysOf(data){
   const m = new Map();
   (data.spaces||[]).forEach(x => m.set('s:'+x.id, sig(x)));
+  (data.templates||[]).forEach(x => m.set('t:'+x.id, sig(x)));
   data.projects.forEach(p => {
     m.set('p:'+p.id, JSON.stringify([p.name, p.streams, p.space]));
     p.items.forEach(i => m.set('i:'+i.id, sig(i)));
@@ -1022,6 +1094,7 @@ function keysOf(data){
 function stamp(){
   const now = Date.now(), cur = keysOf(D), del = D.deleted ||= {};
   (D.spaces||[]).forEach(x => { if (known.get('s:'+x.id) !== cur.get('s:'+x.id)) x.u = now; });
+  (D.templates||[]).forEach(x => { if (known.get('t:'+x.id) !== cur.get('t:'+x.id)) x.u = now; });
   D.projects.forEach(p => {
     if (known.get('p:'+p.id) !== cur.get('p:'+p.id)) p.u = now;
     p.items.forEach(i => { if (known.get('i:'+i.id) !== cur.get('i:'+i.id)) i.u = now; });
@@ -1041,9 +1114,9 @@ function mergeData(L, R){
   const ids = [...new Set([...L.projects.map(p=>p.id), ...R.projects.map(p=>p.id)])];
   const projects = ids.map(id => { const lp = L.projects.find(p=>p.id===id), rp = R.projects.find(p=>p.id===id), meta = newer(rp, lp);
     return {...meta, items: list(lp&&lp.items, rp&&rp.items, 'i:'), ideas: list(lp&&lp.ideas, rp&&rp.ideas, 'd:')}; });
-  return ensureSpaces({...R, ...L, projects, spaces: list(L.spaces, R.spaces, 's:'), activeSpace: L.activeSpace, deleted: del, sampleCleared: L.sampleCleared || R.sampleCleared, updatedAt: Math.max(L.updatedAt||0, R.updatedAt||0)});
+  return ensureSpaces({...R, ...L, projects, spaces: list(L.spaces, R.spaces, 's:'), templates: list(L.templates, R.templates, 't:'), activeSpace: L.activeSpace, deleted: del, sampleCleared: L.sampleCleared || R.sampleCleared, updatedAt: Math.max(L.updatedAt||0, R.updatedAt||0)});
 }
-const dataSig = d => JSON.stringify([d.projects, d.spaces||[], d.deleted||{}]);
+const dataSig = d => JSON.stringify([d.projects, d.spaces||[], d.templates||[], d.deleted||{}]);
 // Every change: stamp it, keep it on this device right away, then queue a cloud sync.
 function save(){ stamp(); D.updatedAt = Date.now(); writeLocal(); Cloud.queue(); }
 try { Object.assign(UI, JSON.parse(store.get(KEY+'-ui')||'{}'), {q:'', showAll:{}}); } catch(e){}
@@ -1433,13 +1506,14 @@ function renderFocus(){
     return `<span class="pill neutral">${i.priority}</span>`; };
   document.getElementById('focusList').innerHTML = list.length ? list.map(i => `
     <li class="focus-item"><button class="check" data-close="${i.id}" aria-label="Close ${esc(i.title)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></button>
-      <div style="min-width:0"><div class="fi-title" data-open="${i.id}">${esc(i.title)}</div><div class="fi-meta">${effortBtn(i)} <span class="mono">${i.code}</span> · ${esc(i.party||'No party')} · ${esc(i.status)}</div></div>${why(i)}</li>`).join('')
+      <div style="min-width:0"><div class="fi-title" data-open="${i.id}">${esc(i.title)}</div><div class="fi-meta">${effortBtn(i)} <span class="mono">${i.code}</span> · ${esc(i.party||'No party')} · ${esc(i.status)}</div></div><span class="fi-r">${why(i)}<button type="button" class="play" data-focus-start="${i.id}" title="Start a 25 min focus on this task" aria-label="Start focus on ${esc(i.title)}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button></span></li>`).join('')
     : `<li class="empty">${cap ? `No open tasks of ${EFFORT_LABEL[UI.focusTime]}. Set "Time needed" on your tasks to use this.` : 'Nothing urgent. Pick something from the board.'}</li>`;
 }
 document.getElementById('focusTime').addEventListener('click', e => {
   const b = e.target.closest('[data-ft]'); if (!b) return; UI.focusTime = b.dataset.ft; saveUI(); renderFocus();
 });
 document.getElementById('focusList').addEventListener('click', e => {
+  const f = e.target.closest('[data-focus-start]'); if (f) return Timer.start(f.dataset.focusStart, 25);
   const c = e.target.closest('[data-close]'); if (c) return setStatus(c.dataset.close, 'Resolved');
   const o = e.target.closest('[data-open]'); if (o) openModal(o.dataset.open);
 });
@@ -1498,6 +1572,55 @@ document.getElementById('ideaList').addEventListener('click', e => {
   if (p){ const idea = P().ideas.find(x=>x.id===p.dataset.promote); openModal(null, {title: idea.text, notes: 'From ideas board', ideaId: idea.id}); }
 });
 
+/* ---------- focus timer (logs real time on a task) ---------- */
+function spentLine(it){
+  const sp = it.spent || 0, need = EFFORT_MIN[it.effort] || 0;
+  if (!sp) return need ? `No time logged yet · ${EFFORT_LABEL[it.effort]} needed` : 'No time logged yet';
+  return `<b>${fmtMins(sp)}</b> spent${need ? ` of ${EFFORT_LABEL[it.effort]} needed${sp > need ? ' <span class="pill bad">over by '+fmtMins(sp-need)+'</span>' : ''}` : ''} · ${(it.sessions||[]).length} session${(it.sessions||[]).length===1?'':'s'}`;
+}
+const Timer = (() => {
+  let st = null, tick = null; const TK = KEY + '-timer', baseTitle = document.title;
+  try { st = JSON.parse(store.get(TK) || 'null'); } catch(e){}
+  const persist = () => store.set(TK, st ? JSON.stringify(st) : '');
+  const elapsed = () => !st ? 0 : (st.paused ? st.paused - st.start : Date.now() - st.start) - (st.pausedTotal || 0);
+  function log(min){
+    const [it] = findItem(st.id); if (!it || min < 1) return null;
+    it.spent = (it.spent || 0) + min; (it.sessions ||= []).push({ t: Date.now(), min }); save(); render(); return it;
+  }
+  function finish(done){
+    if (!st) return;
+    const min = done ? st.min : Math.round(elapsed() / 60000), it = log(min), code = it ? it.code : '';
+    st = null; persist(); draw();
+    if (done){ toast(`Focus done: ${min} min logged on ${code}`); try { navigator.vibrate && navigator.vibrate([200,100,200]); } catch(e){}
+      try { if ('Notification' in window && Notification.permission === 'granted') new Notification('Focus session done', { body: `${min} min logged on ${code}`, tag: 'mk-focus' }); } catch(e){} }
+    else toast(min >= 1 ? `${min} min logged on ${code}` : 'Timer stopped, under a minute so nothing logged');
+  }
+  function draw(){
+    const el = $('timer');
+    if (!st){ el.hidden = true; document.title = baseTitle; clearInterval(tick); tick = null; return; }
+    const [it] = findItem(st.id); if (!it){ st = null; persist(); return draw(); }
+    const left = Math.max(0, st.min*60000 - elapsed()), mm = Math.floor(left/60000), ss = Math.floor(left/1000)%60, txt = `${pad(mm)}:${pad(ss)}`;
+    el.hidden = false; el.classList.toggle('paused', !!st.paused);
+    $('tmTask').textContent = `${it.code} · ${it.title}`; $('tmClock').textContent = txt; $('tmPause').textContent = st.paused ? 'Resume' : 'Pause';
+    $('tmRing').style.setProperty('--p', (1 - left/(st.min*60000)) * 100);
+    document.title = `${st.paused ? '⏸' : '▶'} ${txt} · ${it.code}`;
+    if (left <= 0 && !st.paused) finish(true);
+  }
+  function start(id, min){
+    if (st && st.id !== id) finish(false);
+    st = { id, min, start: Date.now(), pausedTotal: 0 }; persist();
+    try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch(e){}
+    clearInterval(tick); tick = setInterval(draw, 1000); draw();
+    const [it] = findItem(id); toast(`Focus started: ${min} min on ${it ? it.code : ''}`);
+  }
+  $('tmPause').onclick = () => { if (!st) return; if (st.paused){ st.pausedTotal += Date.now() - st.paused; delete st.paused; } else st.paused = Date.now(); persist(); draw(); };
+  $('tmAdd').onclick = () => { if (st){ st.min += 5; persist(); draw(); } };
+  $('tmStop').onclick = () => finish(false);
+  $('tmTask').onclick = () => { if (st){ const it = goToItem(st.id); if (it) openModal(it.id); } };
+  if (st){ tick = setInterval(draw, 1000); setTimeout(draw, 0); }
+  return { start };
+})();
+
 /* ---------- quick add (type one line) ---------- */
 const WEEKDAYS = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 const REPEATS = [['','Does not repeat'],['daily','Every day'],['weekdays','Every weekday (Mon–Fri)'],['weekly','Every week'],['monthly','Every month'],['yearly','Every year']];
@@ -1505,6 +1628,8 @@ const REPEAT_LABEL = Object.fromEntries(REPEATS);
 function parseQuick(text){
   const t = today(), out = { title: '' };
   let rest = ' ' + text + ' ';
+  // /name at the start uses a template
+  rest = rest.replace(/^\s\/([^\s]+)\s/, (m, n) => { const tp = (D.templates||[]).find(x => x.name.toLowerCase().startsWith(n.toLowerCase())); if (!tp) return m; out.template = tp; return ' '; });
   const take = (re, fn) => { rest = rest.replace(re, (...m) => { const r = fn(...m); return r === false ? m[0] : ' '; }); };
   // repeat
   take(/\severy\s+day\s/i, () => { out.repeat = 'daily'; });
@@ -1535,14 +1660,17 @@ function parseQuick(text){
     take(/\s(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+(\d{1,2})\s/i, (m, mo, d) => md(d, mo));
   }
   out.title = rest.replace(/\s+/g,' ').trim();
+  if (out.template){ const tp = out.template; out.title = out.title ? `${tp.title} ${out.title}` : tp.title;
+    ['effort','priority','party','group','repeat'].forEach(k => { if (!out[k] && tp[k]) out[k] = tp[k]; }); out.checklist = (tp.checklist||[]); }
   if (out.repeat && !out.due) out.due = t;
   return out;
 }
 function renderQuickPreview(){
   const v = $('quickIn').value.trim(), el = $('quickPrev');
-  if (!v){ el.innerHTML = '<span class="qp-help">Type a task and add details in the same line: <b>today</b>, <b>tomorrow</b>, <b>fri</b>, <b>30 sep</b>, <b>in 3d</b> · <b>15m 30m 1h 2h 4h 1d 2d</b> · <b>!high</b> · <b>@party</b> · <b>#workstream</b> · <b>every week</b> / <b>every monday</b> / <b>every month</b></span>'; return; }
+  if (!v){ el.innerHTML = '<span class="qp-help">Type a task and add details in the same line: <b>today</b>, <b>tomorrow</b>, <b>fri</b>, <b>30 sep</b>, <b>in 3d</b> · <b>15m 30m 1h 2h 4h 1d 2d</b> · <b>!high</b> · <b>@party</b> · <b>#workstream</b> · <b>every week</b> / <b>every monday</b> / <b>every month</b> · start with <b>/template</b></span>'; return; }
   const q = parseQuick(v), bits = [];
   bits.push(`<span class="qp-title">${esc(q.title || 'Untitled')}</span>`);
+  if (q.template) bits.push(`<span class="pill good">Template: ${esc(q.template.name)}${(q.checklist||[]).length ? ' · '+q.checklist.length+' steps' : ''}</span>`);
   if (q.due) bits.push(`<span class="pill neutral">📅 ${parse(q.due).toLocaleDateString(undefined,{weekday:'short', day:'numeric', month:'short'})}</span>`);
   if (q.effort) bits.push(`<span class="pill neutral">⏱ ${EFFORT_LABEL[q.effort]}</span>`);
   if (q.priority) bits.push(`<span class="pill ${q.priority==='Critical'||q.priority==='High' ? 'bad' : 'neutral'}">${q.priority}</span>`);
@@ -1553,7 +1681,7 @@ function renderQuickPreview(){
   bits.push(`<button type="button" class="link" id="quickMore">More details…</button>`);
   el.innerHTML = bits.join('');
 }
-function quickFields(){ const q = parseQuick($('quickIn').value.trim()); return { title: q.title, ...(q.due ? {due:q.due} : {due:''}), ...(q.effort?{effort:q.effort}:{}), ...(q.priority?{priority:q.priority}:{}), ...(q.party?{party:q.party}:{}), ...(q.stream?{stream:q.stream}:{}), ...(q.group?{group:q.group}:{}), ...(q.repeat?{repeat:q.repeat}:{}) }; }
+function quickFields(){ const q = parseQuick($('quickIn').value.trim()); return { title: q.title, ...(q.due ? {due:q.due} : {due:''}), ...(q.effort?{effort:q.effort}:{}), ...(q.priority?{priority:q.priority}:{}), ...(q.party?{party:q.party}:{}), ...(q.stream?{stream:q.stream}:{}), ...(q.group?{group:q.group}:{}), ...(q.repeat?{repeat:q.repeat}:{}), ...(q.checklist?{checklist:q.checklist.map(text => ({ id: uid(), text, done:false }))}:{}) }; }
 $('quickIn').addEventListener('input', renderQuickPreview);
 $('quickIn').addEventListener('focus', renderQuickPreview);
 $('quickPrev').addEventListener('click', e => { if (e.target.id === 'quickMore'){ const f = quickFields(); $('quickIn').value = ''; renderQuickPreview(); openModal(null, f); } });
@@ -1734,6 +1862,50 @@ document.getElementById('calView').onclick = e => { const b = e.target.closest('
 document.getElementById('calScope').onclick = e => { const b = e.target.closest('[data-cs]'); if (b){ UI.calScope = b.dataset.cs; saveUI(); renderCalendar(); } };
 document.getElementById('calDone').onchange = e => { UI.calDone = e.target.checked; saveUI(); renderCalendar(); };
 
+/* ---------- table view ---------- */
+UI.tblSort = UI.tblSort || 'due'; UI.tblDir = UI.tblDir || 1; UI.tblDone = !!UI.tblDone;
+const TCOLS = [['code','No.'],['title','Task'],['status','Status'],['priority','Priority'],['effort','Time'],['due','Due'],['party','Party'],['stream','Workstream'],['check','Checklist'],['repeat','Repeat'],['spent','Spent']];
+function renderTable(){
+  const v = view().filter(i => UI.tblDone || isOpen(i));
+  const key = UI.tblSort, dir = UI.tblDir;
+  const val = i => key==='priority' ? PRIORITIES.indexOf(i.priority) : key==='status' ? STATUSES.indexOf(i.status) : key==='effort' ? (EFFORT_MIN[i.effort]||99999) : key==='check' ? (i.checklist||[]).length : key==='spent' ? (i.spent||0) : key==='code' ? (+String(i.code).replace(/\D/g,'')||0) : String(i[key]||'￿').toLowerCase();
+  v.sort((a,b) => { const x = val(a), y = val(b); return (x < y ? -1 : x > y ? 1 : 0) * dir; });
+  const opts = (list, cur) => list.map(([k,l]) => `<option value="${esc(k)}" ${k===(cur||'')?'selected':''}>${esc(l)}</option>`).join('');
+  const t = today(), streams = streamsOf(P());
+  document.getElementById('tbl').innerHTML = `<thead><tr>${TCOLS.map(([k,l]) => `<th><button type="button" data-sort="${k}" class="${UI.tblSort===k?'on':''}">${l}${UI.tblSort===k ? (dir>0?' ▲':' ▼') : ''}</button></th>`).join('')}</tr></thead><tbody>` +
+    (v.length ? v.map(i => `<tr data-row="${i.id}" class="${isOpen(i)?'':'closed'} ${isOpen(i) && i.due && i.due < t ? 'late' : ''}">
+      <td class="mono">${i.code}</td>
+      <td><input data-f="title" value="${esc(i.title)}" aria-label="Task"></td>
+      <td><select data-f="status" class="st-${SLUG[i.status]}" aria-label="Status">${opts(STATUSES.map(x=>[x,x]), i.status)}</select></td>
+      <td><select data-f="priority" aria-label="Priority">${opts(PRIORITIES.map(x=>[x,x]), i.priority)}</select></td>
+      <td><select data-f="effort" aria-label="Time needed">${opts([['','–'], ...EFFORTS.map(([k,,l]) => [k,l])], i.effort)}</select></td>
+      <td><input type="date" data-f="due" value="${i.due||''}" aria-label="Due date"></td>
+      <td><input data-f="party" value="${esc(i.party||'')}" list="ptyList" aria-label="Party"></td>
+      <td><select data-f="stream" aria-label="Workstream">${opts(streams.map(x=>[x,x]), i.stream)}</select></td>
+      <td class="num">${(i.checklist||[]).length ? `${i.checklist.filter(c=>c.done).length}/${i.checklist.length}` : '–'}</td>
+      <td><select data-f="repeat" aria-label="Repeat">${opts(REPEATS.map(([k,l]) => [k, k ? l.replace('Every ','') : '–']), i.repeat)}</select></td>
+      <td class="num">${i.spent ? fmtMins(i.spent) : '–'}</td>
+    </tr>`).join('') : `<tr><td colspan="${TCOLS.length}" class="empty">No tasks in this view.</td></tr>`) + '</tbody>';
+  document.getElementById('tblDone').checked = UI.tblDone;
+  document.getElementById('tblSum').textContent = `${view().filter(isOpen).length} open task${view().filter(isOpen).length===1?'':'s'} in ${P().name}`;
+}
+const tblEl = document.getElementById('tbl');
+tblEl.addEventListener('click', e => { const b = e.target.closest('[data-sort]'); if (!b) return; if (UI.tblSort === b.dataset.sort) UI.tblDir *= -1; else { UI.tblSort = b.dataset.sort; UI.tblDir = 1; } renderTable(); });
+tblEl.addEventListener('change', e => {
+  const f = e.target.dataset.f, row = e.target.closest('[data-row]'); if (!f || !row) return;
+  const id = row.dataset.row, [it] = findItem(id), v = e.target.value; if (!it) return;
+  if (f === 'status') return setStatus(id, v);
+  if (f === 'due') return moveDue(id, v);
+  if (f === 'title' && !v.trim()){ e.target.value = it.title; return; }
+  it[f] = f==='title' || f==='party' ? v.trim() : v; save(); render(); toast(`${it.code} updated`);
+});
+tblEl.addEventListener('keydown', e => { if (e.key==='Enter' && e.target.matches('input[data-f]')) e.target.blur(); });
+document.getElementById('tblDone').onchange = e => { UI.tblDone = e.target.checked; renderTable(); };
+function setTblOpen(open, scroll){ const sec = document.getElementById('table'); sec.classList.toggle('folded', !open); document.getElementById('tblBar').setAttribute('aria-expanded', open); store.set(KEY+'-tblOpen', open ? '1' : ''); if (open && scroll) sec.scrollIntoView({behavior:'smooth'}); }
+setTblOpen(store.get(KEY+'-tblOpen') === '1');
+document.getElementById('tblBar').onclick = () => setTblOpen(document.getElementById('table').classList.contains('folded'));
+document.addEventListener('click', e => { if (e.target.closest('a[href="#table"]')) setTblOpen(true); });
+
 /* ---------- history ---------- */
 const HIST_PERIODS = [['7','7 days'],['30','30 days'],['90','90 days'],['year','This year'],['all','All']];
 UI.histPeriod = UI.histPeriod || '30'; UI.histSpace = UI.histSpace || 'all'; UI.histQ = '';
@@ -1791,7 +1963,7 @@ function renderHistory(){
             <div class="h-main"><button type="button" class="h-title" data-hopen="${i.id}"><i class="sq-${p.space} chip-sq" title="${esc(sp ? sp.name : '')}" aria-hidden="true"></i>${esc(i.title)}</button>
               <div class="h-meta"><span>${esc(sp ? sp.name : '')} › ${esc(p.name)}${i.stream ? ' › '+esc(i.stream) : ''}</span>${i.party ? `<span>${esc(i.party)}</span>` : ''}<span class="mono">${i.code}</span></div>
               ${i.closeNote ? `<p class="h-note">${esc(i.closeNote)}</p>` : ''}</div>
-            <div class="h-tags">${lb===null ? '' : lb <= 0 ? '<span class="pill good">On time</span>' : `<span class="pill bad">${lb}d late</span>`}<span class="pill neutral">${took ? took+'d' : 'Same day'}</span>${i.effort ? `<span class="pill neutral">⏱ ${EFFORT_LABEL[i.effort]}</span>` : ''}
+            <div class="h-tags">${lb===null ? '' : lb <= 0 ? '<span class="pill good">On time</span>' : `<span class="pill bad">${lb}d late</span>`}<span class="pill neutral">${took ? took+'d' : 'Same day'}</span>${i.effort ? `<span class="pill neutral">⏱ ${EFFORT_LABEL[i.effort]}</span>` : ''}${i.spent ? `<span class="pill neutral">▶ ${fmtMins(i.spent)} spent</span>` : ''}
               <span class="h-acts"><button type="button" class="link" data-hnote="${i.id}">${i.closeNote ? 'Edit note' : 'Add note'}</button><button type="button" class="link muted" data-hreopen="${i.id}">Reopen</button></span></div>
           </li>`; }).join('') + `</ul></div>`).join('') + `</section>`;
   }).join('');
@@ -1820,8 +1992,8 @@ document.getElementById('histList').addEventListener('click', e => {
 document.getElementById('histExport').onclick = () => {
   const rows = closedRecords();
   const cell = v => `"${String(v ?? '').replace(/"/g,'""')}"`;
-  const head = ['Closed on','Task no.','Task','Space','Project','Workstream','Group','Party','Priority','Due','Days late (negative = early)','Days to close','Time needed','Closing note'];
-  const lines = rows.map(({i,p}) => [i.resolved, i.code, i.title, (D.spaces.find(x=>x.id===p.space)||{}).name, p.name, i.stream, i.group, i.party, i.priority, i.due, lateBy(i) ?? '', Math.max(0, diff(i.since||i.resolved, i.resolved)), i.effort ? EFFORT_LABEL[i.effort] : '', i.closeNote].map(cell).join(','));
+  const head = ['Closed on','Task no.','Task','Space','Project','Workstream','Group','Party','Priority','Due','Days late (negative = early)','Days to close','Time needed','Time spent (min)','Closing note'];
+  const lines = rows.map(({i,p}) => [i.resolved, i.code, i.title, (D.spaces.find(x=>x.id===p.space)||{}).name, p.name, i.stream, i.group, i.party, i.priority, i.due, lateBy(i) ?? '', Math.max(0, diff(i.since||i.resolved, i.resolved)), i.effort ? EFFORT_LABEL[i.effort] : '', i.spent || '', i.closeNote].map(cell).join(','));
   const blob = new Blob(['﻿' + [head.map(cell).join(','), ...lines].join('\r\n')], {type:'text/csv;charset=utf-8'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `mk-space-history-${today()}.csv`;
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
@@ -1837,7 +2009,7 @@ function card(i){
     <h4>${esc(i.title)}</h4>
     <div class="grp">${esc(i.group || 'No group')} · ${esc(i.stream)}</div>
     ${i.status==='In Progress' ? `<div class="bar" title="${i.pct}% complete"><i style="width:${i.pct}%"></i></div>` : ''}
-    ${(i.checklist||[]).length || i.repeat ? `<div class="card-extra">${(i.checklist||[]).length ? `<span class="cl-chip ${i.checklist.every(c=>c.done)?'all':''}" title="Checklist">☑ ${i.checklist.filter(c=>c.done).length}/${i.checklist.length}</span>` : ''}${i.repeat ? `<span class="rep-chip" title="${REPEAT_LABEL[i.repeat]}">↻ ${REPEAT_LABEL[i.repeat].replace('Every ','')}</span>` : ''}</div>` : ''}
+    ${(i.checklist||[]).length || i.repeat || i.spent ? `<div class="card-extra">${i.spent ? `<span class="rep-chip" title="Time logged with the focus timer">▶ ${fmtMins(i.spent)}</span>` : ''}${(i.checklist||[]).length ? `<span class="cl-chip ${i.checklist.every(c=>c.done)?'all':''}" title="Checklist">☑ ${i.checklist.filter(c=>c.done).length}/${i.checklist.length}</span>` : ''}${i.repeat ? `<span class="rep-chip" title="${REPEAT_LABEL[i.repeat]}">↻ ${REPEAT_LABEL[i.repeat].replace('Every ','')}</span>` : ''}</div>` : ''}
     ${i.status==='Pending / Stuck' && i.reason ? `<div class="grp">⏸ ${esc(i.reason)}</div>` : ''}
     <div class="card-foot"><span class="avatar" style="background:${avColor(i.party)}" title="${esc(i.party)}">${initials(i.party)}</span>
       ${i.status==='Resolved' ? `<span class="due">Closed ${fmt(i.resolved)}</span>` : `<span class="due ${late?'late':''}">${late?'Overdue · ':'Due '}${fmt(i.due)}</span>`}
@@ -1884,6 +2056,11 @@ function openModal(id, preset = {}){
   $('fDue').value = it.due||''; $('fPct').value = it.pct||0; $('pctOut').textContent = (it.pct||0)+'%'; $('fNotes').value = it.notes||'';
   $('grpList').innerHTML = [...new Set(P().items.map(i=>i.group).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('');
   $('ptyList').innerHTML = [...new Set(P().items.map(i=>i.party).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('');
+  const tpls = D.templates || [];
+  $('tplPickWrap').hidden = !!editing || !tpls.length; $('tplDel').hidden = true;
+  $('tplPick').innerHTML = `<option value="">None</option>` + tpls.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('');
+  $('focusBox').hidden = !editing || !isOpen(editing);
+  if (editing) $('spentTxt').innerHTML = spentLine(editing);
   $('fRep').innerHTML = REPEATS.map(([k,l]) => `<option value="${k}" ${k===(it.repeat||'')?'selected':''}>${l}</option>`).join('');
   CL = (it.checklist || []).map(c => ({...c})); renderCL(); $('clNew').value = '';
   $('fClose').value = (editing && editing.closeNote) || '';
@@ -1894,6 +2071,27 @@ function openModal(id, preset = {}){
   $('overlay').hidden = false; setTimeout(() => $('fTitle').focus(), 0);
 }
 const closeModal = () => { $('overlay').hidden = true; editing = null; };
+// templates
+function applyTemplate(tp){
+  $('fTitle').value = tp.title || $('fTitle').value;
+  if (tp.effort !== undefined) $('fEff').value = tp.effort; if (tp.priority) $('fPri').value = tp.priority;
+  if (tp.party) $('fPty').value = tp.party; if (tp.group) $('fGrp').value = tp.group; $('fRep').value = tp.repeat || '';
+  if (tp.notes) $('fNotes').value = tp.notes;
+  CL = (tp.checklist || []).map(text => ({ id: uid(), text, done: false })); renderCL();
+}
+$('tplPick').onchange = e => { const tp = (D.templates||[]).find(x => x.id===e.target.value); $('tplDel').hidden = !tp; if (tp) applyTemplate(tp); };
+$('tplDel').onclick = () => { const id = $('tplPick').value, tp = (D.templates||[]).find(x => x.id===id); if (!tp) return;
+  D.templates = D.templates.filter(x => x.id !== id); save(); $('tplPick').querySelector(`option[value="${id}"]`)?.remove(); $('tplPick').value = ''; $('tplDel').hidden = true;
+  toast(`Template "${tp.name}" deleted`, () => { D.templates.push(tp); save(); }); };
+$('tplSave').onclick = () => {
+  const title = $('fTitle').value.trim(); if (!title) return toast('Give the task a title first.');
+  D.templates ||= [];
+  const tp = { id: uid(), name: title, title, effort: $('fEff').value, priority: $('fPri').value, party: $('fPty').value.trim(), group: $('fGrp').value.trim(), repeat: $('fRep').value, notes: $('fNotes').value.trim(), checklist: CL.map(c => c.text) };
+  const same = D.templates.findIndex(x => x.name.toLowerCase() === title.toLowerCase());
+  if (same >= 0) D.templates[same] = { ...tp, id: D.templates[same].id }; else D.templates.push(tp);
+  save(); toast(same >= 0 ? `Template "${title}" updated` : `Saved template "${title}". Use it from New task or type /${title.split(' ')[0].toLowerCase()} in Quick add.`);
+};
+$('focusStart').onclick = () => { if (editing){ const id = editing.id; closeModal(); Timer.start(id, +$('focusLen').value); } };
 // checklist editor (kept in CL until Save)
 let CL = [];
 function renderCL(){
@@ -2040,10 +2238,10 @@ const navLinks = [...document.querySelectorAll('.nav a')];
 const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(en => {
   if (en.isIntersecting) [...navLinks, ...document.querySelectorAll('#tabbar a')].forEach(a => a.classList.toggle('on', a.getAttribute('href')==='#'+en.target.id));
 }), {rootMargin:'-40% 0px -55% 0px'}) : null;
-if (io) ['today','trend','focus','balance','ideas','calendar','board','history'].forEach(id => io.observe(document.getElementById(id)));
+if (io) ['today','trend','focus','balance','ideas','calendar','table','board','history'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.10.02-1';
+const APP_VERSION = '2026.10.03-1';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');
@@ -2284,7 +2482,7 @@ function render(){
   const h = new Date().getHours();
   $('greet').textContent = `${h<12?'Good morning':h<17?'Good afternoon':'Good evening'}, ${D.name||'MK'}`;
   $('dateNow').textContent = new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-  renderSpaces(); renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard(); renderCalendar(); renderHistory();
+  renderSpaces(); renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard(); renderCalendar(); renderTable(); renderHistory();
 }
 if (matchMedia('(max-width:640px)').matches) $('q').placeholder = 'Search';
 load(); render(); Cloud.init(); checkForUpdate();

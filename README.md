@@ -164,17 +164,16 @@ tables, charts, badges.
 `https://mkhushfeh.github.io/pending-tracker/mk-space/`. It starts with three empty projects;
 the example tasks from earlier versions are removed automatically on first open.
 
-**Saving and sync:** every change is saved on the device right away. Tap **Save** (or **Refresh**,
-the circular arrows next to it) once per device to connect Google Drive (same Google setup as
+**Saving and sync:** every change is saved on the device right away. Tap **Sync** (top bar) once per device to connect Google Drive (same Google setup as
 Pending Tracker). After that:
 
 - Changes upload about a second after you make them, and again when you leave or close the page.
 - Each device loads the latest copy when it opens, when you come back to it, every minute while
-  open, and whenever you tap **Refresh**.
+  open, and whenever you tap **Sync**.
 - Devices merge task by task: edits made on different devices are all kept, and a task deleted
   on one device is deleted everywhere. The Drive file is `mk-space-data.json`.
-- **Refresh** also checks for a newer version of the app and reloads it, so a phone's home-screen
-  app never keeps running an old copy.
+- The **Sync** button does everything in one tap: keeps your changes on the device, loads a newer
+  version of the app if there is one, and syncs with Google Drive (signing in first if needed).
 
 **Staying connected:** MK Space always opens instantly with the tasks saved on the device. While
 its Google access is valid (about an hour after a sign-in) it syncs automatically. After that, a

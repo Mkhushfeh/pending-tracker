@@ -204,3 +204,9 @@ time of their open tasks.
 at commit `9fa8890`. Both versions use the same saved data, so you can switch between them. To go
 back for good, copy `mk-space-v1/index.html` over `mk-space/index.html`.
 
+**Spaces:** the four squares of the MK Space logo are four spaces, each with its own projects and
+colour: **Work** (blue, your existing projects), **Personal** (teal), **Home** (magenta) and
+**Growth** (orange). Switch by tapping a square or a space name under the logo (on a phone, the
+row of space buttons at the top). Rename a space with the ✎ next to its name above the project
+tabs. Each space remembers the project you last opened, and everything syncs as before.
+

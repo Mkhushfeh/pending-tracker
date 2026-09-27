@@ -210,3 +210,12 @@ colour: **Work** (blue, your existing projects), **Personal** (teal), **Home** (
 row of space buttons at the top). Rename a space with the ✎ next to its name above the project
 tabs. Each space remembers the project you last opened, and everything syncs as before.
 
+**History (closed tasks):** the *History* section lists everything you have closed, across all
+four spaces, newest first, grouped by month and day. Filter by period (7 days, 30 days, 90 days,
+this year, all) and by space, or search. Each entry shows its space, project and workstream, the
+party, whether it closed on time or how many days late, how many days it took, its time needed and
+an optional closing note (*Add note*). Tap a title to open the task; *Reopen* moves it back to In
+Progress. The summary shows closed count, on-time share, average days to close and time spent.
+*Export (CSV)* downloads the filtered list for Excel. Every task also records its status changes
+with date and time, shown as *Status history* in the task form.
+

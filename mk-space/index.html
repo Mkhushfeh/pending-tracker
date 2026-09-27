@@ -213,8 +213,9 @@ button{cursor:pointer}
 .save-btn[data-state="warn"] .sdot{background:var(--s-stk)}
 .sync-txt{order:-1;font-size:12px;color:var(--text-3);white-space:nowrap;line-height:1}
 .menu-btn,.tabbar,.fab,.scrim{display:none}
-#refreshBtn svg{transition:transform .2s}
-#refreshBtn.spin svg{animation:spin 1s linear infinite}
+.save-btn .sync-ico{transition:transform .2s}
+.save-btn.spin .sync-ico{animation:spin 1s linear infinite}
+@media (prefers-reduced-motion:reduce){.save-btn.spin .sync-ico{animation:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .sync-banner{display:flex;align-items:center;gap:10px;background:var(--s-prg-bg);color:var(--s-prg-ink);border-radius:14px;padding:10px 12px 10px 16px;font-size:13.5px;font-weight:500}
 .sync-banner span{flex:1;min-width:0}
@@ -741,8 +742,7 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
     <div class="topbar">
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Search tasks, tags, parties…" aria-label="Search"></label>
-      <div class="save-wrap"><button class="save-btn" id="saveBtn" data-state="local"><span class="sdot" aria-hidden="true"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3v5h8V3M7 21v-7h10v7"/></svg><span id="saveLbl">Save</span></button><span class="sync-txt" id="syncTxt">This device only</span></div>
-      <button class="icon-btn" id="refreshBtn" aria-label="Refresh: load the latest data and app version" title="Refresh: load the latest data and app version"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 21v-5h-5"/></svg></button>
+      <div class="save-wrap"><button class="save-btn" id="saveBtn" data-state="local"><span class="sdot" aria-hidden="true"></span><svg class="sync-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 21v-5h-5"/></svg><span id="saveLbl">Sync</span></button><span class="sync-txt" id="syncTxt">This device only</span></div>
       <button class="icon-btn" id="themeBtn" aria-label="Switch light or dark theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
     </div>
 
@@ -2267,7 +2267,7 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.
 if (io) ['today','trend','focus','balance','ideas','calendar','table','board','history'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.10.04-2';
+const APP_VERSION = '2026.10.04-3';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');
@@ -2299,17 +2299,17 @@ const Cloud = (() => {
   function status(st){
     const t = hhmm(lastAt);
     const map = {
-      local:    ['Save', 'Saved on this device only. Tap Save to sync with your Google Drive.', 'local', 'This device only'],
-      pending:  ['Save', 'Changes waiting to upload', 'pending', 'Unsaved changes'],
-      syncing:  ['Saving…', 'Syncing with Google Drive', 'pending', 'Syncing…'],
-      synced:   ['Saved', `Synced with Google Drive${t ? ' at '+t : ''}`, 'ok', `Synced ${t}`],
-      reconnect:['Save', 'Google sign-in expired. Tap Save or Refresh to sync.', 'warn', 'Sign-in expired'],
+      local:    ['Sync', 'Saved on this device only. Tap Sync to connect Google Drive.', 'local', 'This device only'],
+      pending:  ['Sync', 'Changes waiting to upload. Tap to sync now.', 'pending', 'Changes to upload'],
+      syncing:  ['Syncing…', 'Syncing with Google Drive', 'pending', 'Syncing…'],
+      synced:   ['Synced', `Synced with Google Drive${t ? ' at '+t : ''}. Tap to check for newer changes.`, 'ok', `Synced ${t}`],
+      reconnect:['Sync', 'Tap to sign in and sync with Google Drive.', 'warn', 'Tap to sync'],
       error:    ['Retry', 'Could not reach Google Drive. Your changes are safe on this device.', 'warn', 'Offline, saved here'],
     };
     const [label, title, cls, small] = map[st];
     const b = $('saveBtn'); b.dataset.state = cls; b.title = title; b.setAttribute('aria-label', label+'. '+title);
     $('saveLbl').textContent = label; $('syncTxt').textContent = small;
-    $('refreshBtn').classList.toggle('spin', st === 'syncing');
+    $('saveBtn').classList.toggle('spin', st === 'syncing');
     $('syncInfo').textContent = st==='synced' ? `Google Drive: synced ${t}` : st==='local' ? 'Google Drive: not connected on this device' : `Google Drive: ${small.toLowerCase()}${t ? ' (last sync '+t+')' : ''}`;
     const showBanner = (st === 'reconnect' || st === 'error' || (st === 'local' && store.get(KEY+'-bannerOff') !== '1'));
     $('syncBanner').hidden = !showBanner;
@@ -2474,13 +2474,14 @@ const Cloud = (() => {
     if (!res) return;
     toast(res.changedHere ? 'Loaded the latest changes from your other devices' : `Up to date. Synced at ${hhmm(lastAt)}`);
   }
-  // Save button: keep it here, then sync (signs in first if needed).
-  function saveNow(){ writeLocal(); if (token) sync().then(report); else { onDone = report; connect(); } }
-  // Refresh button: get the newest app version, then the newest data.
-  async function refresh(){
+  // The Sync button does everything: keeps changes on this device, loads a newer app version
+  // if there is one, then syncs with Google Drive (signing in first if needed).
+  async function saveNow(){
+    writeLocal();
     if (await checkForUpdate()) return;
-    if (token) sync().then(report); else { onDone = report; connect(); }
+    if (token) sync().then(report); else { store.set(KEY+'-redirectBroken', ''); onDone = report; connect(); }
   }
+  const refresh = saveNow;
   function init(){
     if (store.get(KEY+'-redirectFix') !== '1'){ store.set(KEY+'-redirectBroken', ''); store.set(KEY+'-redirectFails', '0'); store.set(KEY+'-redirectFix', '1'); }
     const back = readRedirectResult();
@@ -2501,14 +2502,13 @@ const Cloud = (() => {
     setInterval(() => { if (token && document.visibilityState==='visible' && !pending) sync(); }, 60000);
     addEventListener('online', () => { if (token) sync(); });
     // A tap on Sync now always tries the full-page sign-in again (e.g. right after the address was added in Google Cloud).
-    $('bannerBtn').onclick = () => { if (token) sync().then(report); else { store.set(KEY+'-redirectBroken', ''); onDone = report; connect(); } };
+    $('bannerBtn').onclick = () => saveNow();        // same action as the Sync button
     $('autoOpen').checked = autoSignIn();
     $('autoOpen').onchange = e => { store.set(KEY+'-autoOpen', e.target.checked ? '1' : ''); toast(e.target.checked ? 'MK Space will sign in to Google each time it opens' : 'MK Space will open instantly; tap Sync when you need the latest'); };
     $('bannerX').onclick = () => { store.set(KEY+'-bannerOff','1'); $('syncBanner').hidden = true; };
   }
   return { queue, saveNow, refresh, init };
 })();
-$('refreshBtn').onclick = () => Cloud.refresh();
 document.getElementById('saveBtn').onclick = () => Cloud.saveNow();
 addEventListener('keydown', e => { if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){ e.preventDefault(); Cloud.saveNow(); } });
 

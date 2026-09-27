@@ -241,3 +241,16 @@ progress such as ☑ 2/5.
 task keeps it in History and creates the next one with the next due date and a fresh checklist.
 Monthly and yearly repeats keep the same day of the month.
 
+**Focus timer:** start a 15, 25 or 50 minute focus on a task from the task form (*Start focus*) or
+the ▶ button in *Today's focus*. A timer bar shows the countdown (pause, +5 minutes, *Stop & log*).
+The time is logged on the task (*Spent*), shown on the card, in the task form against its time
+needed, in History and in the CSV export. It keeps running if you reload the page.
+
+**Table view:** the *Table* section (folded by default) lists the current project's tasks like a
+spreadsheet. Change the title, status, priority, time, due date, party, workstream or repeat right
+in the cell; click a column name to sort; tick *Show closed* to include finished tasks.
+
+**Templates:** in the task form, *Save as template* keeps the title, time, priority, party, group,
+repeat and checklist. Start a new task from it with *Start from template* in the form, or type
+`/name` at the start of Quick add (for example `/loop PT-202 tomorrow`).
+

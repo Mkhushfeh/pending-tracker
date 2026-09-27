@@ -338,6 +338,14 @@ button.legend-item{background:none;border:0;padding:0;color:inherit;font:inherit
 .effort-chip{font:inherit;font-size:11px;font-weight:600;color:var(--text-2);background:var(--panel-2);border:1px solid var(--border-2);border-radius:999px;padding:1px 8px;white-space:nowrap;line-height:1.5}
 button.effort-chip{cursor:pointer}
 button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
+.eff-group{display:inline-flex;align-items:center}
+.eff-group .effort-chip{border-top-right-radius:0;border-bottom-right-radius:0}
+.eff-play{display:inline-grid;place-items:center;height:21px;width:24px;padding:0;border:1px solid var(--border-2);border-left:0;border-radius:0 999px 999px 0;background:var(--panel-2);color:var(--ink);cursor:pointer}
+.eff-play svg{width:10px;height:10px;margin-left:1px}
+.eff-play:hover{background:var(--ink);color:var(--ink-text);border-color:var(--ink)}
+.eff-play.on{background:var(--ink);color:var(--ink-text);border-color:var(--ink);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.55}}
+@media (prefers-reduced-motion:reduce){.eff-play.on{animation:none}}
 .effort-chip.unset{background:none;border-style:dashed;color:var(--text-3);font-weight:500}
 .fi-meta .effort-chip{font-size:11px;padding:0 7px;margin-right:2px}
 .eff-pop{position:fixed;z-index:70;background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:10px;box-shadow:0 12px 32px rgba(0,0,0,.2);width:236px;display:flex;flex-direction:column;gap:8px}
@@ -415,7 +423,7 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 .rep-chip{color:var(--link)}
 
 /* calendar */
-.cal-bar{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:0;text-align:left;color:var(--text)}
+.cal-bar{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:0;text-align:left;color:var(--text);min-width:0}
 .cal-ico{width:20px;height:20px;color:var(--ink);flex:none}
 .cal-bar-t{font-size:16px;font-weight:600}
 .cal-bar-s{font-size:12.5px;color:var(--text-3);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -427,7 +435,13 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 .folded .cal-bar-a svg{transform:none}
 .folded .cal-body{display:none}
 .panel:not(.folded) > .cal-bar{margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border-2)}
-.panel.folded{padding-block:14px}
+.panel.folded{padding:7px 8px 7px 14px;border-radius:14px}
+.panel.folded .cal-bar-t{font-size:14px}
+.panel.folded .cal-ico{width:17px;height:17px}
+.panel.folded .cal-bar-a{padding:3px 9px;font-size:12px}
+.fold-row{display:flex;gap:14px;flex-wrap:wrap}
+.fold-row > .panel{flex:1 1 320px;min-width:0}
+.fold-row > .panel:not(.folded){flex-basis:100%}
 .cal-head{align-items:center}
 .cal-nav{display:flex;align-items:center;gap:8px}
 .cal-nav h2{min-width:170px;text-align:center}
@@ -813,6 +827,7 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       </div>
     </section>
 
+    <div class="fold-row">
     <section class="panel folded" id="calendar">
       <button type="button" class="cal-bar" id="calBar" aria-expanded="false" aria-controls="calBody">
         <svg class="cal-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
@@ -847,6 +862,8 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       </div>
     </section>
 
+    </div>
+
     <section class="panel" id="board">
       <div class="ph"><h2>Task board</h2><span class="hint"><span class="hint-desk">Drag cards between columns, or open a card to change its status</span><span class="hint-touch" style="display:none">Swipe across the columns. Tap a card to change its status.</span></span></div>
       <div class="board-wrap"><div class="board" id="boardEl"></div></div>
@@ -873,7 +890,7 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       <button type="button" class="link muted" id="tplDel" hidden>Delete this template</button></div>
     <div class="focus-box" id="focusBox" hidden>
       <span id="spentTxt"></span>
-      <span class="fb-acts"><select id="focusLen" aria-label="Focus length"><option value="15">15 min</option><option value="25" selected>25 min</option><option value="50">50 min</option></select><button type="button" class="btn sm primary" id="focusStart"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg> Start focus</button></span>
+      <span class="fb-acts"><select id="focusLen" aria-label="Focus length"><option value="15">15 min</option><option value="25" selected>25 min</option><option value="30">30 min</option><option value="50">50 min</option><option value="60">1 hour</option></select><button type="button" class="btn sm primary" id="focusStart"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg> Start focus</button></span>
     </div>
     <div class="fgrid">
       <label class="field full">Item / task<input id="fTitle" required autocomplete="off"></label>
@@ -1506,14 +1523,14 @@ function renderFocus(){
     return `<span class="pill neutral">${i.priority}</span>`; };
   document.getElementById('focusList').innerHTML = list.length ? list.map(i => `
     <li class="focus-item"><button class="check" data-close="${i.id}" aria-label="Close ${esc(i.title)}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5L20 7"/></svg></button>
-      <div style="min-width:0"><div class="fi-title" data-open="${i.id}">${esc(i.title)}</div><div class="fi-meta">${effortBtn(i)} <span class="mono">${i.code}</span> · ${esc(i.party||'No party')} · ${esc(i.status)}</div></div><span class="fi-r">${why(i)}<button type="button" class="play" data-focus-start="${i.id}" title="Start a 25 min focus on this task" aria-label="Start focus on ${esc(i.title)}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button></span></li>`).join('')
+      <div style="min-width:0"><div class="fi-title" data-open="${i.id}">${esc(i.title)}</div><div class="fi-meta">${effortBtn(i)} <span class="mono">${i.code}</span> · ${esc(i.party||'No party')} · ${esc(i.status)}</div></div><span class="fi-r">${why(i)}<button type="button" class="play" data-focus-start="${i.id}" title="Start a focus session on this task" aria-label="Start focus on ${esc(i.title)}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button></span></li>`).join('')
     : `<li class="empty">${cap ? `No open tasks of ${EFFORT_LABEL[UI.focusTime]}. Set "Time needed" on your tasks to use this.` : 'Nothing urgent. Pick something from the board.'}</li>`;
 }
 document.getElementById('focusTime').addEventListener('click', e => {
   const b = e.target.closest('[data-ft]'); if (!b) return; UI.focusTime = b.dataset.ft; saveUI(); renderFocus();
 });
 document.getElementById('focusList').addEventListener('click', e => {
-  const f = e.target.closest('[data-focus-start]'); if (f) return Timer.start(f.dataset.focusStart, 25);
+  const f = e.target.closest('[data-focus-start]'); if (f) return Timer.start(f.dataset.focusStart, focusLen(findItem(f.dataset.focusStart)[0]));
   const c = e.target.closest('[data-close]'); if (c) return setStatus(c.dataset.close, 'Resolved');
   const o = e.target.closest('[data-open]'); if (o) openModal(o.dataset.open);
 });
@@ -1573,6 +1590,8 @@ document.getElementById('ideaList').addEventListener('click', e => {
 });
 
 /* ---------- focus timer (logs real time on a task) ---------- */
+// Session length follows the task's time needed: 15 / 30 min / 1 hour; longer or unset → 25 min.
+const focusLen = it => ({ '15m':15, '30m':30, '1h':60 })[it && it.effort] || 25;
 function spentLine(it){
   const sp = it.spent || 0, need = EFFORT_MIN[it.effort] || 0;
   if (!sp) return need ? `No time logged yet · ${EFFORT_LABEL[it.effort]} needed` : 'No time logged yet';
@@ -1590,7 +1609,7 @@ const Timer = (() => {
   function finish(done){
     if (!st) return;
     const min = done ? st.min : Math.round(elapsed() / 60000), it = log(min), code = it ? it.code : '';
-    st = null; persist(); draw();
+    st = null; persist(); draw(); renderBoard();
     if (done){ toast(`Focus done: ${min} min logged on ${code}`); try { navigator.vibrate && navigator.vibrate([200,100,200]); } catch(e){}
       try { if ('Notification' in window && Notification.permission === 'granted') new Notification('Focus session done', { body: `${min} min logged on ${code}`, tag: 'mk-focus' }); } catch(e){} }
     else toast(min >= 1 ? `${min} min logged on ${code}` : 'Timer stopped, under a minute so nothing logged');
@@ -1610,7 +1629,7 @@ const Timer = (() => {
     if (st && st.id !== id) finish(false);
     st = { id, min, start: Date.now(), pausedTotal: 0 }; persist();
     try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch(e){}
-    clearInterval(tick); tick = setInterval(draw, 1000); draw();
+    clearInterval(tick); tick = setInterval(draw, 1000); draw(); renderBoard();
     const [it] = findItem(id); toast(`Focus started: ${min} min on ${it ? it.code : ''}`);
   }
   $('tmPause').onclick = () => { if (!st) return; if (st.paused){ st.pausedTotal += Date.now() - st.paused; delete st.paused; } else st.paused = Date.now(); persist(); draw(); };
@@ -1618,7 +1637,7 @@ const Timer = (() => {
   $('tmStop').onclick = () => finish(false);
   $('tmTask').onclick = () => { if (st){ const it = goToItem(st.id); if (it) openModal(it.id); } };
   if (st){ tick = setInterval(draw, 1000); setTimeout(draw, 0); }
-  return { start };
+  return { start, current: () => st && st.id };
 })();
 
 /* ---------- quick add (type one line) ---------- */
@@ -2005,7 +2024,7 @@ function card(i){
   const t = today(), late = i.due && i.due < t && isOpen(i);
   const age = isOpen(i) ? diff(i.moved, t) : null;
   return `<article class="card" draggable="true" data-id="${i.id}" tabindex="0">
-    <div class="card-top"><span class="mono">${i.code}</span>${isOpen(i) ? effortBtn(i) : (i.effort ? `<span class="effort-chip">⏱ ${EFFORT_LABEL[i.effort]}</span>` : '')}<span class="prio ${i.priority}">${i.priority}</span></div>
+    <div class="card-top"><span class="mono">${i.code}</span>${isOpen(i) ? `<span class="eff-group">${effortBtn(i)}<button type="button" class="eff-play ${Timer.current()===i.id?'on':''}" data-focus-start="${i.id}" title="${Timer.current()===i.id ? 'Focus running on this task' : 'Start a '+focusLen(i)+' min focus'}" aria-label="Start focus on ${esc(i.title)}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button></span>` : (i.effort ? `<span class="effort-chip">⏱ ${EFFORT_LABEL[i.effort]}</span>` : '')}<span class="prio ${i.priority}">${i.priority}</span></div>
     <h4>${esc(i.title)}</h4>
     <div class="grp">${esc(i.group || 'No group')} · ${esc(i.stream)}</div>
     ${i.status==='In Progress' ? `<div class="bar" title="${i.pct}% complete"><i style="width:${i.pct}%"></i></div>` : ''}
@@ -2029,6 +2048,7 @@ function renderBoard(){
 }
 const boardEl = document.getElementById('boardEl');
 boardEl.addEventListener('click', e => {
+  const fp = e.target.closest('[data-focus-start]'); if (fp){ e.stopPropagation(); const [it] = findItem(fp.dataset.focusStart); if (Timer.current() === fp.dataset.focusStart) return; return Timer.start(fp.dataset.focusStart, focusLen(it)); }
   const a = e.target.closest('[data-add]'); if (a) return openModal(null, {status: a.dataset.add});
   const m = e.target.closest('[data-more]'); if (m){ UI.showAll[m.dataset.more] = !UI.showAll[m.dataset.more]; return renderBoard(); }
   const c = e.target.closest('.card'); if (c) openModal(c.dataset.id);
@@ -2060,6 +2080,7 @@ function openModal(id, preset = {}){
   $('tplPickWrap').hidden = !!editing || !tpls.length; $('tplDel').hidden = true;
   $('tplPick').innerHTML = `<option value="">None</option>` + tpls.map(x => `<option value="${x.id}">${esc(x.name)}</option>`).join('');
   $('focusBox').hidden = !editing || !isOpen(editing);
+  if (editing) $('focusLen').value = String(focusLen(editing));
   if (editing) $('spentTxt').innerHTML = spentLine(editing);
   $('fRep').innerHTML = REPEATS.map(([k,l]) => `<option value="${k}" ${k===(it.repeat||'')?'selected':''}>${l}</option>`).join('');
   CL = (it.checklist || []).map(c => ({...c})); renderCL(); $('clNew').value = '';
@@ -2241,7 +2262,7 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.
 if (io) ['today','trend','focus','balance','ideas','calendar','table','board','history'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.10.03-1';
+const APP_VERSION = '2026.10.03-2';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');

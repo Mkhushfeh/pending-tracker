@@ -2262,7 +2262,7 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.
 if (io) ['today','trend','focus','balance','ideas','calendar','table','board','history'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.10.03-2';
+const APP_VERSION = '2026.10.03-3';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');
@@ -2479,7 +2479,8 @@ const Cloud = (() => {
     addEventListener('beforeunload', e => { if (token && pending){ flush(); e.preventDefault(); e.returnValue = ''; } });
     setInterval(() => { if (token && document.visibilityState==='visible' && !pending) sync(); }, 60000);
     addEventListener('online', () => { if (token) sync(); });
-    $('bannerBtn').onclick = () => { if (token) sync().then(report); else { onDone = report; connect(); } };
+    // A tap on Sync now always tries the full-page sign-in again (e.g. right after the address was added in Google Cloud).
+    $('bannerBtn').onclick = () => { if (token) sync().then(report); else { store.set(KEY+'-redirectBroken', ''); onDone = report; connect(); } };
     $('bannerX').onclick = () => { store.set(KEY+'-bannerOff','1'); $('syncBanner').hidden = true; };
   }
   return { queue, saveNow, refresh, init };

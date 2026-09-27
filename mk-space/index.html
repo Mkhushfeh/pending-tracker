@@ -2262,14 +2262,15 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.
 if (io) ['today','trend','focus','balance','ideas','calendar','table','board','history'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.10.03-3';
+const APP_VERSION = '2026.10.04-1';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');
     const html = await fetch(path + 'index.html?check=' + Date.now(), {cache:'no-store'}).then(r => r.ok ? r.text() : '');
     const m = html.match(/const APP_VERSION = '([^']+)'/);
-    if (m && m[1] !== APP_VERSION && sessionStorage.getItem('mk-reloaded') !== m[1]){
-      sessionStorage.setItem('mk-reloaded', m[1]); writeLocal();
+    const signingIn = window.__mkLeaving || Date.now() - (+(store.get(KEY+'-redirectPending') || 0)) < 120000;
+    if (m && m[1] !== APP_VERSION && sessionStorage.getItem('mk-reloaded') !== m[1] && !signingIn){
+      sessionStorage.setItem('mk-reloaded', m[1]); sessionStorage.setItem('mk-update-reload', '1'); writeLocal();
       location.replace(path + 'index.html?v=' + m[1]); return true;
     }
   } catch(e){}
@@ -2310,7 +2311,7 @@ const Cloud = (() => {
     $('bannerMsg').textContent = st==='local' ? 'This device is not syncing yet. Connect Google Drive to see the same tasks on every device.'
       : st==='error' ? 'Could not reach Google Drive. Your changes are kept on this device.'
       : redirectWorks() ? 'Sign in again to load your latest tasks from other devices.'
-      : 'Sign in again to sync. For automatic sign-in, add the MK Space address in Google Cloud (see README).';
+      : 'Sign in again to sync your latest tasks.';
     $('bannerBtn').textContent = st==='error' ? 'Retry' : st==='local' ? 'Connect' : 'Sync now';
   }
   function keepToken(t, sec){ token = t; store.set(KEY+'-token', t); store.set(KEY+'-tokenExp', String(Date.now() + (+sec||3500)*1000)); store.set(KEY+'-cloud','1'); planRenewal(); rememberAccount(); }
@@ -2398,6 +2399,7 @@ const Cloud = (() => {
   const redirectWorks = () => !(Date.now() - (+(store.get(KEY+'-redirectBroken')||0)) < 86400000);   // retried after a day
   function signInRedirect(silent){
     const state = Math.random().toString(36).slice(2);
+    window.__mkLeaving = true;
     store.set(KEY+'-oauthState', state); store.set(KEY+'-redirectPending', String(Date.now())); writeLocal(); flush();
     try { sessionStorage.setItem('mk-scroll', String(scrollY)); } catch(e){}
     const q = new URLSearchParams({ client_id: GOOGLE_CLIENT_ID, redirect_uri: redirectUri(), response_type: 'token', scope: DRIVE_SCOPE, include_granted_scopes: 'true', state });
@@ -2412,7 +2414,15 @@ const Cloud = (() => {
     const hasResult = location.hash.includes('access_token=') || location.hash.includes('error=');
     // Went to Google but came back without an answer (e.g. Google showed an error page and the
     // user went back): the return address is not set up, so stop using the full-page sign-in.
-    if (!hasResult){ if (started && Date.now() - started < 15*60000) store.set(KEY+'-redirectBroken', String(Date.now())); return false; }
+    let updateReload = false; try { updateReload = sessionStorage.getItem('mk-update-reload') === '1'; sessionStorage.removeItem('mk-update-reload'); } catch(e){}
+    if (!hasResult){
+      if (started && !updateReload && Date.now() - started < 15*60000){
+        const fails = +(store.get(KEY+'-redirectFails') || 0) + 1; store.set(KEY+'-redirectFails', String(fails));
+        if (fails >= 2) store.set(KEY+'-redirectBroken', String(Date.now()));
+      }
+      return false;
+    }
+    store.set(KEY+'-redirectFails', '0');
     const h = new URLSearchParams(location.hash.slice(1));
     history.replaceState(null, '', location.pathname + location.search);
     try { const y = +sessionStorage.getItem('mk-scroll'); if (y) setTimeout(() => scrollTo(0, y), 0); } catch(e){}
@@ -2462,6 +2472,7 @@ const Cloud = (() => {
     if (token) sync().then(report); else { onDone = report; connect(); }
   }
   function init(){
+    if (store.get(KEY+'-redirectFix') !== '1'){ store.set(KEY+'-redirectBroken', ''); store.set(KEY+'-redirectFails', '0'); store.set(KEY+'-redirectFix', '1'); }
     const back = readRedirectResult();
     restoreToken();
     let quiet = false; try { quiet = sessionStorage.getItem('mk-silent') === '1'; sessionStorage.removeItem('mk-silent'); } catch(e){}

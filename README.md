@@ -219,7 +219,8 @@ Progress. The summary shows closed count, on-time share, average days to close a
 *Export (CSV)* downloads the filtered list for Excel. Every task also records its status changes
 with date and time, shown as *Status history* in the task form.
 
-**Calendar:** the *Calendar* section shows tasks on their due dates, in a Month or Week view, for
+**Calendar:** the *Calendar* section starts folded as a slim bar (with a one-line summary); click the bar
+or the Calendar link to open it, and *Fold* to close it again. Open, it shows tasks on their due dates, in a Month or Week view, for
 this project, this space or all spaces (with *Show closed* to include finished ones). Drag a task
 to another day to change its due date, or tap it to move it to Today, Tomorrow, +1 day, +1 week,
 Next Monday, a picked date or no date, to open it, or to mark it done. Tasks without a due date wait

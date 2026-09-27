@@ -54,6 +54,19 @@
   --heat-0:#1a3150; --heat-1:#173a30; --heat-2:#1d5f49; --heat-3:#2a9a6f; --heat-4:#63d6a6;
   --grid:#1a3150; --shadow:0 1px 2px rgba(0,0,0,.3);
 }
+/* each space tints the accent, sidebar and page */
+:root[data-space="personal"]{ --ink:#0e7f81; --ink-soft:#d5f0ef; --link:#0b6f71; --side:#d6eeec; --side-2:#c3e4e1; --side-border:#aed6d2; --bg:#eaf6f5; }
+:root[data-space="home"]{ --ink:#b0307a; --ink-soft:#f6ddeb; --link:#9c2a6c; --side:#f5dfeb; --side-2:#edccde; --side-border:#e1b5cd; --bg:#fbf0f5; }
+:root[data-space="growth"]{ --ink:#b84e14; --ink-soft:#fae3d4; --link:#a94a16; --side:#f8e6da; --side-2:#f1d3bf; --side-border:#e6bea2; --bg:#fcf3ec; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"])[data-space="personal"]{ --ink:#4fd1c5; --ink-soft:#123a3a; --link:#7fe0d6; --side:#0c2524; --side-2:#123533; --side-border:#1b4744; }
+  :root:not([data-theme="light"])[data-space="home"]{ --ink:#f07ab8; --ink-soft:#3a1730; --link:#f5a3cd; --side:#2a1422; --side-2:#3a1c2f; --side-border:#4d2640; }
+  :root:not([data-theme="light"])[data-space="growth"]{ --ink:#f59e5b; --ink-soft:#3a2513; --link:#f8bb8a; --side:#2b1a10; --side-2:#3a2416; --side-border:#4d311d; }
+  :root:not([data-theme="light"])[data-space]{ --bg:#0b1826; }
+}
+:root[data-theme="dark"][data-space="personal"]{ --ink:#4fd1c5; --ink-soft:#123a3a; --link:#7fe0d6; --side:#0c2524; --side-2:#123533; --side-border:#1b4744; --bg:#0b1826; }
+:root[data-theme="dark"][data-space="home"]{ --ink:#f07ab8; --ink-soft:#3a1730; --link:#f5a3cd; --side:#2a1422; --side-2:#3a1c2f; --side-border:#4d2640; --bg:#0b1826; }
+:root[data-theme="dark"][data-space="growth"]{ --ink:#f59e5b; --ink-soft:#3a2513; --link:#f8bb8a; --side:#2b1a10; --side-2:#3a2416; --side-border:#4d311d; --bg:#0b1826; }
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--text);font:14px/1.45 var(--f-ui);-webkit-font-smoothing:antialiased}
@@ -68,8 +81,24 @@ button{cursor:pointer}
 .shell{display:grid;grid-template-columns:288px minmax(0,1fr);min-height:100vh}
 .side{background:var(--side);color:var(--side-text);padding:22px 18px;display:flex;flex-direction:column;gap:18px;border-right:1px solid var(--side-border);position:sticky;top:0;height:100vh;overflow-y:auto}
 .brand{display:flex;align-items:center;gap:10px;padding:0 6px}
-.brand-mark{display:grid;grid-template-columns:repeat(2,9px);gap:3px}
-.brand-mark i{width:9px;height:9px;border-radius:3px;display:block}
+.brand-mark{display:grid;grid-template-columns:repeat(2,12px);gap:3px}
+.sq{width:12px;height:12px;border-radius:4px;border:0;padding:0;opacity:.45;transition:opacity .15s,transform .15s}
+.sq:hover{opacity:.8;transform:scale(1.12)}
+.sq.on{opacity:1;box-shadow:0 0 0 2px var(--side),0 0 0 3.5px currentColor}
+.sq-work{background:#1c6dd0;color:#1c6dd0} .sq-personal{background:#0e8a8c;color:#0e8a8c} .sq-home{background:#b8327f;color:#b8327f} .sq-growth{background:#c85a17;color:#c85a17}
+.spaces{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.space{display:flex;align-items:center;gap:8px;border:1px solid transparent;background:none;border-radius:11px;padding:7px 9px;color:var(--side-text);font-weight:500;text-align:left;transition:background .15s}
+.space:hover{background:var(--side-2)}
+.space.on{background:var(--side-card);border-color:var(--side-border);font-weight:600;box-shadow:0 1px 2px rgba(15,43,72,.08)}
+.space i{width:10px;height:10px;border-radius:3px;flex:none}
+.space .spn{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.space .spc{margin-left:auto;font-size:11.5px;color:var(--side-muted)}
+.space-strip{display:none}
+.proj-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.space-label{display:inline-flex;align-items:center;gap:7px;font-weight:600;color:var(--text-2);font-size:13px}
+.space-label .ren{color:var(--text-3)}
+.space-label .inline-input{width:130px;flex:none}
+.sq-dot{width:10px;height:10px;border-radius:3px;background:var(--ink)}
 .brand-name{font-family:var(--f-display);font-weight:700;font-size:21px;letter-spacing:-.01em}
 .side h4{margin:0;padding:0;font-size:12.5px;color:var(--side-muted);font-weight:600}
 .nav{display:flex;flex-direction:column;gap:2px}
@@ -388,7 +417,16 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
   .fab svg{width:24px;height:24px}
   .hello-r .btn.primary{display:none}
   .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
-    .projects,.filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * clamp(16px,2.4vw,32px));padding-inline:clamp(16px,2.4vw,32px);padding-block:2px}
+    .space-strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * clamp(16px,2.4vw,32px));padding-inline:clamp(16px,2.4vw,32px)}
+  .space-strip::-webkit-scrollbar{display:none}
+  .space-strip .space{flex:none;background:var(--panel);border-color:var(--border);color:var(--text)}
+  .space-strip .space.on{background:var(--ink);border-color:var(--ink);color:var(--ink-text)}
+  .space-strip .space.on .spc{color:var(--ink-text);opacity:.8}
+  .space-strip .space.on i{box-shadow:0 0 0 2px var(--ink-text)}
+  .proj-row{flex-wrap:nowrap}
+  .proj-row .space-label{display:none}
+  .proj-row .projects{flex:1;min-width:0}
+  .projects,.filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1 * clamp(16px,2.4vw,32px));padding-inline:clamp(16px,2.4vw,32px);padding-block:2px}
   .projects::-webkit-scrollbar,.filters::-webkit-scrollbar{display:none}
   .ptab,.ptab-add,.filters select{flex:none}
   .chip-note{white-space:nowrap}
@@ -441,9 +479,10 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 <div class="shell">
   <aside class="side">
     <div class="brand">
-      <span class="brand-mark" aria-hidden="true"><i style="background:var(--s-idn)"></i><i style="background:var(--s-stk)"></i><i style="background:var(--s-prg)"></i><i style="background:var(--s-res)"></i></span>
+      <span class="brand-mark" id="spaceMark" role="group" aria-label="Spaces"></span>
       <span class="brand-name">MK Space</span>
     </div>
+    <div class="spaces" id="spaces" role="group" aria-label="Choose a space"></div>
     <button class="today-card" id="todayCard" type="button"></button>
     <nav class="nav" aria-label="Sections">
       <a href="#today" class="on" data-short="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Overview</a>
@@ -485,7 +524,9 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 
     <div class="sync-banner" id="syncBanner" hidden><span id="bannerMsg"></span><button type="button" class="btn sm primary" id="bannerBtn">Sync now</button><button type="button" class="banner-x" id="bannerX" aria-label="Hide this message">✕</button></div>
 
-    <nav class="projects" id="projTabs" aria-label="Projects"></nav>
+    <div class="space-strip" id="spaceStrip" role="group" aria-label="Choose a space"></div>
+    <div class="proj-row"><span class="space-label" id="spaceLabel"></span>
+    <nav class="projects" id="projTabs" aria-label="Projects"></nav></div>
 
     <section class="hello" id="today">
       <div>
@@ -718,17 +759,35 @@ function clearSample(data){
   return n;
 }
 const blankProject = (id, name) => ({ id, name, streams:['Tasks'], items:[], ideas:[] });
+/* Spaces: the four squares of the logo. Each space has its own projects and colour. */
+const SPACES = [
+  { id:'work',     name:'Work',     first:'Project 1' },
+  { id:'personal', name:'Personal', first:'My tasks' },
+  { id:'home',     name:'Home',     first:'Home' },
+  { id:'growth',   name:'Growth',   first:'Learning' },
+];
+function ensureSpaces(d){
+  if (!Array.isArray(d.spaces)) d.spaces = [];
+  SPACES.forEach(sd => { if (!d.spaces.some(x => x.id===sd.id)) d.spaces.push({ id: sd.id, name: sd.name }); });
+  d.spaces.sort((a,b) => SPACES.findIndex(x=>x.id===a.id) - SPACES.findIndex(x=>x.id===b.id));
+  d.projects.forEach(p => { if (!p.space) p.space = 'work'; });
+  const cur = d.projects.find(p => p.id===d.active);
+  if (cur) d.activeSpace = cur.space; else if (!d.activeSpace) d.activeSpace = 'work';
+  return d;
+}
 function seedAll(){
   const p1 = { ...blankProject('p1','Project 1'), streams:['Tasks','Remaining Work','As-Built Drawing'] };
-  return { name:'MK', active:'p1', projects:[p1, blankProject('p2','Project 2'), blankProject('p3','Project 3')] };
+  return ensureSpaces({ name:'MK', active:'p1', activeSpace:'work', projects:[p1, blankProject('p2','Project 2'), blankProject('p3','Project 3')] });
 }
 
 /* ---------- state ---------- */
 let D, UI = { stream:'all', q:'', group:'', prio:'', party:'', focusTime:'', trendDays:30, balBy:'party', showAll:{} };
 function P(){ return D.projects.find(p => p.id===D.active) || D.projects[0]; }
+const SP = () => D.spaces.find(x => x.id===D.activeSpace) || D.spaces[0];
+const spaceProjects = id => D.projects.filter(p => p.space===id);
 function streamsOf(p){ const s = [...(p.streams||[])]; p.items.forEach(i => { if (i.stream && !s.includes(i.stream)) s.push(i.stream); }); p.streams = s.length ? s : ['Tasks']; return p.streams; }
 function load(){
-  try { const raw = store.get(KEY); if (raw){ D = JSON.parse(raw); if (D && Array.isArray(D.projects) && D.projects.length){ clearSample(D); delete D.seeded; if (D.syncV !== 2) D.legacy = true; writeLocal(); known = keysOf(D); return; } } } catch(e){}
+  try { const raw = store.get(KEY); if (raw){ D = JSON.parse(raw); if (D && Array.isArray(D.projects) && D.projects.length){ clearSample(D); delete D.seeded; if (D.syncV !== 2) D.legacy = true; ensureSpaces(D); writeLocal(); known = keysOf(D); return; } } } catch(e){}
   D = seedAll(); D.sampleCleared = true; D.syncV = 2;   // new device: starts empty, merges with the Drive copy on first sync
   try { const old = JSON.parse(store.get(OLD_KEY)||'null');   // keep anything saved by the first version
     if (old && Array.isArray(old.items)) Object.assign(D.projects[0], { items: old.items, ideas: old.ideas||[] }); } catch(e){}
@@ -744,8 +803,9 @@ let known = new Map();
 const sig = o => { const {u, ...rest} = o; return JSON.stringify(rest); };
 function keysOf(data){
   const m = new Map();
+  (data.spaces||[]).forEach(x => m.set('s:'+x.id, sig(x)));
   data.projects.forEach(p => {
-    m.set('p:'+p.id, JSON.stringify([p.name, p.streams]));
+    m.set('p:'+p.id, JSON.stringify([p.name, p.streams, p.space]));
     p.items.forEach(i => m.set('i:'+i.id, sig(i)));
     (p.ideas||[]).forEach(d => m.set('d:'+d.id, sig(d)));
   });
@@ -753,12 +813,13 @@ function keysOf(data){
 }
 function stamp(){
   const now = Date.now(), cur = keysOf(D), del = D.deleted ||= {};
+  (D.spaces||[]).forEach(x => { if (known.get('s:'+x.id) !== cur.get('s:'+x.id)) x.u = now; });
   D.projects.forEach(p => {
     if (known.get('p:'+p.id) !== cur.get('p:'+p.id)) p.u = now;
     p.items.forEach(i => { if (known.get('i:'+i.id) !== cur.get('i:'+i.id)) i.u = now; });
     (p.ideas||[]).forEach(d => { if (known.get('d:'+d.id) !== cur.get('d:'+d.id)) d.u = now; });
   });
-  known.forEach((_, k) => { if (!cur.has(k)) del[k] = now; });
+  known.forEach((_, k) => { if (!cur.has(k) && !k.startsWith('s:')) del[k] = now; });
   cur.forEach((_, k) => { delete del[k]; });
   Object.keys(del).forEach(k => { if (now - del[k] > 180*86400000) delete del[k]; });
   known = cur;
@@ -772,9 +833,9 @@ function mergeData(L, R){
   const ids = [...new Set([...L.projects.map(p=>p.id), ...R.projects.map(p=>p.id)])];
   const projects = ids.map(id => { const lp = L.projects.find(p=>p.id===id), rp = R.projects.find(p=>p.id===id), meta = newer(rp, lp);
     return {...meta, items: list(lp&&lp.items, rp&&rp.items, 'i:'), ideas: list(lp&&lp.ideas, rp&&rp.ideas, 'd:')}; });
-  return {...R, ...L, projects, deleted: del, sampleCleared: L.sampleCleared || R.sampleCleared, updatedAt: Math.max(L.updatedAt||0, R.updatedAt||0)};
+  return ensureSpaces({...R, ...L, projects, spaces: list(L.spaces, R.spaces, 's:'), activeSpace: L.activeSpace, deleted: del, sampleCleared: L.sampleCleared || R.sampleCleared, updatedAt: Math.max(L.updatedAt||0, R.updatedAt||0)});
 }
-const dataSig = d => JSON.stringify([d.projects, d.deleted||{}]);
+const dataSig = d => JSON.stringify([d.projects, d.spaces||[], d.deleted||{}]);
 // Every change: stamp it, keep it on this device right away, then queue a cloud sync.
 function save(){ stamp(); D.updatedAt = Date.now(); writeLocal(); Cloud.queue(); }
 try { Object.assign(UI, JSON.parse(store.get(KEY+'-ui')||'{}'), {q:'', showAll:{}}); } catch(e){}
@@ -853,9 +914,37 @@ document.querySelectorAll('[data-fold]').forEach(b => {
   b.onclick = () => { const open = b.getAttribute('aria-expanded') !== 'true'; apply(open); folds[b.dataset.fold] = open; store.set(KEY+'-folds', JSON.stringify(folds)); };
 });
 
+/* ---------- spaces ---------- */
+function setSpace(id){
+  if (id === D.activeSpace) return;
+  D.activeSpace = id;
+  let list = spaceProjects(id);
+  if (!list.length){ const def = SPACES.find(x => x.id===id); const p = {...blankProject('p'+Date.now().toString(36), def ? def.first : 'Project 1'), space: id}; D.projects.push(p); list = [p]; }
+  const sp = SP(); D.active = list.some(p => p.id===sp.last) ? sp.last : list[0].id;
+  UI.stream='all'; UI.group=UI.prio=UI.party=''; UI.showAll={};
+  save(); saveUI(); render();
+}
+function renderSpaces(){
+  document.documentElement.dataset.space = D.activeSpace;
+  const openIn = id => spaceProjects(id).reduce((n,p) => n + p.items.filter(isOpen).length, 0);
+  document.getElementById('spaceMark').innerHTML = D.spaces.map(x =>
+    `<button type="button" class="sq sq-${x.id} ${x.id===D.activeSpace?'on':''}" data-space="${x.id}" aria-label="${esc(x.name)}" title="${esc(x.name)}"></button>`).join('');
+  const pills = D.spaces.map(x => `<button type="button" class="space ${x.id===D.activeSpace?'on':''}" data-space="${x.id}" aria-pressed="${x.id===D.activeSpace}"><i class="sq-${x.id}" aria-hidden="true"></i><span class="spn">${esc(x.name)}</span><span class="spc num">${openIn(x.id) || ''}</span></button>`).join('');
+  document.getElementById('spaces').innerHTML = pills;
+  document.getElementById('spaceStrip').innerHTML = pills;
+  document.getElementById('spaceLabel').innerHTML = `<i class="sq-dot" aria-hidden="true"></i><span id="spaceName">${esc(SP().name)}</span><button type="button" class="ren" id="spaceRen" aria-label="Rename this space" title="Rename this space">✎</button>`;
+}
+['spaceMark','spaces','spaceStrip'].forEach(id => document.getElementById(id).addEventListener('click', e => {
+  const b = e.target.closest('[data-space]'); if (b) setSpace(b.dataset.space);
+}));
+document.getElementById('spaceLabel').addEventListener('click', e => {
+  if (!e.target.closest('#spaceRen')) return;
+  const sp = SP(); inlineEdit(document.getElementById('spaceName'), sp.name, name => { sp.name = name; save(); });
+});
+
 /* ---------- render: projects ---------- */
 function renderProjects(){
-  document.getElementById('projTabs').innerHTML = D.projects.map(p => {
+  document.getElementById('projTabs').innerHTML = spaceProjects(D.activeSpace).map(p => {
     const open = p.items.filter(isOpen).length;
     return `<div class="ptab ${p.id===D.active?'on':''}"><button class="ptab-go" data-p="${p.id}"><span class="pname">${esc(p.name)}</span><span class="pcnt num">${p.items.length ? open+' open' : 'empty'}</span></button><button class="ren" data-pren="${p.id}" aria-label="Rename ${esc(p.name)}" title="Rename">✎</button></div>`;
   }).join('') + `<button class="ptab-add" id="addProj" title="Add project">+ Project</button>`;
@@ -865,9 +954,9 @@ document.getElementById('projTabs').addEventListener('click', e => {
   if (r){ const pr = D.projects.find(p => p.id===r.dataset.pren);
     return inlineEdit(r.parentElement.querySelector('.ptab-go'), pr.name, name => { pr.name = name; save(); }); }
   const g = e.target.closest('[data-p]');
-  if (g){ D.active = g.dataset.p; UI.stream='all'; UI.group=UI.prio=UI.party=''; UI.showAll={}; save(); saveUI(); render(); return; }
+  if (g){ D.active = g.dataset.p; SP().last = D.active; UI.stream='all'; UI.group=UI.prio=UI.party=''; UI.showAll={}; save(); saveUI(); render(); return; }
   if (e.target.closest('#addProj')){ const id = 'p'+Date.now().toString(36);
-    D.projects.push(blankProject(id, 'Project '+(D.projects.length+1))); D.active = id; UI.stream='all'; save(); render();
+    D.projects.push({...blankProject(id, 'Project '+(spaceProjects(D.activeSpace).length+1)), space: D.activeSpace}); D.active = id; SP().last = id; UI.stream='all'; save(); render();
     document.querySelector(`[data-pren="${id}"]`)?.click(); }
 });
 
@@ -1302,15 +1391,17 @@ function fromLegacy(obj){
   return items;
 }
 function importObj(obj){
-  if (obj && Array.isArray(obj.projects) && obj.projects.length && Array.isArray(obj.projects[0].items)){ D = obj; }   // MK Space backup
+  if (obj && Array.isArray(obj.projects) && obj.projects.length && Array.isArray(obj.projects[0].items)){ D = ensureSpaces(obj); }   // MK Space backup
   else if (obj && Array.isArray(obj.items)){ P().items = obj.items; P().ideas = obj.ideas||[]; }                   // MK Space v1 backup
   else {                                                                                                         // Pending Tracker
     const projects = obj.projects || (obj.pages ? [{name:'Project 1', pages: obj.pages}] : []);
     if (!projects.some(p => (p.pages||[]).some(pg => (pg.items||[]).length))) throw new Error('no items');
     projects.forEach((lp, k) => {
       const items = fromLegacy({projects:[lp]}), streams = (lp.pages||[]).map(pg => pg.name||'Tasks');
-      if (!D.projects[k]) D.projects.push(blankProject('p'+Date.now().toString(36)+k, 'Project '+(k+1)));
-      Object.assign(D.projects[k], { name: lp.name || D.projects[k].name, streams: streams.length ? streams : ['Tasks'], items });
+      const work = spaceProjects('work');
+      let target = work[k];
+      if (!target){ target = {...blankProject('p'+Date.now().toString(36)+k, 'Project '+(k+1)), space:'work'}; D.projects.push(target); }
+      Object.assign(target, { name: lp.name || target.name, streams: streams.length ? streams : ['Tasks'], items });
     });
   }
   UI.stream = 'all'; save(); render();
@@ -1341,7 +1432,8 @@ function describeImport(obj){
   const projects = (obj && (obj.projects || (obj.pages ? [{name:'Project 1', pages: obj.pages}] : []))) || [];
   const n = projects.reduce((a,p)=>a+(p.pages||[]).reduce((b,pg)=>b+(pg.items||[]).length,0),0);
   if (!n) return null;
-  const hit = projects.map((lp,k) => D.projects[k] ? `<li><b>${esc(lp.name||'Project '+(k+1))}</b> replaces <b>${esc(D.projects[k].name)}</b> (${plural(D.projects[k].items.length,'task')} now)</li>` : `<li><b>${esc(lp.name||'Project '+(k+1))}</b> is added as a new project</li>`).join('');
+  const W = spaceProjects('work');
+  const hit = projects.map((lp,k) => W[k] ? `<li><b>${esc(lp.name||'Project '+(k+1))}</b> replaces Work › <b>${esc(W[k].name)}</b> (${plural(W[k].items.length,'task')} now)</li>` : `<li><b>${esc(lp.name||'Project '+(k+1))}</b> is added as a new project</li>`).join('');
   return { msg: `Found <b>${plural(n,'task')}</b> in <b>${plural(projects.length,'project')}</b>.<ul>${hit}</ul>Ideas and other projects stay as they are.` };
 }
 async function runImport(obj, sourceLabel){
@@ -1396,7 +1488,7 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.
 if (io) ['today','trend','focus','balance','ideas','board'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.09.28-1';
+const APP_VERSION = '2026.09.29-1';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');
@@ -1500,7 +1592,7 @@ const Cloud = (() => {
       const merged = remote ? mergeData(base, remote) : D;
       const mergedSig = dataSig(merged), changedHere = mergedSig !== localSig;
       if (changedHere){
-        const active = D.active; D = merged; D.active = D.projects.some(p => p.id===active) ? active : D.projects[0].id;
+        const active = D.active; D = merged; D.active = D.projects.some(p => p.id===active) ? active : D.projects[0].id; ensureSpaces(D);
         writeLocal(); known = keysOf(D); render();
       }
       if (!remote || mergedSig !== dataSig(remote)) await upload();
@@ -1637,7 +1729,7 @@ function render(){
   const h = new Date().getHours();
   $('greet').textContent = `${h<12?'Good morning':h<17?'Good afternoon':'Good evening'}, ${D.name||'MK'}`;
   $('dateNow').textContent = new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-  renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard();
+  renderSpaces(); renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard();
 }
 if (matchMedia('(max-width:640px)').matches) $('q').placeholder = 'Search';
 load(); render(); Cloud.init(); checkForUpdate();

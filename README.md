@@ -227,3 +227,17 @@ Next Monday, a picked date or no date, to open it, or to mark it done. Tasks wit
 in the *No due date* tray; drag them onto a day. Tap a day for its list and *+ Add task* on that
 date. Every date change is recorded in the task's status history and can be undone.
 
+**Quick add:** type a task in one line in the *Quick add* bar and press Enter. Words in the line
+fill in the details: dates (`today`, `tomorrow`, `fri`, `30 sep`, `30/9`, `in 3d`, `in 2w`,
+`next week`), time needed (`15m 30m 1h 2h 4h 1d 2d`), priority (`!critical !high !medium !low`),
+party (`@Vendor`, use `_` for spaces), workstream (`#Tasks`, otherwise it becomes the group) and
+repeat (`every day`, `every weekday`, `every week`, `every monday`, `every month`, `every year`).
+A preview shows what was understood; *More details…* opens the full form.
+
+**Checklist:** each task can hold a checklist of steps (task form → *Checklist*). Cards show
+progress such as ☑ 2/5.
+
+**Recurring tasks:** set *Repeat* in the task form (or `every …` in quick add). Closing a recurring
+task keeps it in History and creates the next one with the next due date and a fresh checklist.
+Monthly and yearly repeats keep the same day of the month.
+

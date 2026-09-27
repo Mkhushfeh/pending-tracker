@@ -191,7 +191,8 @@ https://mkhushfeh.github.io/pending-tracker/mk-space/
 ```
 
 Until it's added, the laptop falls back to the Google pop-up and asks you to tap **Sync now** about
-once an hour.
+once an hour. If the full-page sign-in fails twice in a row, the app uses the pop-up for a day; tapping **Sync
+now** tries the full-page sign-in again straight away.
 
 **Time needed:** each task can have a *Time needed*: 15 min, 30 min, 1H, 2H, 4H, 1D or 2D (a day
 counts as 8 hours). Set it in the task form, or tap the ⏱ chip on a card (*Set time* if it has none)

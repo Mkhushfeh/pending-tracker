@@ -241,8 +241,9 @@ progress such as ☑ 2/5.
 task keeps it in History and creates the next one with the next due date and a fresh checklist.
 Monthly and yearly repeats keep the same day of the month.
 
-**Focus timer:** start a 15, 25 or 50 minute focus on a task from the task form (*Start focus*) or
-the ▶ button in *Today's focus*. A timer bar shows the countdown (pause, +5 minutes, *Stop & log*).
+**Focus timer:** start a focus on any open task with the ▶ next to its ⏱ time chip on the board, the
+▶ in *Today's focus*, or *Start focus* in the task form. The length follows the task's time needed
+(15 min, 30 min, 1 hour; longer or unset tasks get 25 min) and can be changed in the form. A timer bar shows the countdown (pause, +5 minutes, *Stop & log*).
 The time is logged on the task (*Spent*), shown on the card, in the task form against its time
 needed, in History and in the CSV export. It keeps running if you reload the page.
 

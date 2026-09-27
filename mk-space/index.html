@@ -347,6 +347,35 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 .eff-pop .link{align-self:flex-start}
 .col-time{font-size:11.5px;color:var(--text-3);font-weight:600;white-space:nowrap}
 
+/* history */
+.hist-intro{margin:-4px 0 12px;color:var(--text-2);font-size:13px;max-width:70ch}
+.hist-controls{display:flex;gap:10px 16px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.hist-search{flex:1;min-width:200px;height:36px;max-width:340px}
+.chip-sq{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:6px;vertical-align:0}
+.hist-sum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.hist-sum div{background:var(--panel-2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column}
+.hist-sum b{font-family:var(--f-display);font-size:22px;line-height:1.1}
+.hist-sum small{color:var(--text-3);font-size:12px}
+.h-month h3{display:flex;align-items:baseline;gap:10px;margin:18px 0 6px;font-size:15px}
+.h-month h3 span{font-size:12px;color:var(--text-3);font-weight:500}
+.h-month:first-child h3{margin-top:0}
+.h-day{display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px solid var(--border-2)}
+.h-date{display:flex;flex-direction:column;align-items:center;color:var(--text-3);font-size:11.5px;padding-top:2px}
+.h-date b{font-family:var(--f-display);font-size:22px;line-height:1;color:var(--text)}
+.h-items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.h-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;align-items:start}
+.h-title{background:none;border:0;padding:0;font-weight:600;font-size:14px;text-align:left;color:var(--text)}
+.h-title:hover{color:var(--link);text-decoration:underline}
+.h-meta{display:flex;gap:4px 12px;flex-wrap:wrap;font-size:12px;color:var(--text-3);margin-top:2px}
+.h-note{margin:6px 0 0;font-size:13px;color:var(--text-2);background:var(--panel-2);border-radius:9px;padding:7px 10px;max-width:70ch;white-space:pre-wrap}
+.h-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.h-acts{display:inline-flex;gap:10px;margin-left:4px}
+.h-noteedit{margin-top:8px;display:flex;flex-direction:column;gap:6px;max-width:70ch}
+.h-noteedit textarea{border:1px solid var(--border);background:var(--panel-2);border-radius:10px;padding:8px 10px;min-height:60px;font-size:14px;color:var(--text)}
+.trail{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-weight:400;color:var(--text)}
+.trail li{display:flex;gap:10px;font-size:13px}
+.tr-when{color:var(--text-3);min-width:150px}
+
 /* board */
 .board-wrap{overflow-x:auto;margin:0 -4px;padding:2px 4px 6px}
 .board{display:grid;grid-template-columns:repeat(4,minmax(250px,1fr));gap:14px}
@@ -408,8 +437,8 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
   .menu-btn{display:grid}
   .topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:var(--bg);margin:-22px calc(-1 * clamp(16px,2.4vw,32px)) 0;padding:10px clamp(16px,2.4vw,32px);border-bottom:1px solid var(--border-2)}
   .main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
-  .tabbar{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--panel);border-top:1px solid var(--border);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
-  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:10px;color:var(--text-3);text-decoration:none;font-size:10.5px;font-weight:600}
+  .tabbar{display:grid;grid-template-columns:repeat(7,1fr);position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--panel);border-top:1px solid var(--border);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;border-radius:10px;color:var(--text-3);text-decoration:none;font-size:10px;font-weight:600}
   .tabbar a svg{width:20px;height:20px}
   .tabbar a.on{color:var(--text)}
   .tabbar a.on svg{color:var(--ink)}
@@ -463,6 +492,13 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
   .hint-desk{display:none}
   .hint-touch{display:inline!important}
   .bal-row{grid-template-columns:96px minmax(0,1fr) 22px}
+  .hist-sum{grid-template-columns:1fr 1fr}
+  .h-item{grid-template-columns:1fr}
+  .h-tags{justify-content:flex-start}
+  .h-day{grid-template-columns:40px minmax(0,1fr);gap:10px}
+  .hist-search{max-width:none}
+  .tr-when{min-width:0}
+  .trail li{flex-direction:column;gap:0}
   .board-wrap{margin-inline:-15px;padding-inline:15px;scroll-snap-type:x mandatory;scroll-padding-inline:15px}
   .board{grid-template-columns:repeat(4,82vw);gap:12px}
   .col{scroll-snap-align:start}
@@ -490,6 +526,7 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       <a href="#focus" data-short="Focus"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Today's focus<span class="badge num" id="bFocus"></span></a>
       <a href="#ideas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>Ideas<span class="badge num" id="bIdeas"></span></a>
       <a href="#balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6z"/></svg>Balance</a>
+      <a href="#history" data-short="History"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/></svg>History<span class="badge num" id="bHist"></span></a>
       <a href="#board"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg>Board<span class="badge num" id="bBoard"></span></a>
     </nav>
     <div>
@@ -601,6 +638,18 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       </div>
     </section>
 
+    <section class="panel" id="history">
+      <div class="ph"><h2>History</h2><button class="btn sm" id="histExport" type="button">Export (CSV)</button></div>
+      <p class="hist-intro">Everything you have closed, newest first. Search, filter by period and space, reopen a task, or add a note on what was done.</p>
+      <div class="hist-controls">
+        <div class="chips" id="histPeriod" role="group" aria-label="Period"></div>
+        <div class="chips" id="histSpace" role="group" aria-label="Space"></div>
+        <label class="search hist-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="histQ" type="search" placeholder="Search closed tasks" aria-label="Search closed tasks"></label>
+      </div>
+      <div class="hist-sum" id="histSum"></div>
+      <div id="histList"></div>
+    </section>
+
     <section class="panel" id="board">
       <div class="ph"><h2>Task board</h2><span class="hint"><span class="hint-desk">Drag cards between columns, or open a card to change its status</span><span class="hint-touch" style="display:none">Swipe across the columns. Tap a card to change its status.</span></span></div>
       <div class="board-wrap"><div class="board" id="boardEl"></div></div>
@@ -623,6 +672,8 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       <label class="field">Reason pending<select id="fRsn"></select></label>
       <label class="field">Progress <span id="pctOut">0%</span><input id="fPct" type="range" min="0" max="100" step="5"></label>
       <label class="field full">Notes / next action<textarea id="fNotes"></textarea></label>
+      <label class="field full" id="closeNoteWrap">What was done (closing note)<textarea id="fClose" placeholder="Optional. Shown in History."></textarea></label>
+      <div class="field full" id="trailWrap"><span>Status history</span><ol class="trail" id="trail"></ol></div>
     </div>
     <div class="modal-actions">
       <button type="button" class="btn danger left" id="delBtn">Delete</button>
@@ -871,9 +922,12 @@ function toast(msg, undo, label = 'Undo'){
 document.getElementById('toastUndo').onclick = () => { if (undoFn) undoFn(); document.getElementById('toast').hidden = true; };
 
 /* ---------- mutations ---------- */
+// Find a task in any project (History lists all spaces).
+function findItem(id){ for (const p of D.projects){ const it = p.items.find(x => x.id===id); if (it) return [it, p]; } return [null, null]; }
 function setStatus(id, status, silent){
-  const it = P().items.find(x => x.id===id); if (!it || it.status===status) return;
-  const prev = {...it};
+  const [it] = findItem(id); if (!it || it.status===status) return;
+  const prev = {...it, history: [...(it.history||[])]};
+  (it.history ||= []).push({ t: Date.now(), from: it.status, to: status });
   it.status = status; it.moved = today();
   if (status==='Resolved'){ it.resolved = today(); it.pct = 100; }
   else { it.resolved = ''; if (it.pct===100) it.pct = 80; }
@@ -981,6 +1035,7 @@ function renderSide(){
     <span class="tc-row">${late ? `<span class="pill bad">${late} overdue</span>` : ''}${dueToday ? `<span class="pill warn">${dueToday} due today</span>` : ''}${quick ? `<span class="pill neutral">${quick} quick task${quick>1?'s':''}</span>` : ''}${!late && !dueToday && !quick ? '<span class="pill good">Nothing due today</span>' : ''}</span>
     <span class="tc-hint">Open today's focus</span>`;
   const set = (id, v, hot) => { const el = document.getElementById(id); el.textContent = v || ''; el.classList.toggle('hot', !!hot); };
+  set('bHist', D.projects.reduce((n,p) => n + p.items.filter(i => !isOpen(i) && i.resolved && diff(i.resolved, t) < 7).length, 0));
   set('bFocus', late + dueToday, late > 0); set('bIdeas', (P().ideas||[]).length); set('bBoard', open.length);
   document.getElementById('legacyBtn').hidden = !store.get(LEGACY_KEY);
 }
@@ -1289,6 +1344,97 @@ addEventListener('keydown', e => { if (e.key==='Escape' && !effPop.hidden) close
 addEventListener('scroll', () => { if (!effPop.hidden) closeEffort(); }, true);
 addEventListener('resize', () => { if (!effPop.hidden) closeEffort(); });
 
+/* ---------- history ---------- */
+const HIST_PERIODS = [['7','7 days'],['30','30 days'],['90','90 days'],['year','This year'],['all','All']];
+UI.histPeriod = UI.histPeriod || '30'; UI.histSpace = UI.histSpace || 'all'; UI.histQ = '';
+const fmtWhen = t => new Date(t).toLocaleString(undefined, {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'});
+function trailOf(it){
+  if (it.history && it.history.length) return it.history;
+  const h = [{ t: parse(it.since||today()).getTime(), to: 'Identified', dateOnly: true }];      // older tasks: rebuilt from their dates
+  if (it.resolved) h.push({ t: parse(it.resolved).getTime(), to: 'Resolved', closed: true, dateOnly: true });
+  return h;
+}
+function closedRecords(){
+  const t = today(), y = new Date().getFullYear() + '-01-01', q = UI.histQ.trim().toLowerCase();
+  const from = UI.histPeriod==='all' ? '' : UI.histPeriod==='year' ? y : addDays(t, -(+UI.histPeriod - 1));
+  const out = [];
+  D.projects.forEach(p => {
+    if (UI.histSpace !== 'all' && p.space !== UI.histSpace) return;
+    p.items.forEach(i => {
+      if (isOpen(i) || !i.resolved || (from && i.resolved < from)) return;
+      if (q && ![i.title, i.code, i.group, i.party, i.stream, i.closeNote, p.name].join(' ').toLowerCase().includes(q)) return;
+      out.push({ i, p });
+    });
+  });
+  return out.sort((a,b) => b.i.resolved.localeCompare(a.i.resolved) || (b.i.u||0) - (a.i.u||0));
+}
+function lateBy(i){ return i.due ? diff(i.due, i.resolved) : null; }
+function renderHistory(){
+  document.getElementById('histPeriod').innerHTML = HIST_PERIODS.map(([k,l]) => `<button type="button" class="chip ${UI.histPeriod===k?'on':''}" data-hp="${k}">${l}</button>`).join('');
+  document.getElementById('histSpace').innerHTML = [['all','All spaces'], ...D.spaces.map(x => [x.id, x.name])].map(([k,l]) =>
+    `<button type="button" class="chip ${UI.histSpace===k?'on':''}" data-hs="${k}">${k==='all' ? '' : `<i class="sq-${k} chip-sq" aria-hidden="true"></i>`}${esc(l)}</button>`).join('');
+  const rows = closedRecords();
+  const withDue = rows.filter(r => r.i.due), onTime = withDue.filter(r => lateBy(r.i) <= 0).length;
+  const days = rows.map(r => Math.max(0, diff(r.i.since || r.i.resolved, r.i.resolved)));
+  const mins = rows.reduce((a,r) => a + (EFFORT_MIN[r.i.effort]||0), 0);
+  document.getElementById('histSum').innerHTML = `
+    <div><b class="num">${rows.length}</b><small>closed</small></div>
+    <div><b class="num">${withDue.length ? Math.round(onTime/withDue.length*100)+'%' : '–'}</b><small>on time${withDue.length ? ` (${onTime} of ${withDue.length})` : ''}</small></div>
+    <div><b class="num">${rows.length ? (days.reduce((a,b)=>a+b,0)/rows.length).toFixed(1) : '–'}</b><small>days to close, average</small></div>
+    <div><b class="num">${mins ? fmtMins(mins) : '–'}</b><small>time spent (from time needed)</small></div>`;
+  const el = document.getElementById('histList');
+  if (!rows.length){ el.innerHTML = `<p class="empty">${UI.histQ ? 'No closed tasks match your search.' : 'No closed tasks in this period yet. Tasks you close appear here with their date.'}</p>`; return; }
+  const months = {};
+  rows.forEach(r => { const m = r.i.resolved.slice(0,7); (months[m] ||= []).push(r); });
+  el.innerHTML = Object.entries(months).map(([m, list]) => {
+    const label = parse(m+'-01').toLocaleDateString(undefined, {month:'long', year:'numeric'});
+    const byDay = {}; list.forEach(r => (byDay[r.i.resolved] ||= []).push(r));
+    return `<section class="h-month"><h3>${label}<span class="num">${list.length} closed</span></h3>` +
+      Object.entries(byDay).map(([d, dl]) => `<div class="h-day"><div class="h-date"><b class="num">${parse(d).getDate()}</b><span>${parse(d).toLocaleDateString(undefined,{weekday:'short'})}</span></div><ul class="h-items">` +
+        dl.map(({i, p}) => {
+          const lb = lateBy(i), took = Math.max(0, diff(i.since || i.resolved, i.resolved));
+          const sp = D.spaces.find(x => x.id===p.space);
+          return `<li class="h-item">
+            <div class="h-main"><button type="button" class="h-title" data-hopen="${i.id}"><i class="sq-${p.space} chip-sq" title="${esc(sp ? sp.name : '')}" aria-hidden="true"></i>${esc(i.title)}</button>
+              <div class="h-meta"><span>${esc(sp ? sp.name : '')} › ${esc(p.name)}${i.stream ? ' › '+esc(i.stream) : ''}</span>${i.party ? `<span>${esc(i.party)}</span>` : ''}<span class="mono">${i.code}</span></div>
+              ${i.closeNote ? `<p class="h-note">${esc(i.closeNote)}</p>` : ''}</div>
+            <div class="h-tags">${lb===null ? '' : lb <= 0 ? '<span class="pill good">On time</span>' : `<span class="pill bad">${lb}d late</span>`}<span class="pill neutral">${took ? took+'d' : 'Same day'}</span>${i.effort ? `<span class="pill neutral">⏱ ${EFFORT_LABEL[i.effort]}</span>` : ''}
+              <span class="h-acts"><button type="button" class="link" data-hnote="${i.id}">${i.closeNote ? 'Edit note' : 'Add note'}</button><button type="button" class="link muted" data-hreopen="${i.id}">Reopen</button></span></div>
+          </li>`; }).join('') + `</ul></div>`).join('') + `</section>`;
+  }).join('');
+}
+function goToItem(id){
+  const [it, p] = findItem(id); if (!it) return null;
+  if (p.space !== D.activeSpace) setSpace(p.space);
+  if (D.active !== p.id){ D.active = p.id; SP().last = p.id; UI.stream='all'; render(); }
+  return it;
+}
+document.getElementById('histPeriod').addEventListener('click', e => { const b = e.target.closest('[data-hp]'); if (b){ UI.histPeriod = b.dataset.hp; renderHistory(); } });
+document.getElementById('histSpace').addEventListener('click', e => { const b = e.target.closest('[data-hs]'); if (b){ UI.histSpace = b.dataset.hs; renderHistory(); } });
+document.getElementById('histQ').addEventListener('input', e => { UI.histQ = e.target.value; renderHistory(); });
+document.getElementById('histList').addEventListener('click', e => {
+  const o = e.target.closest('[data-hopen]'); if (o){ const it = goToItem(o.dataset.hopen); if (it) openModal(it.id); return; }
+  const r = e.target.closest('[data-hreopen]'); if (r){ setStatus(r.dataset.hreopen, 'In Progress'); return; }
+  const n = e.target.closest('[data-hnote]');
+  if (n){ const [it] = findItem(n.dataset.hnote); if (!it) return;
+    const li = n.closest('.h-item'); const box = document.createElement('div'); box.className = 'h-noteedit';
+    box.innerHTML = `<textarea aria-label="What was done">${esc(it.closeNote||'')}</textarea><div><button type="button" class="btn sm primary">Save note</button> <button type="button" class="btn sm">Cancel</button></div>`;
+    li.querySelector('.h-main').appendChild(box); const ta = box.querySelector('textarea'); ta.focus();
+    box.querySelector('.primary').onclick = () => { it.closeNote = ta.value.trim(); save(); render(); toast('Note saved'); };
+    box.querySelectorAll('.btn')[1].onclick = () => box.remove();
+  }
+});
+document.getElementById('histExport').onclick = () => {
+  const rows = closedRecords();
+  const cell = v => `"${String(v ?? '').replace(/"/g,'""')}"`;
+  const head = ['Closed on','Task no.','Task','Space','Project','Workstream','Group','Party','Priority','Due','Days late (negative = early)','Days to close','Time needed','Closing note'];
+  const lines = rows.map(({i,p}) => [i.resolved, i.code, i.title, (D.spaces.find(x=>x.id===p.space)||{}).name, p.name, i.stream, i.group, i.party, i.priority, i.due, lateBy(i) ?? '', Math.max(0, diff(i.since||i.resolved, i.resolved)), i.effort ? EFFORT_LABEL[i.effort] : '', i.closeNote].map(cell).join(','));
+  const blob = new Blob(['﻿' + [head.map(cell).join(','), ...lines].join('\r\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `mk-space-history-${today()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast(`Exported ${rows.length} closed task${rows.length===1?'':'s'}`);
+};
+
 /* ---------- render: board ---------- */
 function card(i){
   const t = today(), late = i.due && i.due < t && isOpen(i);
@@ -1345,11 +1491,16 @@ function openModal(id, preset = {}){
   $('fDue').value = it.due||''; $('fPct').value = it.pct||0; $('pctOut').textContent = (it.pct||0)+'%'; $('fNotes').value = it.notes||'';
   $('grpList').innerHTML = [...new Set(P().items.map(i=>i.group).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('');
   $('ptyList').innerHTML = [...new Set(P().items.map(i=>i.party).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('');
+  $('fClose').value = (editing && editing.closeNote) || '';
+  $('closeNoteWrap').hidden = it.status !== 'Resolved';
+  $('trailWrap').hidden = !editing;
+  if (editing) $('trail').innerHTML = trailOf(editing).map(h => `<li><span class="tr-when">${h.dateOnly ? new Date(h.t).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}) : fmtWhen(h.t)}</span><span>${h.closed ? '<b>Closed</b>' : h.from ? `${esc(h.from)} → <b>${esc(h.to)}</b>` : `Created as <b>${esc(h.to)}</b>`}</span></li>`).join('');
   $('delBtn').hidden = !editing; delArmed = false; $('delBtn').textContent = 'Delete';
   $('overlay').hidden = false; setTimeout(() => $('fTitle').focus(), 0);
 }
 const closeModal = () => { $('overlay').hidden = true; editing = null; };
 $('fPct').oninput = e => $('pctOut').textContent = e.target.value + '%';
+$('fSt').addEventListener('change', e => { $('closeNoteWrap').hidden = e.target.value !== 'Resolved'; });
 $('cancelBtn').onclick = closeModal;
 $('overlay').addEventListener('mousedown', e => { if (e.target.id==='overlay') closeModal(); });
 document.addEventListener('keydown', e => { if (e.key==='Escape' && !$('overlay').hidden) closeModal(); });
@@ -1361,13 +1512,13 @@ $('delBtn').onclick = () => {
 $('taskForm').addEventListener('submit', e => {
   e.preventDefault();
   const vals = { title: $('fTitle').value.trim(), stream: $('fStream').value, group: $('fGrp').value.trim(), party: $('fPty').value.trim(),
-    priority: $('fPri').value, effort: $('fEff').value, due: $('fDue').value, reason: $('fRsn').value, pct: +$('fPct').value, notes: $('fNotes').value.trim() };
+    priority: $('fPri').value, effort: $('fEff').value, due: $('fDue').value, reason: $('fRsn').value, pct: +$('fPct').value, notes: $('fNotes').value.trim(), closeNote: $('fClose').value.trim() };
   if (!vals.title) return;
   const st = $('fSt').value;
   if (editing){ Object.assign(editing, vals); const id = editing.id; closeModal(); if (st !== P().items.find(i=>i.id===id).status) setStatus(id, st, true); save(); render(); toast('Saved'); }
   else {
     const n = Math.max(100, ...P().items.map(i => +String(i.code).replace(/\D/g,'') || 0)) + 1;
-    const it = { id: uid(), code: 'MK-'+n, ...vals, status: st, since: today(), moved: today(), resolved: st==='Resolved' ? today() : '' };
+    const it = { id: uid(), code: 'MK-'+n, ...vals, status: st, since: today(), moved: today(), resolved: st==='Resolved' ? today() : '', history: [{ t: Date.now(), to: st }] };
     if (st==='Resolved') it.pct = 100;
     P().items.push(it);
     if (fromIdea){ P().ideas = P().ideas.filter(x => x.id !== fromIdea); }
@@ -1485,10 +1636,10 @@ const navLinks = [...document.querySelectorAll('.nav a')];
 const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(en => {
   if (en.isIntersecting) [...navLinks, ...document.querySelectorAll('#tabbar a')].forEach(a => a.classList.toggle('on', a.getAttribute('href')==='#'+en.target.id));
 }), {rootMargin:'-40% 0px -55% 0px'}) : null;
-if (io) ['today','trend','focus','balance','ideas','board'].forEach(id => io.observe(document.getElementById(id)));
+if (io) ['today','trend','focus','balance','ideas','history','board'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.09.29-1';
+const APP_VERSION = '2026.09.30-1';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');
@@ -1721,7 +1872,7 @@ document.getElementById('menuBtn').onclick = () => drawer(!side.classList.contai
 scrim.onclick = () => drawer(false);
 side.addEventListener('click', e => { if (e.target.closest('.nav a, .stream, .side-btn, .person, .today-card, .sadd')) drawer(false); });
 document.getElementById('tabbar').innerHTML = [...document.querySelectorAll('.nav a')].map(a =>
-  `<a href="${a.getAttribute('href')}">${a.querySelector('svg').outerHTML}<span>${a.dataset.short || a.textContent.trim()}</span></a>`).join('');
+  `<a href="${a.getAttribute('href')}">${a.querySelector('svg').outerHTML}<span>${a.dataset.short || [...a.childNodes].filter(n => n.nodeType===3).map(n => n.textContent).join('').trim()}</span></a>`).join('');
 document.getElementById('fab').onclick = () => openModal(null);
 
 /* ---------- boot ---------- */
@@ -1729,7 +1880,7 @@ function render(){
   const h = new Date().getHours();
   $('greet').textContent = `${h<12?'Good morning':h<17?'Good afternoon':'Good evening'}, ${D.name||'MK'}`;
   $('dateNow').textContent = new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-  renderSpaces(); renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard();
+  renderSpaces(); renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard(); renderHistory();
 }
 if (matchMedia('(max-width:640px)').matches) $('q').placeholder = 'Search';
 load(); render(); Cloud.init(); checkForUpdate();

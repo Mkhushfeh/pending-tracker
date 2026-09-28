@@ -548,6 +548,9 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 .col-h .add{margin-left:auto;background:none;border:0;color:var(--text-2);font-size:20px;line-height:1;padding:0 4px}
 .cards{display:flex;flex-direction:column;gap:8px}
 .card{background:var(--panel);border:1px solid var(--border-2);border-radius:13px;padding:11px 12px;display:flex;flex-direction:column;gap:7px;cursor:grab;box-shadow:var(--shadow)}
+.card.overdue{background:var(--s-stk-bg);border-color:color-mix(in srgb, var(--s-stk) 45%, transparent);box-shadow:inset 3px 0 0 var(--s-stk)}
+.card.overdue:hover{border-color:var(--s-stk)}
+.card.overdue .effort-chip,.card.overdue .eff-play,.card.overdue .cl-chip,.card.overdue .rep-chip{background:var(--panel)}
 .card:hover{border-color:var(--border)}
 .card.dragging{opacity:.4}
 .card-top{display:flex;align-items:center;gap:6px}
@@ -2028,7 +2031,7 @@ document.getElementById('histExport').onclick = () => {
 function card(i){
   const t = today(), late = i.due && i.due < t && isOpen(i);
   const age = isOpen(i) ? diff(i.moved, t) : null;
-  return `<article class="card" draggable="true" data-id="${i.id}" tabindex="0">
+  return `<article class="card ${late ? 'overdue' : ''}" draggable="true" data-id="${i.id}" tabindex="0"${late ? ' title="Overdue"' : ''}>
     <div class="card-top"><span class="mono">${i.code}</span>${isOpen(i) ? `<span class="eff-group">${effortBtn(i)}<button type="button" class="eff-play ${Timer.current()===i.id?'on':''}" data-focus-start="${i.id}" title="${Timer.current()===i.id ? 'Focus running on this task' : 'Start a '+focusLen(i)+' min focus'}" aria-label="Start focus on ${esc(i.title)}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button></span>` : (i.effort ? `<span class="effort-chip">⏱ ${EFFORT_LABEL[i.effort]}</span>` : '')}<span class="prio ${i.priority}">${i.priority}</span></div>
     <h4>${esc(i.title)}</h4>
     <div class="grp">${esc(i.group || 'No group')} · ${esc(i.stream)}</div>
@@ -2267,7 +2270,7 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.
 if (io) ['today','trend','focus','balance','ideas','calendar','table','board','history'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.10.05-1';
+const APP_VERSION = '2026.10.05-2';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');

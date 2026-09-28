@@ -231,6 +231,7 @@ fill in the details: dates (`today`, `tomorrow`, `fri`, `30 sep`, `30/9`, `in 3d
 `next week`), time needed (`15m 30m 1h 2h 4h 1d 2d`), priority (`!critical !high !medium !low`),
 party (`@Vendor`, use `_` for spaces), workstream (`#Tasks`, otherwise it becomes the group) and
 repeat (`every day`, `every weekday`, `every week`, `every monday`, `every month`, `every year`).
+Without a date, the task is due today (new tasks from the form also start with today's date).
 A preview shows what was understood; *More details…* opens the full form.
 
 **Checklist:** each task can hold a checklist of steps (task form → *Checklist*). Cards show

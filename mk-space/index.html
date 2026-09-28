@@ -1695,7 +1695,7 @@ function renderQuickPreview(){
   const q = parseQuick(v), bits = [];
   bits.push(`<span class="qp-title">${esc(q.title || 'Untitled')}</span>`);
   if (q.template) bits.push(`<span class="pill good">Template: ${esc(q.template.name)}${(q.checklist||[]).length ? ' · '+q.checklist.length+' steps' : ''}</span>`);
-  if (q.due) bits.push(`<span class="pill neutral">📅 ${parse(q.due).toLocaleDateString(undefined,{weekday:'short', day:'numeric', month:'short'})}</span>`);
+  bits.push(`<span class="pill neutral">📅 ${q.due ? parse(q.due).toLocaleDateString(undefined,{weekday:'short', day:'numeric', month:'short'}) : 'Today'}</span>`);
   if (q.effort) bits.push(`<span class="pill neutral">⏱ ${EFFORT_LABEL[q.effort]}</span>`);
   if (q.priority) bits.push(`<span class="pill ${q.priority==='Critical'||q.priority==='High' ? 'bad' : 'neutral'}">${q.priority}</span>`);
   if (q.party) bits.push(`<span class="pill neutral">@ ${esc(q.party)}</span>`);
@@ -1705,7 +1705,7 @@ function renderQuickPreview(){
   bits.push(`<button type="button" class="link" id="quickMore">More details…</button>`);
   el.innerHTML = bits.join('');
 }
-function quickFields(){ const q = parseQuick($('quickIn').value.trim()); return { title: q.title, ...(q.due ? {due:q.due} : {due:''}), ...(q.effort?{effort:q.effort}:{}), ...(q.priority?{priority:q.priority}:{}), ...(q.party?{party:q.party}:{}), ...(q.stream?{stream:q.stream}:{}), ...(q.group?{group:q.group}:{}), ...(q.repeat?{repeat:q.repeat}:{}), ...(q.checklist?{checklist:q.checklist.map(text => ({ id: uid(), text, done:false }))}:{}) }; }
+function quickFields(){ const q = parseQuick($('quickIn').value.trim()); return { title: q.title, due: q.due || today(), ...(q.effort?{effort:q.effort}:{}), ...(q.priority?{priority:q.priority}:{}), ...(q.party?{party:q.party}:{}), ...(q.stream?{stream:q.stream}:{}), ...(q.group?{group:q.group}:{}), ...(q.repeat?{repeat:q.repeat}:{}), ...(q.checklist?{checklist:q.checklist.map(text => ({ id: uid(), text, done:false }))}:{}) }; }
 $('quickIn').addEventListener('input', renderQuickPreview);
 $('quickIn').addEventListener('focus', renderQuickPreview);
 $('quickPrev').addEventListener('click', e => { if (e.target.id === 'quickMore'){ const f = quickFields(); $('quickIn').value = ''; renderQuickPreview(); openModal(null, f); } });
@@ -2069,7 +2069,7 @@ boardEl.addEventListener('drop', e => { const col = e.target.closest('.col'); if
 let editing = null, fromIdea = null, delArmed = false;
 function openModal(id, preset = {}){
   editing = id ? P().items.find(i=>i.id===id) : null; fromIdea = preset.ideaId || null;
-  const it = editing || { title:'', stream: UI.stream==='all' ? streamsOf(P())[0] : UI.stream, group: UI.group, party:'', priority:'Medium', status:'Identified', due: addDays(today(),7), reason:'Planned', pct:0, notes:'', ...preset };
+  const it = editing || { title:'', stream: UI.stream==='all' ? streamsOf(P())[0] : UI.stream, group: UI.group, party:'', priority:'Medium', status:'Identified', due: today(), reason:'Planned', pct:0, notes:'', ...preset };
   const streams = streamsOf(P());
   $('mTitle').textContent = editing ? `Edit ${editing.code}` : 'New task';
   $('fTitle').value = it.title; $('fGrp').value = it.group||''; $('fPty').value = it.party||'';
@@ -2267,7 +2267,7 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.
 if (io) ['today','trend','focus','balance','ideas','calendar','table','board','history'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.10.04-3';
+const APP_VERSION = '2026.10.05-1';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');

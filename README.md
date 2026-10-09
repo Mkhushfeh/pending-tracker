@@ -235,7 +235,7 @@ Without a date, the task is due today (new tasks from the form also start with t
 A preview shows what was understood; *More details…* opens the full form.
 
 **Done button:** every open card on the board (Identified, Pending / Stuck, In Progress) has a
-**✓ Done** button. One tap closes the task and moves it to *Resolved*; the toast offers *Undo*.
+red **Done** button (green when you point at it). One tap closes the task and moves it to *Resolved*; the toast offers *Undo*.
 
 **Checklist:** each task can hold a checklist of steps (task form → *Checklist*). Cards show
 progress such as ☑ 2/5.

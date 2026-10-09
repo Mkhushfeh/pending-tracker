@@ -565,6 +565,9 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
 .due{display:inline-flex;align-items:center;gap:4px}
 .due.late{color:var(--s-stk-ink);font-weight:600}
 .age{margin-left:auto}
+.done-btn{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--s-res);background:var(--panel);color:var(--s-res-ink);border-radius:999px;padding:3px 9px 3px 7px;font-size:12px;font-weight:600;line-height:1.2;cursor:pointer}
+.done-btn svg{width:12px;height:12px}
+.done-btn:hover,.done-btn:focus-visible{background:var(--s-res);color:#fff}
 .bar{height:5px;background:var(--border-2);border-radius:3px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--s-prg);border-radius:3px}
 .more-btn{background:none;border:1px dashed var(--border);border-radius:10px;padding:6px;color:var(--text-2);font-size:12.5px}
@@ -2040,7 +2043,8 @@ function card(i){
     ${i.status==='Pending / Stuck' && i.reason ? `<div class="grp">⏸ ${esc(i.reason)}</div>` : ''}
     <div class="card-foot"><span class="avatar" style="background:${avColor(i.party)}" title="${esc(i.party)}">${initials(i.party)}</span>
       ${i.status==='Resolved' ? `<span class="due">Closed ${fmt(i.resolved)}</span>` : `<span class="due ${late?'late':''}">${late?'Overdue · ':'Due '}${fmt(i.due)}</span>`}
-      ${age!==null ? `<span class="age num" title="Days in this status">${age}d</span>` : ''}</div></article>`;
+      ${age!==null ? `<span class="age num" title="Days in this status">${age}d</span>` : ''}
+      ${isOpen(i) ? `<button type="button" class="done-btn" data-done="${i.id}" title="Mark as done (moves to Resolved)" aria-label="Mark ${esc(i.title)} as done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>Done</button>` : ''}</div></article>`;
 }
 function renderBoard(){
   const v = view();
@@ -2057,11 +2061,12 @@ function renderBoard(){
 const boardEl = document.getElementById('boardEl');
 boardEl.addEventListener('click', e => {
   const fp = e.target.closest('[data-focus-start]'); if (fp){ e.stopPropagation(); const [it] = findItem(fp.dataset.focusStart); if (Timer.current() === fp.dataset.focusStart) return; return Timer.start(fp.dataset.focusStart, focusLen(it)); }
+  const d = e.target.closest('[data-done]'); if (d){ e.stopPropagation(); return setStatus(d.dataset.done, 'Resolved'); }
   const a = e.target.closest('[data-add]'); if (a) return openModal(null, {status: a.dataset.add});
   const m = e.target.closest('[data-more]'); if (m){ UI.showAll[m.dataset.more] = !UI.showAll[m.dataset.more]; return renderBoard(); }
   const c = e.target.closest('.card'); if (c) openModal(c.dataset.id);
 });
-boardEl.addEventListener('keydown', e => { const c = e.target.closest('.card'); if (c && e.key==='Enter') openModal(c.dataset.id); });
+boardEl.addEventListener('keydown', e => { const c = e.target.closest('.card'); if (c && e.key==='Enter' && !e.target.closest('button')) openModal(c.dataset.id); });
 boardEl.addEventListener('dragstart', e => { const c = e.target.closest('.card'); if (!c) return; e.dataTransfer.setData('text/plain', c.dataset.id); c.classList.add('dragging'); });
 boardEl.addEventListener('dragend', e => e.target.closest('.card')?.classList.remove('dragging'));
 boardEl.addEventListener('dragover', e => { const col = e.target.closest('.col'); if (!col) return; e.preventDefault(); boardEl.querySelectorAll('.col').forEach(x => x.classList.toggle('over', x===col)); });

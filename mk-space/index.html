@@ -270,8 +270,8 @@ button{cursor:pointer}
 .kpi.hero .pill{background:rgba(127,127,127,.22);color:inherit}
 .spark{width:96px;height:36px;flex:none}
 
-.row2{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch}
-.row2.cmp-off{grid-template-columns:minmax(0,1.6fr) 56px minmax(0,1.25fr)}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,1fr);gap:14px;align-items:stretch}
+.row2.cmp-off{grid-template-columns:minmax(0,1.25fr) minmax(0,1.6fr) 56px}
 /* completion: folds sideways into a slim vertical strip */
 .cmp-x{flex:none}
 .cmp-x svg{width:15px;height:15px}
@@ -615,9 +615,14 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
   .sync-txt{display:none}
   .row3{grid-template-columns:1fr 1fr}
   .row3 > :first-child{grid-column:1/-1}
-  .row2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-  .row2 > :first-child{grid-column:1/-1}
-  .row2.cmp-off{grid-template-columns:56px minmax(0,1fr)}
+  .row2,.row2.cmp-off{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}
+  .row2 > .cmp{grid-column:1/-1}
+  .cmp.off{padding:4px 0}
+  .cmp.off .cmp-rail{flex-direction:row;justify-content:flex-start;padding:6px 15px}
+  .cmp-rail svg{transform:rotate(-90deg)}
+  .cmp-rail-t{writing-mode:horizontal-tb;transform:none}
+  .cmp-rail-bar{flex:1;width:auto;height:6px;min-height:0;max-height:none}
+  .cmp-rail-bar i{top:0;bottom:0;right:auto}
 }
 @media (max-width:980px){
   .shell{grid-template-columns:1fr}
@@ -653,7 +658,7 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
   .projects::-webkit-scrollbar,.filters::-webkit-scrollbar{display:none}
   .ptab,.ptab-add,.filters select{flex:none}
   .chip-note{white-space:nowrap}
-  .row2{grid-template-columns:1fr}
+  .row2,.row2.cmp-off{grid-template-columns:1fr}
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:640px){
@@ -720,12 +725,6 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
   .board{grid-template-columns:repeat(4,82vw);gap:12px}
   .col{scroll-snap-align:start}
   .ideas{max-height:none}
-  .row2.cmp-off{grid-template-columns:1fr}
-  .cmp.off{padding:4px 0}
-  .cmp.off .cmp-rail{flex-direction:row;justify-content:flex-start;padding:6px 15px}
-  .cmp-rail-t{writing-mode:horizontal-tb;transform:none}
-  .cmp-rail-bar{flex:1;width:auto;height:6px;min-height:0;max-height:none}
-  .cmp-rail-bar i{top:0;bottom:0;right:auto}
   .modal{border-radius:18px 18px 0 0;max-height:92vh;align-self:end;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
   .overlay{padding:0;place-items:end center}
   .overlay.confirm{padding:16px;place-items:center}
@@ -820,6 +819,14 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
     <section class="kpis" id="kpis"></section>
 
     <section class="row2" id="trend">
+      <div class="panel" id="notes">
+        <div class="ph"><h2>Quick notes</h2><span class="hint" id="noteHint">Points, remarks, sudden info. Turn one into a task when ready.</span></div>
+        <form class="note-form" id="noteForm" autocomplete="off">
+          <textarea id="noteText" rows="2" aria-label="New note" placeholder="Jot it down… (Enter saves, Shift+Enter for a new line)" enterkeyhint="enter"></textarea>
+          <button class="btn primary sm" type="submit">Save</button>
+        </form>
+        <ul class="notes" id="noteList"></ul>
+      </div>
       <div class="panel">
         <div class="ph">
           <h2>Closing trend</h2>
@@ -831,11 +838,11 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
       </div>
       <div class="panel cmp" id="completion">
         <button type="button" class="cmp-rail" id="cmpRail" aria-expanded="false" aria-controls="cmpBody" title="Open Completion">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg>
           <span class="cmp-rail-t">Completion</span><span class="cmp-rail-bar"><i id="cmpRailBar"></i></span><b class="cmp-rail-p" id="cmpRailPct">0%</b>
         </button>
         <div class="cmp-body" id="cmpBody">
-        <div class="ph"><h2>Completion</h2><span style="display:flex;align-items:center;gap:8px"><span class="hint" id="gaugeHint"></span><button type="button" class="icon-btn sm cmp-x" id="cmpFold" aria-label="Fold Completion" title="Fold to the side"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg></button></span></div>
+        <div class="ph"><h2>Completion</h2><span style="display:flex;align-items:center;gap:8px"><span class="hint" id="gaugeHint"></span><button type="button" class="icon-btn sm cmp-x" id="cmpFold" aria-label="Fold Completion" title="Fold to the side"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></span></div>
         <div class="gauge-wrap">
           <svg class="gauge" id="gauge" viewBox="0 0 220 124" role="img" aria-label="Completion gauge"></svg>
           <div class="gauge-mid"><b id="gaugePct">0%</b><small>of items resolved</small></div>
@@ -847,14 +854,6 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
           <div class="heat-scale">Less <i style="background:var(--heat-0)"></i><i style="background:var(--heat-1)"></i><i style="background:var(--heat-2)"></i><i style="background:var(--heat-3)"></i><i style="background:var(--heat-4)"></i> More</div>
         </div>
         </div>
-      </div>
-      <div class="panel" id="notes">
-        <div class="ph"><h2>Quick notes</h2><span class="hint" id="noteHint">Points, remarks, sudden info. Turn one into a task when ready.</span></div>
-        <form class="note-form" id="noteForm" autocomplete="off">
-          <textarea id="noteText" rows="2" aria-label="New note" placeholder="Jot it down… (Enter saves, Shift+Enter for a new line)" enterkeyhint="enter"></textarea>
-          <button class="btn primary sm" type="submit">Save</button>
-        </form>
-        <ul class="notes" id="noteList"></ul>
       </div>
     </section>
 
@@ -2398,7 +2397,7 @@ const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.
 if (io) ['today','trend','notes','focus','balance','ideas','calendar','table','board','history'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.11.24-1';
+const APP_VERSION = '2026.11.24-2';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');

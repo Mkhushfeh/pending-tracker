@@ -270,7 +270,31 @@ button{cursor:pointer}
 .kpi.hero .pill{background:rgba(127,127,127,.22);color:inherit}
 .spark{width:96px;height:36px;flex:none}
 
-.row2{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:14px}
+.row2{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:stretch}
+.row2.cmp-off{grid-template-columns:minmax(0,1.6fr) 56px minmax(0,1.25fr)}
+/* completion: folds sideways into a slim vertical strip */
+.cmp-x{flex:none}
+.cmp-x svg{width:15px;height:15px}
+.cmp-rail{display:none}
+.cmp.off{padding:8px 0;display:flex}
+.cmp.off .cmp-body{display:none}
+.cmp.off .cmp-rail{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%;background:none;border:0;border-radius:14px;color:var(--text);font:inherit;cursor:pointer;padding:8px 0}
+.cmp.off .cmp-rail:hover{color:var(--link)}
+.cmp-rail svg{width:16px;height:16px;flex:none}
+.cmp-rail-t{writing-mode:vertical-rl;transform:rotate(180deg);font-weight:600;font-size:14px;letter-spacing:.02em;white-space:nowrap}
+.cmp-rail-p{font-family:var(--f-display);font-size:13px;font-weight:700;color:var(--s-res-ink)}
+.cmp-rail-bar{width:6px;flex:1;min-height:40px;max-height:140px;border-radius:99px;background:var(--border-2);position:relative;overflow:hidden}
+.cmp-rail-bar i{position:absolute;left:0;right:0;bottom:0;background:var(--s-res);border-radius:99px}
+/* quick notes */
+.note-form{display:flex;gap:8px;align-items:flex-end;margin-bottom:10px}
+.note-form textarea,.note textarea{flex:1;min-width:0;width:100%;resize:vertical;min-height:42px;max-height:220px;border:1px solid var(--border);background:var(--panel-2);border-radius:10px;padding:8px 11px;font:inherit;font-size:13.5px;line-height:1.4;color:var(--text)}
+.notes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto}
+.note{padding:9px 11px;border-radius:12px;background:var(--panel-2);border:1px solid var(--border-2);border-left:3px solid var(--s-prg)}
+.note.pin{border-left-color:var(--s-stk)}
+.note p{margin:0 0 6px;font-size:13.5px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.note .idea-actions{gap:12px}
+.note-edit{display:flex;flex-direction:column;gap:6px;margin-bottom:6px}
+.note-edit div{display:flex;gap:8px}
 .row3{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr);gap:14px}
 .chart{position:relative;width:100%}
 .chart svg{display:block;width:100%;overflow:visible}
@@ -591,6 +615,9 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
   .sync-txt{display:none}
   .row3{grid-template-columns:1fr 1fr}
   .row3 > :first-child{grid-column:1/-1}
+  .row2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .row2 > :first-child{grid-column:1/-1}
+  .row2.cmp-off{grid-template-columns:56px minmax(0,1fr)}
 }
 @media (max-width:980px){
   .shell{grid-template-columns:1fr}
@@ -693,10 +720,16 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
   .board{grid-template-columns:repeat(4,82vw);gap:12px}
   .col{scroll-snap-align:start}
   .ideas{max-height:none}
+  .row2.cmp-off{grid-template-columns:1fr}
+  .cmp.off{padding:4px 0}
+  .cmp.off .cmp-rail{flex-direction:row;justify-content:flex-start;padding:6px 15px}
+  .cmp-rail-t{writing-mode:horizontal-tb;transform:none}
+  .cmp-rail-bar{flex:1;width:auto;height:6px;min-height:0;max-height:none}
+  .cmp-rail-bar i{top:0;bottom:0;right:auto}
   .modal{border-radius:18px 18px 0 0;max-height:92vh;align-self:end;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
   .overlay{padding:0;place-items:end center}
   .overlay.confirm{padding:16px;place-items:center}
-  .field input,.field select,.field textarea,.idea-form input,.search input{font-size:16px}
+  .field input,.field select,.field textarea,.idea-form input,.note-form textarea,.note textarea,.search input{font-size:16px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -713,6 +746,7 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
     <nav class="nav" aria-label="Sections">
       <a href="#today" class="on" data-short="Home" data-tab="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Overview</a>
       <a href="#trend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Trend</a>
+      <a href="#notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3h10l4 4v14H5z"/><path d="M15 3v4h4M9 12h6M9 16h4"/></svg>Quick notes<span class="badge num" id="bNotes"></span></a>
       <a href="#focus" data-short="Focus" data-tab="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Today's focus<span class="badge num" id="bFocus"></span></a>
       <a href="#ideas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></svg>Ideas<span class="badge num" id="bIdeas"></span></a>
       <a href="#balance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 7h14M5 7l-3 7h6zM19 7l-3 7h6z"/></svg>Balance</a>
@@ -795,8 +829,13 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
         <div class="chart" id="trendChart"></div>
         <div class="legend" style="margin-top:8px"><span><i style="background:var(--s-res)"></i>Closed (resolved)</span><span><i class="line" style="background:var(--text)"></i>Closed, 7-day average</span><span><i class="line" style="background:var(--s-idn)"></i>Opened, 7-day average</span></div>
       </div>
-      <div class="panel">
-        <div class="ph"><h2>Completion</h2><span class="hint" id="gaugeHint"></span></div>
+      <div class="panel cmp" id="completion">
+        <button type="button" class="cmp-rail" id="cmpRail" aria-expanded="false" aria-controls="cmpBody" title="Open Completion">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>
+          <span class="cmp-rail-t">Completion</span><span class="cmp-rail-bar"><i id="cmpRailBar"></i></span><b class="cmp-rail-p" id="cmpRailPct">0%</b>
+        </button>
+        <div class="cmp-body" id="cmpBody">
+        <div class="ph"><h2>Completion</h2><span style="display:flex;align-items:center;gap:8px"><span class="hint" id="gaugeHint"></span><button type="button" class="icon-btn sm cmp-x" id="cmpFold" aria-label="Fold Completion" title="Fold to the side"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg></button></span></div>
         <div class="gauge-wrap">
           <svg class="gauge" id="gauge" viewBox="0 0 220 124" role="img" aria-label="Completion gauge"></svg>
           <div class="gauge-mid"><b id="gaugePct">0%</b><small>of items resolved</small></div>
@@ -807,6 +846,15 @@ button.effort-chip:hover{border-color:var(--text-3);color:var(--text)}
           <div class="chart" id="heat"></div>
           <div class="heat-scale">Less <i style="background:var(--heat-0)"></i><i style="background:var(--heat-1)"></i><i style="background:var(--heat-2)"></i><i style="background:var(--heat-3)"></i><i style="background:var(--heat-4)"></i> More</div>
         </div>
+        </div>
+      </div>
+      <div class="panel" id="notes">
+        <div class="ph"><h2>Quick notes</h2><span class="hint" id="noteHint">Points, remarks, sudden info. Turn one into a task when ready.</span></div>
+        <form class="note-form" id="noteForm" autocomplete="off">
+          <textarea id="noteText" rows="2" aria-label="New note" placeholder="Jot it down… (Enter saves, Shift+Enter for a new line)" enterkeyhint="enter"></textarea>
+          <button class="btn primary sm" type="submit">Save</button>
+        </form>
+        <ul class="notes" id="noteList"></ul>
       </div>
     </section>
 
@@ -1111,6 +1159,7 @@ function keysOf(data){
   const m = new Map();
   (data.spaces||[]).forEach(x => m.set('s:'+x.id, sig(x)));
   (data.templates||[]).forEach(x => m.set('t:'+x.id, sig(x)));
+  (data.notes||[]).forEach(x => m.set('n:'+x.id, sig(x)));
   data.projects.forEach(p => {
     m.set('p:'+p.id, JSON.stringify([p.name, p.streams, p.space]));
     p.items.forEach(i => m.set('i:'+i.id, sig(i)));
@@ -1122,6 +1171,7 @@ function stamp(){
   const now = Date.now(), cur = keysOf(D), del = D.deleted ||= {};
   (D.spaces||[]).forEach(x => { if (known.get('s:'+x.id) !== cur.get('s:'+x.id)) x.u = now; });
   (D.templates||[]).forEach(x => { if (known.get('t:'+x.id) !== cur.get('t:'+x.id)) x.u = now; });
+  (D.notes||[]).forEach(x => { if (known.get('n:'+x.id) !== cur.get('n:'+x.id)) x.u = now; });
   D.projects.forEach(p => {
     if (known.get('p:'+p.id) !== cur.get('p:'+p.id)) p.u = now;
     p.items.forEach(i => { if (known.get('i:'+i.id) !== cur.get('i:'+i.id)) i.u = now; });
@@ -1141,9 +1191,9 @@ function mergeData(L, R){
   const ids = [...new Set([...L.projects.map(p=>p.id), ...R.projects.map(p=>p.id)])];
   const projects = ids.map(id => { const lp = L.projects.find(p=>p.id===id), rp = R.projects.find(p=>p.id===id), meta = newer(rp, lp);
     return {...meta, items: list(lp&&lp.items, rp&&rp.items, 'i:'), ideas: list(lp&&lp.ideas, rp&&rp.ideas, 'd:')}; });
-  return ensureSpaces({...R, ...L, projects, spaces: list(L.spaces, R.spaces, 's:'), templates: list(L.templates, R.templates, 't:'), activeSpace: L.activeSpace, deleted: del, sampleCleared: L.sampleCleared || R.sampleCleared, updatedAt: Math.max(L.updatedAt||0, R.updatedAt||0)});
+  return ensureSpaces({...R, ...L, projects, spaces: list(L.spaces, R.spaces, 's:'), templates: list(L.templates, R.templates, 't:'), notes: list(L.notes, R.notes, 'n:'), activeSpace: L.activeSpace, deleted: del, sampleCleared: L.sampleCleared || R.sampleCleared, updatedAt: Math.max(L.updatedAt||0, R.updatedAt||0)});
 }
-const dataSig = d => JSON.stringify([d.projects, d.spaces||[], d.templates||[], d.deleted||{}]);
+const dataSig = d => JSON.stringify([d.projects, d.spaces||[], d.templates||[], d.notes||[], d.deleted||{}]);
 // Every change: stamp it, keep it on this device right away, then queue a cloud sync.
 function save(){ stamp(); D.updatedAt = Date.now(); writeLocal(); Cloud.queue(); }
 try { Object.assign(UI, JSON.parse(store.get(KEY+'-ui')||'{}'), {q:'', showAll:{}}); } catch(e){}
@@ -1320,7 +1370,7 @@ function renderSide(){
     <span class="tc-hint">Open today's focus</span>`;
   const set = (id, v, hot) => { const el = document.getElementById(id); el.textContent = v || ''; el.classList.toggle('hot', !!hot); };
   set('bHist', D.projects.reduce((n,p) => n + p.items.filter(i => !isOpen(i) && i.resolved && diff(i.resolved, t) < 7).length, 0));
-  set('bFocus', late + dueToday, late > 0); set('bIdeas', (P().ideas||[]).length); set('bBoard', open.length);
+  set('bFocus', late + dueToday, late > 0); set('bIdeas', (P().ideas||[]).length); set('bNotes', (D.notes||[]).length); set('bBoard', open.length);
   document.getElementById('legacyBtn').hidden = !store.get(LEGACY_KEY);
 }
 document.getElementById('streams').addEventListener('click', e => {
@@ -1471,6 +1521,8 @@ function renderGauge(){
     `<path d="${arcPath()}" fill="none" stroke="var(--border-2)" stroke-width="22"/>` +
     (v.length ? seg(0, pRes, 'var(--s-res)') + seg(pRes, pPrg, 'var(--s-prg)') + seg(pRes+pPrg, 100-pRes-pPrg, 'var(--s-stk)') : '');
   document.getElementById('gaugePct').textContent = Math.round(pRes) + '%';
+  document.getElementById('cmpRailPct').textContent = Math.round(pRes) + '%';
+  document.getElementById('cmpRailBar').style.cssText = `height:${pRes}%;width:${pRes}%`;
   document.getElementById('gaugeHint').textContent = `${v.length} items in view`;
   document.getElementById('gaugeLegend').innerHTML =
     `<span><i style="background:var(--s-res)"></i>Resolved ${res}</span><span><i style="background:var(--s-prg)"></i>In progress ${prg}</span><span><i style="background:var(--s-stk)"></i>Not started / stuck ${rest}</span>`;
@@ -1598,6 +1650,77 @@ document.getElementById('ideaList').addEventListener('click', e => {
     toast('Idea removed', () => { P().ideas.splice(idx,0,gone); save(); renderIdeas(); }); }
   if (p){ const idea = P().ideas.find(x=>x.id===p.dataset.promote); openModal(null, {title: idea.text, notes: 'From ideas board', ideaId: idea.id}); }
 });
+
+/* ---------- quick notes (shared across all spaces) ---------- */
+let noteEditing = null;
+const N = () => (D.notes ||= []);
+function renderNotes(){
+  const list = [...N()].sort((a,b) => (b.pin?1:0) - (a.pin?1:0) || (b.created||0) - (a.created||0));
+  document.getElementById('noteHint').textContent = list.length ? `${plural(list.length,'note')} · shared across all spaces` : 'Points, remarks, sudden info. Turn one into a task when ready.';
+  document.getElementById('noteList').innerHTML = list.length ? list.map(n => `
+    <li class="note${n.pin?' pin':''}" data-id="${n.id}">
+      ${noteEditing===n.id
+        ? `<div class="note-edit"><textarea rows="3" aria-label="Edit note">${esc(n.text)}</textarea><div><button class="btn primary sm" data-nsave>Save</button><button class="btn sm" data-ncancel>Cancel</button></div></div>`
+        : `<p>${esc(n.text)}</p>`}
+      <div class="idea-actions"><span>${n.pin?'📌 ':''}${fmtWhen(n.created)}</span>
+        <button class="link" data-ntask>Make it a task →</button>
+        <button class="link muted" data-npin>${n.pin?'Unpin':'Pin'}</button>
+        <button class="link muted" data-nedit>Edit</button>
+        <button class="link muted" data-ndel>Delete</button></div></li>`).join('')
+    : '<li class="empty">No notes yet. Type anything above and press Enter.</li>';
+  const ta = document.querySelector('#noteList .note-edit textarea');
+  if (ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+}
+function addNote(){
+  const inp = document.getElementById('noteText'), text = inp.value.trim(); if (!text) return;
+  N().push({ id: uid(), text, created: Date.now(), pin: false });
+  inp.value = ''; save(); renderNotes(); renderSide();
+}
+document.getElementById('noteForm').addEventListener('submit', e => { e.preventDefault(); addNote(); });
+document.getElementById('noteText').addEventListener('keydown', e => {
+  // On phones Enter adds a new line (there is no Shift key); tap Save instead.
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && !matchMedia('(hover:none)').matches){ e.preventDefault(); addNote(); }
+});
+function saveNoteEdit(li){
+  const n = N().find(x => x.id===li.dataset.id), text = li.querySelector('textarea').value.trim();
+  noteEditing = null;
+  if (n && text && text !== n.text){ n.text = text; save(); }
+  renderNotes();
+}
+document.getElementById('noteList').addEventListener('click', e => {
+  const li = e.target.closest('.note'); if (!li) return;
+  const n = N().find(x => x.id===li.dataset.id); if (!n) return;
+  if (e.target.closest('[data-nsave]')) return saveNoteEdit(li);
+  if (e.target.closest('[data-ncancel]')){ noteEditing = null; return renderNotes(); }
+  if (e.target.closest('[data-nedit]')){ noteEditing = n.id; return renderNotes(); }
+  if (e.target.closest('[data-npin]')){ n.pin = !n.pin; save(); return renderNotes(); }
+  if (e.target.closest('[data-ndel]')){
+    const idx = N().indexOf(n); N().splice(idx,1); save(); renderNotes(); renderSide();
+    return toast('Note deleted', () => { N().splice(idx,0,n); save(); renderNotes(); renderSide(); });
+  }
+  if (e.target.closest('[data-ntask]')){
+    const [first, ...rest] = n.text.split('\n'), title = first.trim().slice(0,140);
+    const more = (first.trim().length > 140 ? first.trim() + '\n' : '') + rest.join('\n').trim();
+    openModal(null, { title, notes: (more ? more + '\n\n' : '') + 'From quick notes', noteId: n.id });
+  }
+});
+document.getElementById('noteList').addEventListener('keydown', e => {
+  const li = e.target.closest('.note-edit') && e.target.closest('.note'); if (!li) return;
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)){ e.preventDefault(); saveNoteEdit(li); }
+  if (e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); noteEditing = null; renderNotes(); }
+});
+
+/* ---------- completion fold (sideways) ---------- */
+function setCmpOpen(open){
+  document.getElementById('completion').classList.toggle('off', !open);
+  document.getElementById('trend').classList.toggle('cmp-off', !open);
+  document.getElementById('cmpRail').setAttribute('aria-expanded', open);
+  store.set(KEY+'-cmpOff', open ? '' : '1');
+  if (open) renderGauge();
+}
+document.getElementById('cmpFold').onclick = () => setCmpOpen(false);
+document.getElementById('cmpRail').onclick = () => setCmpOpen(true);
+if (store.get(KEY+'-cmpOff')){ document.getElementById('completion').classList.add('off'); document.getElementById('trend').classList.add('cmp-off'); }
 
 /* ---------- focus timer (logs real time on a task) ---------- */
 // Session length follows the task's time needed: 15 / 30 min / 1 hour; longer or unset → 25 min.
@@ -2073,9 +2196,9 @@ boardEl.addEventListener('dragleave', e => { if (!boardEl.contains(e.relatedTarg
 boardEl.addEventListener('drop', e => { const col = e.target.closest('.col'); if (!col) return; e.preventDefault(); setStatus(e.dataTransfer.getData('text/plain'), col.dataset.s); });
 
 /* ---------- modal ---------- */
-let editing = null, fromIdea = null, delArmed = false;
+let editing = null, fromIdea = null, fromNote = null, delArmed = false;
 function openModal(id, preset = {}){
-  editing = id ? P().items.find(i=>i.id===id) : null; fromIdea = preset.ideaId || null;
+  editing = id ? P().items.find(i=>i.id===id) : null; fromIdea = preset.ideaId || null; fromNote = preset.noteId || null;
   const it = editing || { title:'', stream: UI.stream==='all' ? streamsOf(P())[0] : UI.stream, group: UI.group, party:'', priority:'Medium', status:'Identified', due: today(), reason:'Planned', pct:0, notes:'', ...preset };
   const streams = streamsOf(P());
   $('mTitle').textContent = editing ? `Edit ${editing.code}` : 'New task';
@@ -2157,6 +2280,7 @@ $('taskForm').addEventListener('submit', e => {
     const it = newItem(vals, st);
     P().items.push(it);
     if (fromIdea){ P().ideas = P().ideas.filter(x => x.id !== fromIdea); }
+    if (fromNote){ D.notes = N().filter(x => x.id !== fromNote); fromNote = null; }
     save(); closeModal(); render(); toast(`Added ${it.code}`);
   }
 });
@@ -2271,10 +2395,10 @@ const navLinks = [...document.querySelectorAll('.nav a')];
 const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(en => {
   if (en.isIntersecting) [...navLinks, ...document.querySelectorAll('#tabbar a')].forEach(a => a.classList.toggle('on', a.getAttribute('href')==='#'+en.target.id));
 }), {rootMargin:'-40% 0px -55% 0px'}) : null;
-if (io) ['today','trend','focus','balance','ideas','calendar','table','board','history'].forEach(id => io.observe(document.getElementById(id)));
+if (io) ['today','trend','notes','focus','balance','ideas','calendar','table','board','history'].forEach(id => io.observe(document.getElementById(id)));
 
 /* ---------- app version (so a home-screen app never runs an old copy) ---------- */
-const APP_VERSION = '2026.10.05-2';
+const APP_VERSION = '2026.11.24-1';
 async function checkForUpdate(){
   try {
     const path = location.pathname.replace(/index\.html$/, '');
@@ -2534,7 +2658,7 @@ function render(){
   const h = new Date().getHours();
   $('greet').textContent = `${h<12?'Good morning':h<17?'Good afternoon':'Good evening'}, ${D.name||'MK'}`;
   $('dateNow').textContent = new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-  renderSpaces(); renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderBoard(); renderCalendar(); renderTable(); renderHistory();
+  renderSpaces(); renderProjects(); renderSide(); renderFilters(); renderKPIs(); renderTrend(); renderGauge(); renderFocus(); renderBalance(); renderIdeas(); renderNotes(); renderBoard(); renderCalendar(); renderTable(); renderHistory();
 }
 if (matchMedia('(max-width:640px)').matches) $('q').placeholder = 'Search';
 load(); render(); Cloud.init(); checkForUpdate();
